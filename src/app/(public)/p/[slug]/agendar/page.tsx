@@ -29,7 +29,7 @@ export default async function AgendarPublico({ params, searchParams }: { params:
 
   return (
     <div className="gutter grid gap-8 py-10 lg:grid-cols-[300px_1fr] xl:gap-12">
-      <aside className="lg:sticky lg:top-6 lg:h-fit">
+      <aside className="rounded-2xl border border-line bg-card/70 p-5 shadow-soft lg:sticky lg:top-6 lg:h-fit">
         <Link href={`/p/${slug}`} className="text-sm font-semibold text-primary">← {pro.displayName}</Link>
         <h1 className="mt-3 text-3xl font-semibold">Agendar com {pro.displayName.split(" ")[0]}</h1>
         <ol className="mt-4 flex gap-2 text-xs font-semibold lg:flex-col" aria-label="Etapas">

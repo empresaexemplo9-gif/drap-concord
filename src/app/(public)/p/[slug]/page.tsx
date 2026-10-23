@@ -48,7 +48,7 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
     <div className="gutter py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="grid gap-8 lg:grid-cols-[1fr_380px] 2xl:grid-cols-[1fr_440px] xl:gap-12">
-        <div className="space-y-8">
+        <div className="space-y-8 rounded-2xl border border-line bg-card/70 p-6 shadow-soft sm:p-8">
           <div className="flex gap-5">
             <Avatar name={pro.displayName} size={96} />
             <div>

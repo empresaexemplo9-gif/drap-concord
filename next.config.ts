@@ -10,6 +10,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Envio de imagens de tema pelo painel admin (limite da Vercel: 4,5 MB por requisição).
+  experimental: { serverActions: { bodySizeLimit: "4.5mb" } },
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },

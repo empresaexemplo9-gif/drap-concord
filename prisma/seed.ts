@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { db } from "../src/lib/db";
 import { profileConfigSchema } from "../src/lib/profiles/schema";
 import { applyProfile } from "../src/lib/onboarding";
+import { processThemeImage } from "../src/lib/themes/process";
 
 const TZ = "America/Sao_Paulo";
 const PASSWORD = "concord123";
@@ -34,6 +35,18 @@ async function upsertProfiles() {
   }
 }
 
+/** Temas iniciais (imagens em prisma/themes). Só associa a perfis que ainda não têm tema. */
+async function upsertThemes() {
+  const dir = join(__dirname, "themes");
+  const list: { file: string; name: string; profiles: string[] }[] = JSON.parse(readFileSync(join(dir, "themes.json"), "utf8"));
+  for (const t of list) {
+    const img = await processThemeImage(readFileSync(join(dir, t.file)));
+    const existing = await db.professionTheme.findUnique({ where: { name: t.name }, select: { id: true } });
+    const theme = existing ?? (await db.professionTheme.create({ data: { name: t.name, ...img, palette: img.palette } }));
+    await db.professionProfile.updateMany({ where: { key: { in: t.profiles }, themeId: null }, data: { themeId: theme.id } });
+  }
+}
+
 async function user(email: string, name: string, role: "PLATFORM_ADMIN" | "PROFESSIONAL" | "CLIENT") {
   const passwordHash = await bcrypt.hash(PASSWORD, 10);
   return db.user.upsert({ where: { email }, update: {}, create: { email, name, role, passwordHash } });
@@ -52,6 +65,7 @@ async function pro(email: string, name: string, profileKey: string, extra: { cit
 
 async function main() {
   await upsertProfiles();
+  await upsertThemes();
   await user("admin@concord.dev", "Admin da Plataforma", "PLATFORM_ADMIN");
 
   // Admin real da plataforma, vindo de variáveis de ambiente (nunca do código).

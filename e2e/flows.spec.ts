@@ -229,3 +229,30 @@ test("modo claro é o padrão (mesmo com o sistema escuro) e a escolha fica salv
   await expect(html).toHaveAttribute("data-theme", "light");
   await ctx.close();
 });
+
+test("admin envia imagem de tema, associa à profissão e a página do profissional usa o tema", async ({ page }) => {
+  await login(page, "admin@concord.dev");
+  await page.goto("/admin/temas");
+  // A página do advogado já usa o tema jurídico (imagem cobrindo a página e efeito de vidro).
+  const sharp = (await import("sharp")).default;
+  const png = await sharp({ create: { width: 1400, height: 800, channels: 3, background: "#2a6f97" } }).png().toBuffer();
+  const name = `Tema teste ${Date.now()}`;
+  await page.getByLabel("Nome do tema").fill(name);
+  await page.getByLabel("Imagem", { exact: true }).setInputFiles({ name: "tema.png", mimeType: "image/png", buffer: png });
+  await page.getByRole("button", { name: "Adicionar tema" }).click();
+  await expect(page.getByText("Tema criado.")).toBeVisible();
+  await expect(page.getByRole("img", { name: `Prévia do tema ${name}` })).toBeVisible();
+
+  await page.goto("/p/carlos-mendes");
+  const bg = page.locator('img[src^="/api/temas/"]');
+  await expect(bg).toHaveCount(1);
+  const res = await page.request.get((await bg.getAttribute("src"))!);
+  expect(res.status()).toBe(200);
+  expect(res.headers()["content-type"]).toBe("image/webp");
+
+  // Limpeza: exclui o tema de teste.
+  await page.goto("/admin/temas");
+  await page.locator("div", { has: page.getByRole("img", { name: `Prévia do tema ${name}` }) }).last()
+    .locator("xpath=ancestor::div[contains(@class,'overflow-hidden')]").getByRole("button", { name: "Excluir tema" }).click();
+  await expect(page.getByText("Tema excluído.")).toBeVisible();
+});

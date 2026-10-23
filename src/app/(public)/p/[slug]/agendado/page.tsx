@@ -14,7 +14,7 @@ export default async function Agendado({ searchParams }: { searchParams: Promise
   const tz = appt.professional.timezone;
   return (
     <div className="gutter grid items-center gap-8 py-16 lg:grid-cols-2">
-      <div>
+      <div className="rounded-2xl border border-line bg-card/70 p-6 shadow-soft sm:p-8">
         <Logo size={44} />
         <h1 className="mt-6 text-3xl font-semibold sm:text-4xl">Pedido enviado!</h1>
         <p className="mt-2 text-lg text-muted">{appt.professional.displayName} recebeu seu agendamento. Você é avisado(a) aqui no portal quando houver novidades.</p>

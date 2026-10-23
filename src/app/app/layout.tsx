@@ -5,6 +5,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { requireProfessional } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { logout } from "../(auth)/actions";
+import { ProfessionTheme } from "@/components/profession-theme";
+import { themeForProfile } from "@/lib/themes/load";
 
 const items: NavItem[] = [
   { href: "/app", label: "Hoje", icon: "home" },
@@ -20,7 +22,10 @@ const items: NavItem[] = [
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, professional } = await requireProfessional();
-  const unread = await db.notification.count({ where: { userId: user.id, readAt: null } });
+  const [unread, theme] = await Promise.all([
+    db.notification.count({ where: { userId: user.id, readAt: null } }),
+    themeForProfile(professional.profileId),
+  ]);
   const mobile: NavItem[] = [
     items[0],
     items[1],
@@ -31,6 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[248px_1fr]">
+      <ProfessionTheme theme={theme} />
       <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-line bg-surface px-4 py-6 md:flex">
         <Brand href="/app" />
         <ButtonLink href="/app/agendar" className="w-full">+ Novo agendamento</ButtonLink>

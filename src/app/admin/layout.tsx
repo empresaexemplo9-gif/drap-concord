@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <nav className="flex items-center gap-1 text-sm font-medium">
             <ThemeToggle />
             <Link href="/admin/perfis" className="inline-flex min-h-11 items-center rounded-xl px-3 hover:bg-card">Perfis profissionais</Link>
+            <Link href="/admin/temas" className="inline-flex min-h-11 items-center rounded-xl px-3 hover:bg-card">Temas</Link>
             <Link href="/admin/moderacao" className="inline-flex min-h-11 items-center rounded-xl px-3 hover:bg-card">Moderação</Link>
             <Link href="/admin/ver-como" className="inline-flex min-h-11 items-center rounded-xl px-3 hover:bg-card">Ver como</Link>
             <form action={logout}><button className="min-h-11 rounded-xl px-3 text-muted hover:bg-card">Sair</button></form>

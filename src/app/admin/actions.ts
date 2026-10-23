@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { parseProfileConfig } from "@/lib/profiles/schema";
 import { slugify } from "@/lib/format";
+import { MAX_THEME_UPLOAD, processThemeImage } from "@/lib/themes/process";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const admin = () => requireUser(["PLATFORM_ADMIN"]);
@@ -119,4 +120,59 @@ export async function viewAs(form: FormData) {
   await startActAs(target.id);
   await audit({ userId: user.id, action: "admin.view_as.start", entity: "User", entityId: target.id });
   redirect(target.role === "CLIENT" ? "/minha-conta" : target.role === "PLATFORM_ADMIN" ? "/admin/perfis" : "/app");
+}
+
+// ---------- Temas das profissões ----------
+
+async function readUpload(form: FormData, back: string) {
+  const file = form.get("file");
+  if (!(file instanceof File) || file.size === 0) redirect(`${back}?erro=${encodeURIComponent("Escolha uma imagem.")}`);
+  if (file.size > MAX_THEME_UPLOAD) redirect(`${back}?erro=${encodeURIComponent("A imagem pode ter no máximo 4 MB.")}`);
+  try {
+    return await processThemeImage(Buffer.from(await file.arrayBuffer()));
+  } catch (e) {
+    redirect(`${back}?erro=${encodeURIComponent((e as Error).message || "Não foi possível ler a imagem.")}`);
+  }
+}
+
+async function assignProfiles(themeId: string, profileIds: string[]) {
+  await db.$transaction([
+    db.professionProfile.updateMany({ where: { themeId, id: { notIn: profileIds } }, data: { themeId: null } }),
+    db.professionProfile.updateMany({ where: { id: { in: profileIds } }, data: { themeId } }),
+  ]);
+}
+
+export async function createTheme(form: FormData) {
+  const user = await admin();
+  const name = str(form, "name");
+  if (!name) redirect(`/admin/temas?erro=${encodeURIComponent("Dê um nome ao tema.")}`);
+  if (await db.professionTheme.findUnique({ where: { name } })) redirect(`/admin/temas?erro=${encodeURIComponent("Já existe um tema com esse nome.")}`);
+  const img = await readUpload(form, "/admin/temas");
+  const theme = await db.professionTheme.create({ data: { name, ...img!, palette: img!.palette } });
+  await assignProfiles(theme.id, form.getAll("profiles").map(String));
+  await audit({ userId: user.id, action: "theme.created", entity: "ProfessionTheme", entityId: theme.id });
+  redirect("/admin/temas?ok=criado");
+}
+
+export async function updateTheme(form: FormData) {
+  const user = await admin();
+  const id = str(form, "id");
+  const file = form.get("file");
+  const data: Prisma.ProfessionThemeUpdateInput = { name: str(form, "name") || undefined };
+  if (file instanceof File && file.size > 0) {
+    const img = await readUpload(form, "/admin/temas");
+    Object.assign(data, { ...img!, palette: img!.palette });
+  }
+  await db.professionTheme.update({ where: { id }, data });
+  await assignProfiles(id, form.getAll("profiles").map(String));
+  await audit({ userId: user.id, action: "theme.updated", entity: "ProfessionTheme", entityId: id });
+  redirect("/admin/temas?ok=salvo");
+}
+
+export async function deleteTheme(form: FormData) {
+  const user = await admin();
+  const id = str(form, "id");
+  await db.professionTheme.delete({ where: { id } });
+  await audit({ userId: user.id, action: "theme.deleted", entity: "ProfessionTheme", entityId: id });
+  redirect("/admin/temas?ok=excluido");
 }

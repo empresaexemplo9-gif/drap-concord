@@ -1,0 +1,11 @@
+[
+  { "file": "espaco-criativo.webp", "name": "Espaço criativo", "profiles": ["psicologo", "personalizado"] },
+  { "file": "juridico.webp", "name": "Escritório jurídico", "profiles": ["advogado"] },
+  { "file": "academia.webp", "name": "Academia ao pôr do sol", "profiles": ["personal-trainer"] },
+  { "file": "medicina.webp", "name": "Corredor hospitalar", "profiles": ["medico"] },
+  { "file": "odontologia.webp", "name": "Clínica odontológica", "profiles": ["dentista"] },
+  { "file": "reabilitacao.webp", "name": "Estúdio de reabilitação", "profiles": ["fisioterapeuta"] },
+  { "file": "nutricao.webp", "name": "Alimentação saudável", "profiles": ["nutricionista"] },
+  { "file": "esportes.webp", "name": "Equipamentos esportivos", "profiles": ["professor-esporte"] },
+  { "file": "estudos.webp", "name": "Mesa de estudos", "profiles": ["professor-particular"] }
+]

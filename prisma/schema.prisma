@@ -149,6 +149,24 @@ model ProfessionProfile {
 
   versions      ProfileVersion[]
   professionals Professional[]
+  themeId       String?
+  theme         ProfessionTheme? @relation(fields: [themeId], references: [id], onDelete: SetNull)
+}
+
+// Tema visual de uma profissão: imagem de fundo que cobre a página do
+// profissional e paleta extraída dela (vidro, acento e texto "simbióticos").
+model ProfessionTheme {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  mime      String
+  data      Bytes
+  width     Int
+  height    Int
+  palette   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profiles ProfessionProfile[]
 }
 
 model ProfileVersion {
