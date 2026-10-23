@@ -14,6 +14,7 @@ const items: NavItem[] = [
   { href: "/app/horarios", label: "Horários", icon: "clock" },
   { href: "/app/relatorios", label: "Relatórios", icon: "chart" },
   { href: "/app/perfil", label: "Meu perfil", icon: "user" },
+  { href: "/vitrine", label: "Vitrine pública", icon: "store" },
 ];
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

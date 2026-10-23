@@ -16,6 +16,7 @@ const icons = {
   user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
   bell: "M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0",
   more: "M5 12h.01M12 12h.01M19 12h.01",
+  store: "M3 9l1.5-5h15L21 9M3 9h18M3 9v1.5a2.5 2.5 0 0 0 5 0V9m0 0v1.5a2.5 2.5 0 0 0 5 0V9m0 0v1.5a2.5 2.5 0 0 0 5 0V9M5 13v7h14v-7",
 };
 
 function Icon({ name }: { name: keyof typeof icons }) {

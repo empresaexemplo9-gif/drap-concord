@@ -147,7 +147,8 @@ test("admin adiciona uma nova profissão sem código e ela aparece no cadastro e
   await page.getByRole("button", { name: "Pronto, criar minha agenda" }).click();
   await expect(page.getByText("Sua agenda está pronta!")).toBeVisible();
 
-  await page.goto("/");
+  // Logado como profissional, a vitrine fica em /vitrine (a página inicial leva para /app).
+  await page.goto("/vitrine");
   await expect(page.getByRole("link", { name: category })).toBeVisible();
   await page.getByRole("link", { name: category }).click();
   await expect(page).toHaveURL(/categoria=/);
@@ -190,4 +191,26 @@ test("quem não é admin não consegue usar o Ver como", async ({ page }) => {
   await page.goto("/admin/ver-como");
   await page.waitForLoadState("networkidle");
   expect(new URL(page.url()).pathname.startsWith("/admin")).toBe(false);
+});
+
+test("profissional logado vai direto para a própria área; vitrine só pelo último item do menu", async ({ page }) => {
+  await login(page, "carlos@concord.dev");
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/app$/);
+
+  const links = page.getByRole("navigation", { name: "Menu principal" }).getByRole("link");
+  await expect(links.last()).toHaveText("Vitrine pública");
+  await links.last().click();
+  await expect(page).toHaveURL(/\/vitrine$/);
+  await expect(page.getByRole("heading", { name: /Encontre quem cuida de você/ })).toBeVisible();
+
+  // Filtros continuam na vitrine, sem mandar de volta para a área do profissional.
+  await page.getByRole("link", { name: "Jurídico", exact: true }).click();
+  await expect(page).toHaveURL(/\/vitrine\?categoria=/);
+  await expect(page.getByRole("link", { name: "Carlos Mendes" })).toBeVisible();
+});
+
+test("visitante continua vendo a vitrine na página inicial", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: /Encontre quem cuida de você/ })).toBeVisible();
 });
