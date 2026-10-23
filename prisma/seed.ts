@@ -54,6 +54,20 @@ async function main() {
   await upsertProfiles();
   await user("admin@concord.dev", "Admin da Plataforma", "PLATFORM_ADMIN");
 
+  // Admin real da plataforma, vindo de variáveis de ambiente (nunca do código).
+  // A senha é reaplicada a cada seed, então trocar a variável troca a senha.
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (adminEmail && adminPassword) {
+    const passwordHash = await bcrypt.hash(adminPassword, 10);
+    await db.user.upsert({
+      where: { email: adminEmail },
+      update: { role: "PLATFORM_ADMIN", passwordHash },
+      create: { email: adminEmail, name: process.env.ADMIN_NAME ?? "Administrador", role: "PLATFORM_ADMIN", passwordHash },
+    });
+    console.log(`Admin da plataforma pronto: ${adminEmail}`);
+  }
+
   const ana = await pro("ana@concord.dev", "Ana Ribeiro", "psicologo", {
     city: "São Paulo",
     registry: "CRP 06/123456",

@@ -1,6 +1,7 @@
 import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { UserRole } from "@prisma/client";
@@ -34,15 +35,50 @@ export async function destroySession() {
   jar.delete(COOKIE);
 }
 
-export async function getUser() {
+const withRelations = { memberships: true, professional: true } as const;
+
+/**
+ * Sessão da requisição: quem fez login (`real`) e quem está sendo visto
+ * (`acting`). São a mesma pessoa, exceto quando um admin da plataforma usa
+ * "Ver como" para enxergar a plataforma do ponto de vista de outro usuário.
+ */
+const getSession = cache(async () => {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   const session = await db.session.findUnique({
     where: { id: hash(token) },
-    include: { user: { include: { memberships: true, professional: true } } },
+    include: { user: { include: withRelations } },
   });
   if (!session || session.expiresAt < new Date()) return null;
-  return session.user;
+  const real = session.user;
+  if (session.actAsUserId && real.role === "PLATFORM_ADMIN") {
+    const acting = await db.user.findUnique({ where: { id: session.actAsUserId }, include: withRelations });
+    if (acting) return { id: session.id, real, acting };
+  }
+  return { id: session.id, real, acting: real };
+});
+
+export async function getUser() {
+  return (await getSession())?.acting ?? null;
+}
+
+/** O admin por trás do "Ver como", ou null quando ninguém está sendo personificado. */
+export async function getImpersonator() {
+  const s = await getSession();
+  return s && s.real.id !== s.acting.id ? s.real : null;
+}
+
+export async function startActAs(targetUserId: string) {
+  const s = await getSession();
+  if (!s || s.real.role !== "PLATFORM_ADMIN") return false;
+  await db.session.update({ where: { id: s.id }, data: { actAsUserId: targetUserId === s.real.id ? null : targetUserId } });
+  return true;
+}
+
+export async function stopActAs() {
+  const s = await getSession();
+  if (!s) return;
+  await db.session.update({ where: { id: s.id }, data: { actAsUserId: null } });
 }
 
 export type CurrentUser = NonNullable<Awaited<ReturnType<typeof getUser>>>;

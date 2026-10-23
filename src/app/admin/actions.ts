@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
-import { requireUser } from "@/lib/auth";
+import { requireUser, startActAs } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { parseProfileConfig } from "@/lib/profiles/schema";
@@ -110,4 +110,13 @@ export async function verifyRegistry(form: FormData) {
   await db.professional.update({ where: { id: str(form, "id") }, data: { registryVerified: verified } });
   await audit({ userId: user.id, action: "registry.verified", entity: "Professional", entityId: str(form, "id"), meta: { verified } });
   revalidatePath("/admin/moderacao");
+}
+
+export async function viewAs(form: FormData) {
+  const user = await admin();
+  const target = await db.user.findUnique({ where: { id: str(form, "userId") } });
+  if (!target) redirect("/admin/ver-como");
+  await startActAs(target.id);
+  await audit({ userId: user.id, action: "admin.view_as.start", entity: "User", entityId: target.id });
+  redirect(target.role === "CLIENT" ? "/minha-conta" : target.role === "PLATFORM_ADMIN" ? "/admin/perfis" : "/app");
 }

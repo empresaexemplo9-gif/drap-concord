@@ -8,6 +8,7 @@ async function login(page: Page, email: string) {
   await page.getByLabel("E-mail").fill(email);
   await page.getByLabel("Senha").fill(PASSWORD);
   await page.getByRole("button", { name: "Entrar" }).click();
+  await page.waitForURL((u) => !u.pathname.startsWith("/entrar"));
 }
 
 async function logout(page: Page) {
@@ -162,4 +163,31 @@ test("app do profissional no celular: navegação inferior e agenda @mobile", as
   await expect(page.getByRole("heading", { name: "Agenda" })).toBeVisible();
   await nav.getByRole("link", { name: "Clientes" }).click();
   await expect(page.getByRole("heading", { name: "Pacientes" })).toBeVisible();
+});
+
+test("admin vê a plataforma como profissional e como cliente, e volta ao admin", async ({ page }) => {
+  await login(page, "admin@concord.dev");
+  await page.goto("/admin/ver-como?q=Ana");
+  await page.getByRole("group", { name: "Ana Ribeiro" }).getByRole("button", { name: "Ver como" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+  await expect(page.getByText(/Você está vendo como/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Olá, Ana" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Voltar ao admin" }).click();
+  await expect(page).toHaveURL(/\/admin\/ver-como/);
+  await expect(page.getByText(/Você está vendo como/)).toHaveCount(0);
+
+  await page.goto("/admin/ver-como?q=maria");
+  await page.getByRole("group", { name: /maria@exemplo\.com/ }).getByRole("button", { name: "Ver como" }).click();
+  await expect(page).toHaveURL(/\/minha-conta/);
+  await expect(page.getByRole("heading", { name: "Olá, Maria" })).toBeVisible();
+  await page.getByRole("button", { name: "Voltar ao admin" }).click();
+  await expect(page).toHaveURL(/\/admin\/ver-como/);
+});
+
+test("quem não é admin não consegue usar o Ver como", async ({ page }) => {
+  await login(page, "maria@exemplo.com");
+  await page.goto("/admin/ver-como");
+  await page.waitForLoadState("networkidle");
+  expect(new URL(page.url()).pathname.startsWith("/admin")).toBe(false);
 });

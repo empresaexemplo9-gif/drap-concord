@@ -100,6 +100,8 @@ model User {
 model Session {
   id        String   @id // sha256 do token do cookie
   userId    String
+  // Admin da plataforma "vendo como" outro usuário (suporte e testes).
+  actAsUserId String?
   expiresAt DateTime
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
