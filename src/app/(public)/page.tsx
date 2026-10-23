@@ -9,7 +9,8 @@ export const dynamic = "force-dynamic";
 export default async function Vitrine({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
   const [cats, results] = await Promise.all([categories(), searchProfessionals(sp)]);
-  const filtering = Object.values(sp).some(Boolean);
+  const filterKeys = ["q", "cidade", "categoria", "modalidade", "precoMax", "disponivel"] as const;
+  const filtering = filterKeys.some((k) => sp[k]);
 
   return (
     <>
