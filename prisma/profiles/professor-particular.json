@@ -1,0 +1,125 @@
+{
+  "key": "professor-particular",
+  "name": "Professor(a) particular",
+  "config": {
+    "category": "Educação",
+    "description": "Aulas particulares, reforço escolar, idiomas e preparação para provas.",
+    "terminology": {
+      "client": {
+        "singular": "aluno",
+        "plural": "alunos"
+      },
+      "appointment": {
+        "singular": "aula",
+        "plural": "aulas"
+      },
+      "record": "Diário de aula",
+      "professional": "Professor(a)"
+    },
+    "professionalFields": [
+      {
+        "key": "subjects",
+        "label": "Disciplinas",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "clientFields": [
+      {
+        "key": "school",
+        "label": "Escola / série",
+        "type": "text"
+      },
+      {
+        "key": "guardian",
+        "label": "Nome do responsável (se menor de idade)",
+        "type": "text"
+      }
+    ],
+    "services": [
+      {
+        "name": "Aula particular",
+        "durationMin": 60,
+        "priceCents": 9000,
+        "modality": "IN_PERSON",
+        "recurrence": "semanal"
+      },
+      {
+        "name": "Aula online",
+        "durationMin": 60,
+        "priceCents": 8000,
+        "modality": "ONLINE"
+      }
+    ],
+    "recordTemplate": {
+      "name": "Aula",
+      "sections": [
+        {
+          "title": "Conteúdo",
+          "fields": [
+            {
+              "key": "topic",
+              "label": "Conteúdo trabalhado",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "homework",
+              "label": "Tarefa para casa",
+              "type": "textarea"
+            },
+            {
+              "key": "difficulty",
+              "label": "Dificuldades observadas",
+              "type": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      {
+        "key": "material",
+        "name": "Material de estudo",
+        "direction": "OUT"
+      },
+      {
+        "key": "boletim",
+        "name": "Boletim / provas",
+        "direction": "IN"
+      }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "NORMAL",
+      "retentionYears": 1,
+      "signatureRequired": false,
+      "consents": [
+        "Tratamento de dados pessoais (LGPD)",
+        "Consentimento do responsável para menores"
+      ],
+      "recordHiddenFrom": [],
+      "notes": "Consentimento de responsável para menores a validar por especialista."
+    },
+    "cancellationPolicy": {
+      "minHoursBefore": 12
+    },
+    "rules": [
+      {
+        "key": "faltas-aviso",
+        "name": "Avisar após 2 faltas seguidas",
+        "trigger": "NO_SHOW",
+        "conditions": {
+          "consecutiveGte": 2
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Notamos que você faltou a {{count}} aulas seguidas. Quer reagendar?"
+          }
+        ],
+        "mode": "AUTO"
+      }
+    ]
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "key": "personal-trainer",
+  "name": "Personal Trainer",
+  "config": {
+    "category": "Esporte e bem-estar",
+    "description": "Treinos personalizados, presenciais, a domicílio ou online.",
+    "terminology": {
+      "client": { "singular": "aluno", "plural": "alunos" },
+      "appointment": { "singular": "treino", "plural": "treinos" },
+      "record": "Ficha de treino",
+      "professional": "Personal Trainer"
+    },
+    "registry": { "label": "CREF", "required": true },
+    "professionalFields": [],
+    "clientFields": [
+      { "key": "birthDate", "label": "Data de nascimento", "type": "date", "required": true },
+      { "key": "medicalClearance", "label": "Atestado médico para atividade física", "type": "upload" }
+    ],
+    "intakeForm": {
+      "name": "Avaliação inicial (PAR-Q simplificado)",
+      "sections": [
+        {
+          "title": "Saúde",
+          "fields": [
+            { "key": "goal", "label": "Seu principal objetivo", "type": "select", "options": ["Emagrecimento", "Hipertrofia", "Condicionamento", "Saúde e qualidade de vida", "Reabilitação"], "required": true },
+            { "key": "heartIssue", "label": "Algum médico já disse que você tem problema no coração?", "type": "select", "options": ["Não", "Sim"], "required": true },
+            { "key": "injuries", "label": "Lesões ou dores atuais", "type": "textarea" }
+          ]
+        }
+      ]
+    },
+    "services": [
+      { "name": "Aula experimental", "durationMin": 60, "priceCents": 0, "modality": "IN_PERSON" },
+      { "name": "Treino personalizado", "durationMin": 60, "priceCents": 12000, "modality": "IN_PERSON", "recurrence": "2 a 3x por semana" },
+      { "name": "Treino a domicílio", "durationMin": 60, "priceCents": 15000, "modality": "HOME" },
+      { "name": "Treino online", "durationMin": 45, "priceCents": 8000, "modality": "ONLINE" }
+    ],
+    "recordTemplate": {
+      "name": "Registro do treino",
+      "sections": [
+        {
+          "title": "Treino",
+          "fields": [
+            { "key": "focus", "label": "Foco do treino", "type": "multiselect", "options": ["Superiores", "Inferiores", "Core", "Cardio", "Mobilidade"], "required": true },
+            { "key": "exercises", "label": "Exercícios, séries e cargas", "type": "textarea", "required": true },
+            { "key": "effort", "label": "Esforço percebido (1 a 10)", "type": "scale", "min": 1, "max": 10 },
+            { "key": "notes", "label": "Observações", "type": "textarea" }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      { "key": "ficha-treino", "name": "Ficha de treino", "direction": "OUT" },
+      { "key": "avaliacao-fisica", "name": "Avaliação física", "direction": "OUT" },
+      { "key": "atestado", "name": "Atestado médico", "direction": "IN" }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "NORMAL",
+      "retentionYears": 2,
+      "signatureRequired": false,
+      "consents": ["Tratamento de dados pessoais e de saúde para prescrição de exercícios (LGPD)"],
+      "recordHiddenFrom": ["FINANCE"],
+      "notes": "Exigência de atestado e prazos de guarda a validar por especialista."
+    },
+    "cancellationPolicy": { "minHoursBefore": 6 },
+    "rules": [
+      {
+        "key": "sem-retorno",
+        "name": "Chamar aluno sumido há 14 dias",
+        "trigger": "DAYS_WITHOUT_RETURN",
+        "conditions": { "days": 14 },
+        "actions": [ { "type": "NOTIFY_CLIENT", "message": "Faz {{days}} dias desde o seu último treino. Bora voltar? Escolha um horário no app." } ],
+        "mode": "AUTO"
+      },
+      {
+        "key": "faltas-bloqueio",
+        "name": "Sugerir bloqueio após 3 faltas",
+        "trigger": "NO_SHOW",
+        "conditions": { "consecutiveGte": 3 },
+        "actions": [ { "type": "BLOCK_BOOKING", "message": "Bloquear novos agendamentos de {{client}} após {{count}} faltas seguidas?" } ],
+        "mode": "SUGGEST"
+      }
+    ]
+  }
+}

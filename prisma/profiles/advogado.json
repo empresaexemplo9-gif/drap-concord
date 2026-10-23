@@ -1,0 +1,90 @@
+{
+  "key": "advogado",
+  "name": "Advogado(a)",
+  "config": {
+    "category": "Jurídico",
+    "description": "Consultas jurídicas, acompanhamento de processos e elaboração de pareceres.",
+    "terminology": {
+      "client": { "singular": "cliente", "plural": "clientes" },
+      "appointment": { "singular": "reunião", "plural": "reuniões" },
+      "record": "Ficha do caso",
+      "professional": "Advogado(a)"
+    },
+    "registry": { "label": "OAB", "required": true },
+    "professionalFields": [
+      { "key": "practiceAreas", "label": "Áreas de atuação", "type": "multiselect", "options": ["Civil", "Trabalhista", "Família", "Consumidor", "Empresarial", "Previdenciário", "Criminal", "Tributário"] }
+    ],
+    "clientFields": [
+      { "key": "document", "label": "CPF ou CNPJ", "type": "text", "required": true },
+      { "key": "address", "label": "Endereço", "type": "text" }
+    ],
+    "intakeForm": {
+      "name": "Sobre o seu caso",
+      "sections": [
+        {
+          "title": "Resumo",
+          "fields": [
+            { "key": "area", "label": "Área do problema", "type": "select", "options": ["Civil", "Trabalhista", "Família", "Consumidor", "Empresarial", "Outro"], "required": true },
+            { "key": "summary", "label": "Conte resumidamente o que aconteceu", "type": "textarea", "required": true },
+            { "key": "hasDeadline", "label": "Existe algum prazo correndo?", "type": "select", "options": ["Não sei", "Não", "Sim"], "required": true },
+            { "key": "deadlineDate", "label": "Qual a data do prazo?", "type": "date", "showIf": { "field": "hasDeadline", "equals": "Sim" } }
+          ]
+        }
+      ]
+    },
+    "services": [
+      { "name": "Consulta jurídica", "durationMin": 60, "priceCents": 35000, "modality": "IN_PERSON" },
+      { "name": "Consulta jurídica online", "durationMin": 60, "priceCents": 30000, "modality": "ONLINE" },
+      { "name": "Reunião de acompanhamento", "durationMin": 30, "priceCents": 0, "modality": "ONLINE" }
+    ],
+    "recordTemplate": {
+      "name": "Registro da reunião",
+      "sections": [
+        {
+          "title": "Caso",
+          "fields": [
+            { "key": "processNumber", "label": "Número do processo", "type": "text" },
+            { "key": "facts", "label": "Fatos relatados", "type": "textarea", "required": true },
+            { "key": "opinion", "label": "Parecer / orientação dada", "type": "textarea", "required": true },
+            { "key": "nextDeadline", "label": "Próximo prazo", "type": "date" },
+            { "key": "pendingDocs", "label": "Documentos pendentes do cliente", "type": "checklist", "options": ["RG/CPF", "Comprovante de residência", "Contrato", "Provas"] }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      { "key": "procuracao", "name": "Procuração", "direction": "OUT", "signatureRequired": true },
+      { "key": "contrato-honorarios", "name": "Contrato de honorários", "direction": "BOTH", "signatureRequired": true },
+      { "key": "parecer", "name": "Parecer jurídico", "direction": "OUT", "signatureRequired": true },
+      { "key": "provas", "name": "Documentos e provas do cliente", "direction": "IN" }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "SIGILOSO",
+      "retentionYears": 5,
+      "signatureRequired": true,
+      "consents": ["Tratamento de dados pessoais para prestação de serviços jurídicos (LGPD)"],
+      "recordHiddenFrom": ["FINANCE"],
+      "notes": "Sigilo profissional e guarda de documentos a validar por especialista conforme normas da OAB."
+    },
+    "cancellationPolicy": { "minHoursBefore": 12 },
+    "rules": [
+      {
+        "key": "prazo-proximo",
+        "name": "Avisar quando um prazo se aproxima",
+        "trigger": "DEADLINE_APPROACHING",
+        "conditions": { "days": 5 },
+        "actions": [ { "type": "NOTIFY_PROFESSIONAL", "message": "O prazo do caso de {{client}} vence em {{days}} dias." } ],
+        "mode": "AUTO"
+      },
+      {
+        "key": "faltas-aviso",
+        "name": "Avisar o profissional após 2 faltas",
+        "trigger": "NO_SHOW",
+        "conditions": { "consecutiveGte": 2 },
+        "actions": [ { "type": "NOTIFY_PROFESSIONAL", "message": "{{client}} faltou a {{count}} reuniões seguidas." } ],
+        "mode": "AUTO"
+      }
+    ]
+  }
+}

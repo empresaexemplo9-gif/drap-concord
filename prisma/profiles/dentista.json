@@ -1,0 +1,159 @@
+{
+  "key": "dentista",
+  "name": "Dentista",
+  "config": {
+    "category": "Saúde",
+    "description": "Avaliação, limpeza, tratamentos e acompanhamento odontológico.",
+    "terminology": {
+      "client": {
+        "singular": "paciente",
+        "plural": "pacientes"
+      },
+      "appointment": {
+        "singular": "consulta",
+        "plural": "consultas"
+      },
+      "record": "Prontuário odontológico",
+      "professional": "Dentista"
+    },
+    "registry": {
+      "label": "CRO",
+      "required": true
+    },
+    "professionalFields": [],
+    "clientFields": [
+      {
+        "key": "birthDate",
+        "label": "Data de nascimento",
+        "type": "date",
+        "required": true
+      }
+    ],
+    "intakeForm": {
+      "name": "Anamnese",
+      "sections": [
+        {
+          "title": "Saúde",
+          "fields": [
+            {
+              "key": "pain",
+              "label": "Sente dor atualmente?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "allergies",
+              "label": "Alergia a anestésicos ou medicamentos?",
+              "type": "text"
+            }
+          ]
+        }
+      ]
+    },
+    "services": [
+      {
+        "name": "Avaliação",
+        "durationMin": 30,
+        "priceCents": 15000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Limpeza (profilaxia)",
+        "durationMin": 45,
+        "priceCents": 25000,
+        "modality": "IN_PERSON",
+        "returnDays": 180
+      },
+      {
+        "name": "Restauração",
+        "durationMin": 60,
+        "priceCents": 30000,
+        "modality": "IN_PERSON"
+      }
+    ],
+    "recordTemplate": {
+      "name": "Procedimento",
+      "sections": [
+        {
+          "title": "Registro",
+          "fields": [
+            {
+              "key": "teeth",
+              "label": "Dentes / região",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "procedure",
+              "label": "Procedimento realizado",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "next",
+              "label": "Próxima etapa",
+              "type": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      {
+        "key": "orcamento",
+        "name": "Plano de tratamento e orçamento",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "receita",
+        "name": "Receita",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "raio-x",
+        "name": "Radiografias",
+        "direction": "BOTH"
+      }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "SIGILOSO",
+      "retentionYears": 20,
+      "signatureRequired": true,
+      "consents": [
+        "Tratamento de dados pessoais sensíveis de saúde (LGPD)"
+      ],
+      "recordHiddenFrom": [
+        "RECEPTION",
+        "FINANCE"
+      ],
+      "notes": "Prazos de guarda e consentimentos a validar por especialista conforme normas do conselho de Odontologia."
+    },
+    "cancellationPolicy": {
+      "minHoursBefore": 24
+    },
+    "rules": [
+      {
+        "key": "faltas-aviso",
+        "name": "Avisar após 2 faltas seguidas",
+        "trigger": "NO_SHOW",
+        "conditions": {
+          "consecutiveGte": 2
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Notamos que você faltou a {{count}} consultas seguidas. Quer reagendar?"
+          }
+        ],
+        "mode": "AUTO"
+      }
+    ]
+  }
+}

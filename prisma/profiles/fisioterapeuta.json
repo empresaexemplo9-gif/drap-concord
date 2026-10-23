@@ -1,0 +1,162 @@
+{
+  "key": "fisioterapeuta",
+  "name": "Fisioterapeuta",
+  "config": {
+    "category": "Saúde",
+    "description": "Reabilitação, fisioterapia ortopédica, neurológica e respiratória.",
+    "terminology": {
+      "client": {
+        "singular": "paciente",
+        "plural": "pacientes"
+      },
+      "appointment": {
+        "singular": "sessão",
+        "plural": "sessões"
+      },
+      "record": "Evolução",
+      "professional": "Fisioterapeuta"
+    },
+    "registry": {
+      "label": "CREFITO",
+      "required": true
+    },
+    "professionalFields": [],
+    "clientFields": [
+      {
+        "key": "birthDate",
+        "label": "Data de nascimento",
+        "type": "date",
+        "required": true
+      },
+      {
+        "key": "referral",
+        "label": "Encaminhamento médico",
+        "type": "upload"
+      }
+    ],
+    "intakeForm": {
+      "name": "Avaliação inicial",
+      "sections": [
+        {
+          "title": "Queixa",
+          "fields": [
+            {
+              "key": "complaint",
+              "label": "Onde e como é a dor ou limitação?",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "painLevel",
+              "label": "Intensidade da dor (0 a 10)",
+              "type": "scale",
+              "min": 0,
+              "max": 10
+            }
+          ]
+        }
+      ]
+    },
+    "services": [
+      {
+        "name": "Avaliação fisioterapêutica",
+        "durationMin": 60,
+        "priceCents": 20000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Sessão de fisioterapia",
+        "durationMin": 50,
+        "priceCents": 15000,
+        "modality": "IN_PERSON",
+        "recurrence": "2x por semana"
+      },
+      {
+        "name": "Atendimento domiciliar",
+        "durationMin": 60,
+        "priceCents": 20000,
+        "modality": "HOME"
+      }
+    ],
+    "recordTemplate": {
+      "name": "Evolução da sessão",
+      "sections": [
+        {
+          "title": "Sessão",
+          "fields": [
+            {
+              "key": "painLevel",
+              "label": "Dor (0 a 10)",
+              "type": "scale",
+              "min": 0,
+              "max": 10
+            },
+            {
+              "key": "techniques",
+              "label": "Condutas e técnicas",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "evolution",
+              "label": "Evolução",
+              "type": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      {
+        "key": "relatorio",
+        "name": "Relatório de evolução",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "exercicios",
+        "name": "Exercícios para casa",
+        "direction": "OUT"
+      },
+      {
+        "key": "exames",
+        "name": "Exames e laudos",
+        "direction": "IN"
+      }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "SIGILOSO",
+      "retentionYears": 20,
+      "signatureRequired": true,
+      "consents": [
+        "Tratamento de dados pessoais sensíveis de saúde (LGPD)"
+      ],
+      "recordHiddenFrom": [
+        "RECEPTION",
+        "FINANCE"
+      ],
+      "notes": "Prazos e regras a validar por especialista conforme normas do conselho de Fisioterapia."
+    },
+    "cancellationPolicy": {
+      "minHoursBefore": 12
+    },
+    "rules": [
+      {
+        "key": "faltas-aviso",
+        "name": "Avisar após 2 faltas seguidas",
+        "trigger": "NO_SHOW",
+        "conditions": {
+          "consecutiveGte": 2
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Notamos que você faltou a {{count}} sessões seguidas. Quer reagendar?"
+          }
+        ],
+        "mode": "AUTO"
+      }
+    ]
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "key": "medico",
+  "name": "Médico(a)",
+  "config": {
+    "category": "Saúde",
+    "description": "Consultas médicas, retornos e teleconsultas.",
+    "terminology": {
+      "client": {
+        "singular": "paciente",
+        "plural": "pacientes"
+      },
+      "appointment": {
+        "singular": "consulta",
+        "plural": "consultas"
+      },
+      "record": "Prontuário",
+      "professional": "Médico(a)"
+    },
+    "registry": {
+      "label": "CRM",
+      "required": true
+    },
+    "professionalFields": [
+      {
+        "key": "specialty",
+        "label": "Especialidade",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "clientFields": [
+      {
+        "key": "birthDate",
+        "label": "Data de nascimento",
+        "type": "date",
+        "required": true
+      },
+      {
+        "key": "healthPlan",
+        "label": "Convênio",
+        "type": "text"
+      }
+    ],
+    "intakeForm": {
+      "name": "Pré-consulta",
+      "sections": [
+        {
+          "title": "Queixa",
+          "fields": [
+            {
+              "key": "complaint",
+              "label": "Motivo da consulta",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "allergies",
+              "label": "Alergias",
+              "type": "text"
+            },
+            {
+              "key": "medications",
+              "label": "Medicações em uso",
+              "type": "text"
+            }
+          ]
+        }
+      ]
+    },
+    "services": [
+      {
+        "name": "Consulta",
+        "durationMin": 30,
+        "priceCents": 30000,
+        "modality": "IN_PERSON",
+        "returnDays": 30
+      },
+      {
+        "name": "Retorno",
+        "durationMin": 20,
+        "priceCents": 0,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Teleconsulta",
+        "durationMin": 30,
+        "priceCents": 25000,
+        "modality": "ONLINE"
+      }
+    ],
+    "recordTemplate": {
+      "name": "Atendimento",
+      "sections": [
+        {
+          "title": "Anamnese e conduta",
+          "fields": [
+            {
+              "key": "anamnesis",
+              "label": "Anamnese",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "exam",
+              "label": "Exame físico",
+              "type": "textarea"
+            },
+            {
+              "key": "hypothesis",
+              "label": "Hipótese diagnóstica",
+              "type": "text"
+            },
+            {
+              "key": "conduct",
+              "label": "Conduta",
+              "type": "textarea",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      {
+        "key": "receita",
+        "name": "Receita",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "atestado",
+        "name": "Atestado",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "pedido-exame",
+        "name": "Pedido de exames",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "exames",
+        "name": "Resultados de exames",
+        "direction": "IN"
+      }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "SIGILOSO",
+      "retentionYears": 20,
+      "signatureRequired": true,
+      "consents": [
+        "Tratamento de dados pessoais sensíveis de saúde (LGPD)"
+      ],
+      "recordHiddenFrom": [
+        "RECEPTION",
+        "FINANCE"
+      ],
+      "notes": "Prazo de guarda de prontuário e requisitos de assinatura a validar por especialista conforme normas do conselho de Medicina."
+    },
+    "cancellationPolicy": {
+      "minHoursBefore": 24
+    },
+    "rules": [
+      {
+        "key": "faltas-aviso",
+        "name": "Avisar após 2 faltas seguidas",
+        "trigger": "NO_SHOW",
+        "conditions": {
+          "consecutiveGte": 2
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Notamos que você faltou a {{count}} consultas seguidas. Quer reagendar?"
+          }
+        ],
+        "mode": "AUTO"
+      },
+      {
+        "key": "retorno",
+        "name": "Lembrar retorno após 30 dias",
+        "trigger": "DAYS_WITHOUT_RETURN",
+        "conditions": {
+          "days": 30
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Está na hora do seu retorno. Agende pelo app."
+          }
+        ],
+        "mode": "AUTO"
+      }
+    ]
+  }
+}

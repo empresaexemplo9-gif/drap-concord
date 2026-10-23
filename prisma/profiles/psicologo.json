@@ -1,0 +1,94 @@
+{
+  "key": "psicologo",
+  "name": "Psicólogo(a)",
+  "config": {
+    "category": "Saúde mental",
+    "description": "Psicoterapia individual, de casal e infantil, presencial ou online.",
+    "terminology": {
+      "client": { "singular": "paciente", "plural": "pacientes" },
+      "appointment": { "singular": "sessão", "plural": "sessões" },
+      "record": "Prontuário",
+      "professional": "Psicólogo(a)"
+    },
+    "registry": { "label": "CRP", "required": true },
+    "professionalFields": [
+      { "key": "approach", "label": "Abordagem terapêutica", "type": "text", "required": false }
+    ],
+    "clientFields": [
+      { "key": "birthDate", "label": "Data de nascimento", "type": "date", "required": true },
+      { "key": "emergencyContact", "label": "Contato de emergência", "type": "text", "required": true }
+    ],
+    "intakeForm": {
+      "name": "Antes da primeira sessão",
+      "sections": [
+        {
+          "title": "Sobre você",
+          "fields": [
+            { "key": "reason", "label": "O que te traz à terapia?", "type": "textarea", "required": true },
+            { "key": "previousTherapy", "label": "Já fez terapia antes?", "type": "select", "options": ["Sim", "Não"], "required": true },
+            { "key": "medication", "label": "Usa alguma medicação contínua?", "type": "text" }
+          ]
+        }
+      ]
+    },
+    "services": [
+      { "name": "Primeira sessão (acolhimento)", "durationMin": 50, "priceCents": 18000, "modality": "IN_PERSON" },
+      { "name": "Sessão individual", "durationMin": 50, "priceCents": 18000, "modality": "IN_PERSON", "recurrence": "semanal" },
+      { "name": "Sessão online", "durationMin": 50, "priceCents": 16000, "modality": "ONLINE", "recurrence": "semanal" }
+    ],
+    "recordTemplate": {
+      "name": "Evolução da sessão",
+      "sections": [
+        {
+          "title": "Registro",
+          "fields": [
+            { "key": "demand", "label": "Demanda trabalhada", "type": "textarea", "required": true },
+            { "key": "mood", "label": "Humor percebido (1 a 10)", "type": "scale", "min": 1, "max": 10 },
+            { "key": "riskSigns", "label": "Sinais de risco observados?", "type": "select", "options": ["Não", "Sim"], "required": true },
+            { "key": "riskDetail", "label": "Descreva e o encaminhamento dado", "type": "textarea", "showIf": { "field": "riskSigns", "equals": "Sim" } },
+            { "key": "plan", "label": "Plano para a próxima sessão", "type": "textarea" }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      { "key": "declaracao", "name": "Declaração de comparecimento", "direction": "OUT", "signatureRequired": true },
+      { "key": "laudo", "name": "Laudo psicológico", "direction": "OUT", "signatureRequired": true },
+      { "key": "contrato", "name": "Contrato terapêutico", "direction": "BOTH", "signatureRequired": true },
+      { "key": "exames", "name": "Exames e relatórios de outros profissionais", "direction": "IN" }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "SIGILOSO",
+      "retentionYears": 5,
+      "signatureRequired": true,
+      "consents": ["Tratamento de dados pessoais sensíveis de saúde (LGPD)", "Atendimento online, quando aplicável"],
+      "recordHiddenFrom": ["RECEPTION", "FINANCE"],
+      "notes": "Prazos e obrigações a validar por especialista à luz das resoluções do conselho de Psicologia vigentes."
+    },
+    "cancellationPolicy": { "minHoursBefore": 24 },
+    "rules": [
+      {
+        "key": "faltas-aviso",
+        "name": "Aviso após 2 faltas seguidas",
+        "trigger": "NO_SHOW",
+        "conditions": { "consecutiveGte": 2 },
+        "actions": [
+          { "type": "NOTIFY_CLIENT", "message": "Sentimos sua falta nas últimas {{count}} sessões. Está tudo bem? Se precisar, podemos reagendar." }
+        ],
+        "mode": "AUTO"
+      },
+      {
+        "key": "faltas-cancelamento",
+        "name": "Cancelar sessões futuras após 3 faltas seguidas",
+        "trigger": "NO_SHOW",
+        "conditions": { "consecutiveGte": 3 },
+        "actions": [
+          { "type": "NOTIFY_CLIENT", "message": "Você faltou a {{count}} sessões seguidas. Se não houver retorno em {{graceDays}} dias, suas sessões futuras serão canceladas." },
+          { "type": "CANCEL_FUTURE", "graceDays": 7, "message": "Cancelar as sessões futuras de {{client}} após {{count}} faltas seguidas?" }
+        ],
+        "mode": "SUGGEST"
+      }
+    ]
+  }
+}

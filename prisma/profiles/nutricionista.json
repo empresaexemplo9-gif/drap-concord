@@ -1,0 +1,164 @@
+{
+  "key": "nutricionista",
+  "name": "Nutricionista",
+  "config": {
+    "category": "Saúde",
+    "description": "Consultas de nutrição clínica e esportiva, presencial e online.",
+    "terminology": {
+      "client": {
+        "singular": "paciente",
+        "plural": "pacientes"
+      },
+      "appointment": {
+        "singular": "consulta",
+        "plural": "consultas"
+      },
+      "record": "Prontuário nutricional",
+      "professional": "Nutricionista"
+    },
+    "registry": {
+      "label": "CRN",
+      "required": true
+    },
+    "professionalFields": [],
+    "clientFields": [
+      {
+        "key": "birthDate",
+        "label": "Data de nascimento",
+        "type": "date",
+        "required": true
+      }
+    ],
+    "intakeForm": {
+      "name": "Pré-consulta",
+      "sections": [
+        {
+          "title": "Hábitos",
+          "fields": [
+            {
+              "key": "goal",
+              "label": "Objetivo",
+              "type": "select",
+              "options": [
+                "Emagrecimento",
+                "Ganho de massa",
+                "Saúde",
+                "Performance",
+                "Outro"
+              ],
+              "required": true
+            },
+            {
+              "key": "restrictions",
+              "label": "Restrições ou alergias alimentares",
+              "type": "text"
+            }
+          ]
+        }
+      ]
+    },
+    "services": [
+      {
+        "name": "Primeira consulta",
+        "durationMin": 60,
+        "priceCents": 25000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Retorno",
+        "durationMin": 40,
+        "priceCents": 15000,
+        "modality": "IN_PERSON",
+        "returnDays": 30
+      },
+      {
+        "name": "Consulta online",
+        "durationMin": 50,
+        "priceCents": 20000,
+        "modality": "ONLINE"
+      }
+    ],
+    "recordTemplate": {
+      "name": "Consulta",
+      "sections": [
+        {
+          "title": "Avaliação",
+          "fields": [
+            {
+              "key": "weight",
+              "label": "Peso (kg)",
+              "type": "number"
+            },
+            {
+              "key": "height",
+              "label": "Altura (cm)",
+              "type": "number"
+            },
+            {
+              "key": "assessment",
+              "label": "Avaliação",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "plan",
+              "label": "Plano alimentar / orientações",
+              "type": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      {
+        "key": "plano-alimentar",
+        "name": "Plano alimentar",
+        "direction": "OUT"
+      },
+      {
+        "key": "lista-compras",
+        "name": "Lista de compras",
+        "direction": "OUT"
+      },
+      {
+        "key": "exames",
+        "name": "Exames laboratoriais",
+        "direction": "IN"
+      }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "SIGILOSO",
+      "retentionYears": 5,
+      "signatureRequired": true,
+      "consents": [
+        "Tratamento de dados pessoais sensíveis de saúde (LGPD)"
+      ],
+      "recordHiddenFrom": [
+        "RECEPTION",
+        "FINANCE"
+      ],
+      "notes": "Prazos e regras a validar por especialista conforme normas do conselho de Nutrição."
+    },
+    "cancellationPolicy": {
+      "minHoursBefore": 24
+    },
+    "rules": [
+      {
+        "key": "faltas-aviso",
+        "name": "Avisar após 2 faltas seguidas",
+        "trigger": "NO_SHOW",
+        "conditions": {
+          "consecutiveGte": 2
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Notamos que você faltou a {{count}} consultas seguidas. Quer reagendar?"
+          }
+        ],
+        "mode": "AUTO"
+      }
+    ]
+  }
+}

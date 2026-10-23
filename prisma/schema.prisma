@@ -1,0 +1,391 @@
+// DRAP Concord: modelo de dados.
+// Núcleo genérico: nenhuma profissão é fixa no código. Cada profissão é um
+// ProfessionProfile (configuração JSON versionada) que adapta a plataforma.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PLATFORM_ADMIN
+  PROFESSIONAL
+  CLIENT
+}
+
+enum MemberRole {
+  OWNER
+  PROFESSIONAL
+  RECEPTION
+  FINANCE
+}
+
+enum ProfileStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+}
+
+enum Modality {
+  IN_PERSON
+  ONLINE
+  HOME
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  DONE
+  NO_SHOW
+  CANCELED_BY_CLIENT
+  CANCELED_BY_PROFESSIONAL
+  RESCHEDULED
+}
+
+enum FunnelStage {
+  LEAD
+  FIRST_VISIT
+  ACTIVE
+  INACTIVE
+}
+
+enum RuleMode {
+  SUGGEST
+  AUTO
+}
+
+enum RuleEventStatus {
+  PENDING_APPROVAL
+  EXECUTED
+  DISMISSED
+  UNDONE
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Plan {
+  TRIAL
+  ESSENTIAL
+  PRO
+  CLINIC
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  phone        String?
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime  @default(now())
+
+  sessions      Session[]
+  memberships   Membership[]
+  professional  Professional?
+  clients       Client[]
+  notifications Notification[]
+  consents      Consent[]
+}
+
+model Session {
+  id        String   @id // sha256 do token do cookie
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  plan      Plan     @default(TRIAL)
+  trialEndsAt DateTime?
+  createdAt DateTime @default(now())
+
+  members       Membership[]
+  professionals Professional[]
+  clients       Client[]
+  services      Service[]
+  appointments  Appointment[]
+  rules         Rule[]
+  records       AttendanceRecord[]
+  auditLogs     AuditLog[]
+}
+
+model Membership {
+  id     String     @id @default(cuid())
+  orgId  String
+  userId String
+  role   MemberRole
+  org    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+}
+
+model ProfessionProfile {
+  id        String        @id @default(cuid())
+  key       String        @unique
+  name      String
+  status    ProfileStatus @default(DRAFT)
+  version   Int           @default(1)
+  config    Json
+  updatedAt DateTime      @updatedAt
+  createdAt DateTime      @default(now())
+
+  versions      ProfileVersion[]
+  professionals Professional[]
+}
+
+model ProfileVersion {
+  id        String            @id @default(cuid())
+  profileId String
+  version   Int
+  config    Json
+  createdAt DateTime          @default(now())
+  profile   ProfessionProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, version])
+}
+
+model Professional {
+  id               String   @id @default(cuid())
+  orgId            String
+  userId           String   @unique
+  profileId        String
+  profileVersion   Int
+  slug             String   @unique
+  displayName      String
+  headline         String?
+  bio              String?
+  city             String?
+  specialties      String[]
+  registryNumber   String?
+  registryVerified Boolean  @default(false)
+  isPublic         Boolean  @default(true)
+  // Personalizações do profissional por cima do perfil-base (não altera o perfil).
+  overrides        Json     @default("{}")
+  timezone         String   @default("America/Sao_Paulo")
+  bufferMin        Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  org          Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile      ProfessionProfile @relation(fields: [profileId], references: [id])
+  services     Service[]
+  availability Availability[]
+  timeOff      TimeOff[]
+  appointments Appointment[]
+  reviews      Review[]
+  rules        Rule[]
+  records      AttendanceRecord[]
+
+  @@index([orgId])
+}
+
+model Service {
+  id             String   @id @default(cuid())
+  orgId          String
+  professionalId String
+  name           String
+  durationMin    Int
+  priceCents     Int      @default(0)
+  modality       Modality @default(IN_PERSON)
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  org          Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  professional Professional  @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@index([orgId])
+}
+
+model Availability {
+  id             String       @id @default(cuid())
+  professionalId String
+  weekday        Int // 0 = domingo
+  startMin       Int // minutos desde 00:00, no fuso do profissional
+  endMin         Int
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@index([professionalId])
+}
+
+model TimeOff {
+  id             String       @id @default(cuid())
+  professionalId String
+  startsAt       DateTime
+  endsAt         DateTime
+  reason         String?
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+}
+
+model Client {
+  id          String      @id @default(cuid())
+  orgId       String
+  userId      String?
+  name        String
+  email       String?
+  phone       String?
+  birthDate   DateTime?
+  tags        String[]
+  notes       String?
+  stage       FunnelStage @default(LEAD)
+  // Respostas do formulário prévio / cadastro definido pelo perfil.
+  intake      Json        @default("{}")
+  guardianName String?
+  createdAt   DateTime    @default(now())
+
+  org          Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  appointments Appointment[]
+  records      AttendanceRecord[]
+  reviews      Review[]
+  ruleEvents   RuleEvent[]
+
+  @@unique([orgId, userId])
+  @@index([orgId])
+}
+
+model Appointment {
+  id             String            @id @default(cuid())
+  orgId          String
+  professionalId String
+  clientId       String
+  serviceId      String
+  startsAt       DateTime
+  endsAt         DateTime
+  status         AppointmentStatus @default(PENDING)
+  modality       Modality          @default(IN_PERSON)
+  notes          String?
+  cancelReason   String?
+  rescheduledToId String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  client       Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  service      Service      @relation(fields: [serviceId], references: [id])
+  records      AttendanceRecord[]
+
+  @@index([orgId, startsAt])
+  @@index([professionalId, startsAt])
+  @@index([clientId])
+}
+
+model AttendanceRecord {
+  id              String   @id @default(cuid())
+  orgId           String
+  professionalId  String
+  clientId        String
+  appointmentId   String?
+  templateVersion Int
+  data            Json
+  createdAt       DateTime @default(now())
+
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  client       Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  appointment  Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, clientId])
+}
+
+model Rule {
+  id             String   @id @default(cuid())
+  orgId          String
+  professionalId String
+  key            String
+  name           String
+  trigger        String
+  conditions     Json
+  actions        Json
+  mode           RuleMode @default(SUGGEST)
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  events       RuleEvent[]
+
+  @@unique([professionalId, key])
+}
+
+model RuleEvent {
+  id        String          @id @default(cuid())
+  ruleId    String
+  clientId  String
+  status    RuleEventStatus
+  action    Json
+  summary   String
+  // Estado anterior para permitir desfazer.
+  undoData  Json?
+  createdAt DateTime        @default(now())
+  decidedAt DateTime?
+
+  rule   Rule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([ruleId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+model Review {
+  id             String       @id @default(cuid())
+  professionalId String
+  clientId       String
+  rating         Int
+  comment        String?
+  status         ReviewStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  client         Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Consent {
+  id        String   @id @default(cuid())
+  userId    String
+  purpose   String
+  textVersion String
+  ip        String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  orgId     String?
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  meta      Json?
+  createdAt DateTime @default(now())
+  org       Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, createdAt])
+}

@@ -1,0 +1,137 @@
+{
+  "key": "professor-esporte",
+  "name": "Professor(a) de esporte",
+  "config": {
+    "category": "Esporte e bem-estar",
+    "description": "Aulas de tênis, natação, artes marciais e outras modalidades, individuais ou em turma.",
+    "terminology": {
+      "client": {
+        "singular": "aluno",
+        "plural": "alunos"
+      },
+      "appointment": {
+        "singular": "aula",
+        "plural": "aulas"
+      },
+      "record": "Registro da aula",
+      "professional": "Professor(a)"
+    },
+    "registry": {
+      "label": "CREF",
+      "required": false
+    },
+    "professionalFields": [
+      {
+        "key": "sport",
+        "label": "Modalidade",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "clientFields": [
+      {
+        "key": "birthDate",
+        "label": "Data de nascimento",
+        "type": "date"
+      },
+      {
+        "key": "level",
+        "label": "Nível",
+        "type": "select",
+        "options": [
+          "Iniciante",
+          "Intermediário",
+          "Avançado"
+        ]
+      }
+    ],
+    "services": [
+      {
+        "name": "Aula experimental",
+        "durationMin": 60,
+        "priceCents": 0,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Aula individual",
+        "durationMin": 60,
+        "priceCents": 15000,
+        "modality": "IN_PERSON",
+        "recurrence": "semanal"
+      },
+      {
+        "name": "Aula em dupla",
+        "durationMin": 60,
+        "priceCents": 10000,
+        "modality": "IN_PERSON"
+      }
+    ],
+    "recordTemplate": {
+      "name": "Aula",
+      "sections": [
+        {
+          "title": "Conteúdo",
+          "fields": [
+            {
+              "key": "content",
+              "label": "Fundamentos trabalhados",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "progress",
+              "label": "Evolução do aluno",
+              "type": "scale",
+              "min": 1,
+              "max": 5
+            }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      {
+        "key": "plano-aula",
+        "name": "Plano de aulas",
+        "direction": "OUT"
+      },
+      {
+        "key": "atestado",
+        "name": "Atestado médico",
+        "direction": "IN"
+      }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "NORMAL",
+      "retentionYears": 1,
+      "signatureRequired": false,
+      "consents": [
+        "Tratamento de dados pessoais (LGPD)",
+        "Uso de imagem (opcional)"
+      ],
+      "recordHiddenFrom": [],
+      "notes": "Exigências a validar por especialista."
+    },
+    "cancellationPolicy": {
+      "minHoursBefore": 6
+    },
+    "rules": [
+      {
+        "key": "faltas-aviso",
+        "name": "Avisar após 2 faltas seguidas",
+        "trigger": "NO_SHOW",
+        "conditions": {
+          "consecutiveGte": 2
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Notamos que você faltou a {{count}} aulas seguidas. Quer reagendar?"
+          }
+        ],
+        "mode": "AUTO"
+      }
+    ]
+  }
+}

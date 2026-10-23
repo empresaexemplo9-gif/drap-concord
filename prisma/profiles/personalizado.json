@@ -1,0 +1,68 @@
+{
+  "key": "personalizado",
+  "name": "Outros / Personalizado",
+  "config": {
+    "category": "Outros serviços",
+    "description": "Monte tudo do seu jeito: termos, serviços, ficha e regras.",
+    "terminology": {
+      "client": {
+        "singular": "cliente",
+        "plural": "clientes"
+      },
+      "appointment": {
+        "singular": "atendimento",
+        "plural": "atendimentos"
+      },
+      "record": "Registro do atendimento",
+      "professional": "Profissional"
+    },
+    "professionalFields": [],
+    "clientFields": [],
+    "services": [
+      {
+        "name": "Atendimento",
+        "durationMin": 60,
+        "priceCents": 0,
+        "modality": "IN_PERSON"
+      }
+    ],
+    "recordTemplate": {
+      "name": "Atendimento",
+      "sections": [
+        {
+          "title": "Registro",
+          "fields": [
+            {
+              "key": "notes",
+              "label": "Anotações",
+              "type": "textarea",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "documents": [
+      {
+        "key": "documento",
+        "name": "Documento",
+        "direction": "BOTH"
+      }
+    ],
+    "compliance": {
+      "validation": "PENDENTE_VALIDACAO",
+      "confidentiality": "NORMAL",
+      "retentionYears": 1,
+      "signatureRequired": false,
+      "consents": [
+        "Tratamento de dados pessoais (LGPD)"
+      ],
+      "recordHiddenFrom": [],
+      "notes": "Defina as regras da sua área com um especialista."
+    },
+    "cancellationPolicy": {
+      "minHoursBefore": 12
+    },
+    "rules": []
+  }
+}
