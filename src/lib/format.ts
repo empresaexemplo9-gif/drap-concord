@@ -62,3 +62,5 @@ export function hhmmToMin(s: string) {
   const [h, m] = s.split(":").map(Number);
   return h * 60 + (m || 0);
 }
+
+export const stageLabel: Record<string, string> = { LEAD: "Interessado", FIRST_VISIT: "1º atendimento", ACTIVE: "Ativo", INACTIVE: "Inativo" };

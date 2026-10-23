@@ -1,26 +1,147 @@
 @import "tailwindcss";
 
+/* Design tokens da DRAP Concord. Paleta do prompt, modo claro e escuro. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #fbf7f2;
+  --surface: #f3ebdf;
+  --card: #fffdf9;
+  --primary: #1f4e5a;
+  --primary-hover: #173b44;
+  --on-primary: #fbf7f2;
+  --accent: #c8745a;
+  --success: #46654e; /* sálvia escurecida para texto AA */
+  --success-bg: #e3ebe4;
+  --gold: #d9a441;
+  --text: #2b2622;
+  --muted: #6b6259;
+  --danger: #9c3b2f;
+  --danger-bg: #f6e1dd;
+  --warning: #7f520e; /* alerta escurecido para texto AA */
+  --warning-bg: #f6ead2;
+  --info: #2f6473;
+  --info-bg: #dfecef;
+  --border: #e6dccd;
+  --ring: #c8745a;
+  --shadow: 0 1px 2px rgb(43 38 34 / 0.04), 0 8px 24px -12px rgb(43 38 34 / 0.12);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root[data-theme="dark"] {
+  --bg: #171513;
+  --surface: #211e1b;
+  --card: #26221f;
+  --primary: #7fb3c0;
+  --primary-hover: #9cc6d1;
+  --on-primary: #10262c;
+  --accent: #e0957c;
+  --success: #9dbba4;
+  --success-bg: #26332a;
+  --gold: #e3b65e;
+  --text: #f1ebe3;
+  --muted: #b3a89c;
+  --danger: #e38b7e;
+  --danger-bg: #3a221e;
+  --warning: #e3b65e;
+  --warning-bg: #352a17;
+  --info: #8cc0cd;
+  --info-bg: #1d2f34;
+  --border: #3a342e;
+  --ring: #e0957c;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --bg: #171513;
+    --surface: #211e1b;
+    --card: #26221f;
+    --primary: #7fb3c0;
+    --primary-hover: #9cc6d1;
+    --on-primary: #10262c;
+    --accent: #e0957c;
+    --success: #9dbba4;
+    --success-bg: #26332a;
+    --gold: #e3b65e;
+    --text: #f1ebe3;
+    --muted: #b3a89c;
+    --danger: #e38b7e;
+    --danger-bg: #3a221e;
+    --warning: #e3b65e;
+    --warning-bg: #352a17;
+    --info: #8cc0cd;
+    --info-bg: #1d2f34;
+    --border: #3a342e;
+    --ring: #e0957c;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
   }
 }
 
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-gold: var(--gold);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-line: var(--border);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --shadow-soft: var(--shadow);
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+* {
+  transition-duration: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface), var(--card), var(--surface));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  to { background-position: -200% 0; }
 }

@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DRAP Concord
 
-## Getting Started
+Agenda inteligente, CRM e organizador de atendimentos para **qualquer profissional que atende o público** (saúde, jurídico, esporte, educação, beleza, consultoria…), com portal do cliente, vitrine pública e app instalável (PWA).
 
-First, run the development server:
+**Nenhuma profissão está no código.** Cada profissão é um *Perfil Profissional*: um JSON validado e versionado que define terminologia, serviços, ficha de atendimento, documentos, compliance e regras automáticas. Uma profissão nova entra pelo painel admin, sem deploy.
+
+## Rodar localmente
+
+Requisitos: Node 22+, PostgreSQL 16+.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env          # ajuste DATABASE_URL e os segredos
+npm install
+npx prisma migrate deploy     # cria as tabelas
+npm run db:seed               # 10 perfis profissionais + dados de demonstração
+npm run dev                   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Contas de demonstração (senha `concord123`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Quem | E-mail | Onde entra |
+| --- | --- | --- |
+| Psicóloga (com agenda cheia) | `ana@concord.dev` | `/app` |
+| Advogado | `carlos@concord.dev` | `/app` |
+| Personal trainer | `juliana@concord.dev` | `/app` |
+| Professor de tênis | `rafael@concord.dev` | `/app` |
+| Paciente | `maria@exemplo.com` | `/minha-conta` |
+| Admin da plataforma | `admin@concord.dev` | `/admin/perfis` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## As 4 interfaces
 
-## Learn More
+- **Vitrine pública** (`/`, `/p/[slug]`): busca por serviço, cidade, categoria, modalidade, preço e disponibilidade; página do profissional com selo de registro verificado, serviços, avaliações e horários livres; agendamento da 1ª consulta em 3 passos com pré-cadastro, formulário prévio do perfil e consentimento LGPD.
+- **App do profissional** (`/app`): Hoje, agenda (semana e lista), novo agendamento/encaixe, detalhe do atendimento com status e registro (ficha dinâmica do perfil), clientes com linha do tempo/tags/funil/notas, serviços e preços, horários e bloqueios, regras automáticas com aprovação e desfazer, relatórios, perfil público e terminologia própria, notificações.
+- **Portal do cliente** (`/minha-conta`): confirmar, reagendar (só horários livres) e cancelar respeitando a política do perfil, histórico, avaliação, baixar ou excluir seus dados.
+- **Painel admin** (`/admin`): criar, duplicar, editar (JSON com validação), enviar para validação e publicar perfis com histórico de versões; moderação de avaliações e verificação de registros.
 
-To learn more about Next.js, take a look at the following resources:
+## Testes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm test          # unitários + integração (regras, horários, perfis, isolamento multi-tenant)
+npm run build && npm run e2e   # ponta a ponta no Chromium, desktop e celular
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Documentação
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Arquitetura e modelo de dados](docs/ARQUITETURA.md)
+- [Como adicionar uma nova profissão](docs/NOVA-PROFISSAO.md)
+- [Design system](docs/DESIGN.md)
+- [Implantação](docs/IMPLANTACAO.md)
+- [Roteiro: o que está pronto e o que falta](docs/ROADMAP.md)
+- Logo e variações: [`brand/`](brand/README.md)
