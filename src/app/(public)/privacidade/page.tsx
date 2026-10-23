@@ -2,7 +2,7 @@ export const metadata = { title: "Política de privacidade" };
 
 export default function Privacidade() {
   return (
-    <article className="mx-auto max-w-2xl space-y-4 px-4 py-12 leading-relaxed">
+    <article className="gutter columns-1 gap-12 space-y-4 py-12 leading-relaxed xl:columns-2 [&>h1]:[column-span:all] [&>p:first-of-type]:[column-span:all]">
       <h1 className="text-3xl font-semibold">Política de privacidade</h1>
       <p className="rounded-xl bg-warning-bg p-4 text-sm text-warning">Modelo inicial. Precisa ser revisado por um especialista em LGPD antes do lançamento.</p>
       <h2 className="text-xl font-semibold">Quais dados tratamos</h2>

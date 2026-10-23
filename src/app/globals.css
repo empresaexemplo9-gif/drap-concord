@@ -145,3 +145,9 @@ h1, h2, h3 {
 @keyframes shimmer {
   to { background-position: -200% 0; }
 }
+
+/* Margem lateral padrão: o conteúdo ocupa a largura toda da tela,
+   com respiro proporcional ao tamanho dela. */
+.gutter {
+  padding-inline: clamp(1rem, 3.5vw, 4rem);
+}

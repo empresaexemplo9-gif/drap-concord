@@ -18,8 +18,8 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
 
   return (
     <div className="min-h-dvh">
-      <header className="px-4 py-5 sm:px-8"><Brand /></header>
-      <main className="mx-auto max-w-4xl px-4 pb-20">
+      <header className="gutter py-5"><Brand /></header>
+      <main className="gutter pb-20">
         <ol className="mb-8 flex gap-2 text-xs font-semibold text-muted" aria-label="Etapas">
           <li className={!chosen ? "text-primary" : ""}>1. Sua profissão</li>
           <li aria-hidden>→</li>
@@ -30,7 +30,7 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
           <>
             <h1 className="text-3xl font-semibold">Olá, {user.name.split(" ")[0]}! Qual é a sua área?</h1>
             <p className="mt-2 text-muted">A plataforma se adapta: nomes, serviços, ficha de atendimento, documentos e regras.</p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {profiles.map((p) => (
                 <Link key={p.key} href={`/onboarding?perfil=${p.key}`} className="group rounded-2xl border border-line bg-card p-5 shadow-soft transition-colors hover:border-primary">
                   <p className="text-xs font-semibold uppercase tracking-wide text-accent">{p.config.category}</p>
@@ -41,7 +41,7 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
             </div>
           </>
         ) : (
-          <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
+          <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] xl:gap-10">
             <div>
               <Link href="/onboarding" className="text-sm font-semibold text-primary">← Trocar profissão</Link>
               <h1 className="mt-3 text-3xl font-semibold">{chosen.name}</h1>

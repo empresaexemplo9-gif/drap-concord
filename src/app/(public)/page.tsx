@@ -15,10 +15,26 @@ export default async function Vitrine({ searchParams }: { searchParams: Promise<
   return (
     <>
       <section className="bg-surface/70">
-        <div className="mx-auto max-w-6xl px-4 pb-10 pt-12 sm:pt-16">
-          <p className="text-sm font-semibold text-accent">Saúde, jurídico, esporte, educação e muito mais</p>
-          <h1 className="mt-2 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">Encontre quem cuida de você e agende em poucos toques</h1>
-          <p className="mt-3 max-w-xl text-lg text-muted">Profissionais com registro verificado, horários reais e confirmação na hora.</p>
+        <div className="gutter pb-10 pt-12 sm:pt-16">
+          <div className="grid items-end gap-8 lg:grid-cols-[1.5fr_1fr]">
+            <div>
+              <p className="text-sm font-semibold text-accent">Saúde, jurídico, esporte, educação e muito mais</p>
+              <h1 className="mt-2 text-4xl font-semibold leading-tight sm:text-5xl xl:text-6xl">Encontre quem cuida de você e agende em poucos toques</h1>
+              <p className="mt-3 text-lg text-muted">Profissionais com registro verificado, horários reais e confirmação na hora.</p>
+            </div>
+            <ol className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              {[
+                ["1", "Busque", "por serviço, cidade ou modalidade"],
+                ["2", "Escolha o horário", "só aparecem horários livres de verdade"],
+                ["3", "Pronto", "confirme, remarque ou cancele pelo app"],
+              ].map(([n, t, d]) => (
+                <li key={n} className="flex items-center gap-3 rounded-2xl border border-line bg-card/70 p-3">
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif font-semibold text-on-primary">{n}</span>
+                  <span className="text-sm"><strong className="block text-ink">{t}</strong><span className="text-muted">{d}</span></span>
+                </li>
+              ))}
+            </ol>
+          </div>
           <form className="mt-8 grid gap-2 rounded-2xl border border-line bg-card p-3 shadow-soft sm:grid-cols-[2fr_1.2fr_1.2fr_auto]" role="search" aria-label="Buscar profissionais">
             <Input name="q" defaultValue={sp.q} placeholder="Serviço, especialidade ou nome" aria-label="O que você procura" />
             <Input name="cidade" defaultValue={sp.cidade} placeholder="Cidade" aria-label="Cidade" />
@@ -49,7 +65,7 @@ export default async function Vitrine({ searchParams }: { searchParams: Promise<
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-10">
+      <section className="gutter py-10">
         <div className="mb-5 flex items-baseline justify-between">
           <h2 className="text-2xl font-semibold">{filtering ? `${results.length} ${results.length === 1 ? "profissional encontrado" : "profissionais encontrados"}` : "Profissionais em destaque"}</h2>
           {filtering && <Link href="/" className="text-sm font-semibold text-primary">Limpar filtros</Link>}
@@ -57,7 +73,7 @@ export default async function Vitrine({ searchParams }: { searchParams: Promise<
         {results.length === 0 ? (
           <EmptyState title="Ninguém por aqui ainda" text="Tente outra cidade, modalidade ou palavra. Novos profissionais entram todos os dias." />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {results.map(({ pro, next, rating, category }) => (
               <Card key={pro.id} className="flex flex-col gap-4">
                 <div className="flex gap-4">
@@ -88,7 +104,7 @@ export default async function Vitrine({ searchParams }: { searchParams: Promise<
         )}
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-16">
+      <section className="gutter pb-16">
         <Card className="flex flex-col items-start gap-4 bg-primary p-8 text-on-primary sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold">Você atende pessoas?</h2>

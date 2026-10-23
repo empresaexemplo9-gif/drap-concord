@@ -28,18 +28,28 @@ export default async function AgendarPublico({ params, searchParams }: { params:
   const self = `/p/${slug}/agendar`;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <Link href={`/p/${slug}`} className="text-sm font-semibold text-primary">← {pro.displayName}</Link>
-      <h1 className="mt-3 text-3xl font-semibold">Agendar com {pro.displayName.split(" ")[0]}</h1>
-      <ol className="mt-4 flex gap-2 text-xs font-semibold" aria-label="Etapas">
-        {["Serviço", "Horário", "Seus dados"].map((l, i) => (
-          <li key={l} className={`flex-1 rounded-full py-1.5 text-center ${i + 1 <= step ? "bg-primary text-on-primary" : "bg-surface text-muted"}`} aria-current={i + 1 === step ? "step" : undefined}>{i + 1}. {l}</li>
-        ))}
-      </ol>
-      {erro && <div className="mt-5"><Alert tone="danger">{erro}{erro.includes("Entre") && <> <Link className="font-semibold underline" href={`/entrar?next=${encodeURIComponent(`${self}?servico=${servico}&horario=${horario ?? ""}`)}`}>Entrar</Link></>}</Alert></div>}
+    <div className="gutter grid gap-8 py-10 lg:grid-cols-[300px_1fr] xl:gap-12">
+      <aside className="lg:sticky lg:top-6 lg:h-fit">
+        <Link href={`/p/${slug}`} className="text-sm font-semibold text-primary">← {pro.displayName}</Link>
+        <h1 className="mt-3 text-3xl font-semibold">Agendar com {pro.displayName.split(" ")[0]}</h1>
+        <ol className="mt-4 flex gap-2 text-xs font-semibold lg:flex-col" aria-label="Etapas">
+          {["Serviço", "Horário", "Seus dados"].map((l, i) => (
+            <li key={l} className={`flex-1 rounded-full px-4 py-1.5 text-center lg:py-2.5 lg:text-left lg:text-sm ${i + 1 <= step ? "bg-primary text-on-primary" : "bg-surface text-muted"}`} aria-current={i + 1 === step ? "step" : undefined}>{i + 1}. {l}</li>
+          ))}
+        </ol>
+        {service && (
+          <div className="mt-4 hidden rounded-2xl border border-line bg-card p-4 text-sm lg:block">
+            <p className="font-semibold">{service.name}</p>
+            <p className="text-muted">{service.durationMin} min · {modalityLabel[service.modality]} · {money(service.priceCents)}</p>
+            {chosen && <p className="mt-2 capitalize">{dateLong(chosen, tz)}, às {time(chosen, tz)}</p>}
+          </div>
+        )}
+      </aside>
+      <div className="min-w-0">
+      {erro && <div className="mb-5"><Alert tone="danger">{erro}{erro.includes("Entre") && <> <Link className="font-semibold underline" href={`/entrar?next=${encodeURIComponent(`${self}?servico=${servico}&horario=${horario ?? ""}`)}`}>Entrar</Link></>}</Alert></div>}
 
       {step === 1 && (
-        <div className="mt-6 space-y-3">
+        <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
           {pro.services.map((s) => (
             <Link key={s.id} href={`${self}?servico=${s.id}`} className="flex items-center justify-between rounded-2xl border border-line bg-card p-4 shadow-soft hover:border-primary">
               <span><span className="block font-semibold">{s.name}</span><span className="text-sm text-muted">{s.durationMin} min · {modalityLabel[s.modality]}</span></span>
@@ -50,7 +60,7 @@ export default async function AgendarPublico({ params, searchParams }: { params:
       )}
 
       {step === 2 && (
-        <Card className="mt-6">
+        <Card>
           <p className="mb-4 text-sm text-muted">{service!.name} · {service!.durationMin} min · <Link href={self} className="font-semibold text-primary">trocar</Link></p>
           <form action={self} className="space-y-5">
             <input type="hidden" name="servico" value={service!.id} />
@@ -61,11 +71,11 @@ export default async function AgendarPublico({ params, searchParams }: { params:
       )}
 
       {step === 3 && (
-        <form action={bookPublic} className="mt-6 space-y-5">
+        <form action={bookPublic} className="grid gap-5 xl:grid-cols-2">
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="serviceId" value={service!.id} />
           <input type="hidden" name="start" value={chosen!.toISOString()} />
-          <Card className="bg-surface">
+          <Card className="bg-surface xl:col-span-2">
             <p className="font-semibold">{service!.name}</p>
             <p className="text-sm capitalize">{dateLong(chosen!, tz)}, às {time(chosen!, tz)}</p>
             <p className="text-sm text-muted">{modalityLabel[service!.modality]} · {money(service!.priceCents)} · <Link href={`${self}?servico=${service!.id}`} className="font-semibold text-primary">trocar horário</Link></p>
@@ -95,7 +105,7 @@ export default async function AgendarPublico({ params, searchParams }: { params:
             </Card>
           )}
 
-          <label className="flex items-start gap-3 rounded-2xl border border-line bg-card p-4 text-sm">
+          <label className="flex items-start gap-3 rounded-2xl border border-line bg-card p-4 text-sm xl:col-span-2">
             <input type="checkbox" name="consent" required className="mt-0.5 size-5 shrink-0 accent-[var(--primary)]" />
             <span>
               Autorizo o tratamento dos meus dados por {pro.displayName} e pela DRAP Concord para este atendimento, conforme a{" "}
@@ -103,9 +113,10 @@ export default async function AgendarPublico({ params, searchParams }: { params:
               <span className="mt-1 block text-muted">{cfg.compliance.consents.join(" · ")}</span>
             </span>
           </label>
-          <SubmitButton className="w-full" pendingText="Agendando…">Confirmar agendamento</SubmitButton>
+          <div className="xl:col-span-2"><SubmitButton className="w-full sm:w-auto sm:px-10" pendingText="Agendando…">Confirmar agendamento</SubmitButton></div>
         </form>
       )}
+      </div>
     </div>
   );
 }

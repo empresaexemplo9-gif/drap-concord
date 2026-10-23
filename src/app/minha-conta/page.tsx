@@ -50,7 +50,7 @@ export default async function MinhaConta({ searchParams }: { searchParams: Promi
       {upcoming.length === 0 ? (
         <EmptyState title="Nada marcado por enquanto" text="Quando você agendar, seus horários aparecem aqui com lembretes." action={<ButtonLink href="/">Encontrar profissional</ButtonLink>} />
       ) : (
-        <div className="space-y-3">
+        <div className="grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
           {upcoming.map((a) => {
             const tz = a.professional.timezone;
             return (

@@ -13,10 +13,10 @@ export default async function NovoCliente({ searchParams }: { searchParams: Prom
   return (
     <>
       <PageHeader title={`Novo(a) ${cfg.terminology.client.singular}`} />
-      <Card className="max-w-xl">
-        <form action={createClient} className="space-y-4">
+      <Card>
+        <form action={createClient} className="grid gap-4 lg:grid-cols-2">
           {erro && <Alert tone="danger">{erro}</Alert>}
-          <Field label="Nome completo" htmlFor="name"><Input id="name" name="name" required /></Field>
+          <div className="lg:col-span-2"><Field label="Nome completo" htmlFor="name"><Input id="name" name="name" required /></Field></div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="E-mail" htmlFor="email"><Input id="email" name="email" type="email" /></Field>
             <Field label="Telefone" htmlFor="phone"><Input id="phone" name="phone" type="tel" /></Field>
@@ -27,7 +27,7 @@ export default async function NovoCliente({ searchParams }: { searchParams: Prom
           </div>
           <Field label="Tags" htmlFor="tags" hint="Separe por vírgula. Ex.: semanal, convênio"><Input id="tags" name="tags" /></Field>
           <Field label="Notas privadas" htmlFor="notes"><Textarea id="notes" name="notes" /></Field>
-          <SubmitButton>Salvar</SubmitButton>
+          <div className="lg:col-span-2"><SubmitButton>Salvar</SubmitButton></div>
         </form>
       </Card>
     </>

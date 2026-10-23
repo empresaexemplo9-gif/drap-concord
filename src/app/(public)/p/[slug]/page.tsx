@@ -45,9 +45,9 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
+    <div className="gutter py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
+      <div className="grid gap-8 lg:grid-cols-[1fr_380px] 2xl:grid-cols-[1fr_440px] xl:gap-12">
         <div className="space-y-8">
           <div className="flex gap-5">
             <Avatar name={pro.displayName} size={96} />
@@ -72,7 +72,7 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
 
           <section>
             <h2 className="mb-3 text-xl font-semibold">Serviços</h2>
-            <div className="space-y-3">
+            <div className="grid gap-3 xl:grid-cols-2">
               {pro.services.map((s) => (
                 <Card key={s.id} className="flex flex-wrap items-center justify-between gap-3">
                   <div>
@@ -91,7 +91,7 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
           {pro.reviews.length > 0 && (
             <section>
               <h2 className="mb-3 text-xl font-semibold">O que dizem</h2>
-              <div className="space-y-3">
+              <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
                 {pro.reviews.map((r) => (
                   <Card key={r.id}>
                     <Stars value={r.rating} />

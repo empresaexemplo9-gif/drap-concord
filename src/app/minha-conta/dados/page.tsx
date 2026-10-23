@@ -14,7 +14,7 @@ export default async function Dados({ searchParams }: { searchParams: Promise<{ 
   return (
     <>
       <PageHeader title="Meus dados e privacidade" subtitle="Seus direitos pela LGPD, sem burocracia." />
-      <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-2">
         <Card className="space-y-1 text-sm">
           <p><span className="text-muted">Nome:</span> {user.name}</p>
           <p><span className="text-muted">E-mail:</span> {user.email}</p>

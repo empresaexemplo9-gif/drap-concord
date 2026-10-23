@@ -2,7 +2,7 @@ export const metadata = { title: "Termos de uso" };
 
 export default function Termos() {
   return (
-    <article className="mx-auto max-w-2xl space-y-4 px-4 py-12 leading-relaxed">
+    <article className="gutter columns-1 gap-12 space-y-4 py-12 leading-relaxed xl:columns-2 [&>h1]:[column-span:all] [&>p:first-of-type]:[column-span:all]">
       <h1 className="text-3xl font-semibold">Termos de uso</h1>
       <p className="rounded-xl bg-warning-bg p-4 text-sm text-warning">Modelo inicial. Precisa ser revisado por um advogado antes do lançamento.</p>
       <p>A DRAP Concord conecta profissionais que prestam serviços ao público e seus clientes, oferecendo agenda, organização de atendimentos e uma vitrine pública.</p>

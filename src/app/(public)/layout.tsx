@@ -8,7 +8,7 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="border-b border-line/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4">
+        <div className="gutter flex items-center justify-between gap-3 py-4">
           <Brand />
           <nav className="flex items-center gap-1 text-sm">
             {user ? (
@@ -24,7 +24,7 @@ export default async function PublicLayout({ children }: { children: React.React
       </header>
       <main className="flex-1">{children}</main>
       <footer className="border-t border-line/60 py-8 text-sm text-muted">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4">
+        <div className="gutter flex flex-wrap items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} DRAP Concord</p>
           <nav className="flex gap-4">
             <Link href="/cadastro" className="hover:text-ink">Para profissionais</Link>

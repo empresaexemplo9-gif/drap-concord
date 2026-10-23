@@ -13,16 +13,18 @@ export default async function Agendado({ searchParams }: { searchParams: Promise
   if (!appt) notFound();
   const tz = appt.professional.timezone;
   return (
-    <div className="mx-auto max-w-lg px-4 py-16 text-center">
-      <Logo size={44} className="mx-auto" />
-      <h1 className="mt-6 text-3xl font-semibold">Pedido enviado!</h1>
-      <p className="mt-2 text-muted">{appt.professional.displayName} recebeu seu agendamento. Você é avisado(a) aqui no portal quando houver novidades.</p>
-      <Card className="mt-8 text-left">
+    <div className="gutter grid items-center gap-8 py-16 lg:grid-cols-2">
+      <div>
+        <Logo size={44} />
+        <h1 className="mt-6 text-3xl font-semibold sm:text-4xl">Pedido enviado!</h1>
+        <p className="mt-2 text-lg text-muted">{appt.professional.displayName} recebeu seu agendamento. Você é avisado(a) aqui no portal quando houver novidades.</p>
+        <ButtonLink href="/minha-conta" className="mt-8">Ver meus agendamentos</ButtonLink>
+      </div>
+      <Card>
         <p className="font-semibold">{appt.service.name}</p>
         <p className="capitalize">{dateLong(appt.startsAt, tz)}, às {time(appt.startsAt, tz)}</p>
         <p className="text-sm text-muted">{modalityLabel[appt.modality]} · com {appt.professional.displayName}</p>
       </Card>
-      <ButtonLink href="/minha-conta" className="mt-8">Ver meus agendamentos</ButtonLink>
     </div>
   );
 }

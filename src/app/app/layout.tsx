@@ -42,7 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </aside>
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-bg/90 px-4 py-3 backdrop-blur md:px-8">
+        <header className="gutter sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-bg/90 py-3 backdrop-blur">
           <div className="md:hidden"><Brand href="/app" /></div>
           <div className="hidden text-sm text-muted md:block">
             Sua página pública:{" "}
@@ -55,7 +55,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             )}
           </Link>
         </header>
-        <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 md:px-8 md:pb-12">{children}</main>
+        <main className="gutter pb-28 pt-6 md:pb-12">{children}</main>
         <Link href="/app/agendar" className="fixed bottom-20 right-4 z-30 inline-flex size-14 items-center justify-center rounded-full bg-primary text-2xl text-on-primary shadow-soft md:hidden" aria-label="Novo agendamento">+</Link>
       </div>
       <BottomNav items={mobile} />

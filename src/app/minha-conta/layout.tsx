@@ -14,7 +14,7 @@ export default async function ClientLayout({ children }: { children: React.React
   return (
     <div className="min-h-dvh">
       <header className="border-b border-line/60">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
+        <div className="gutter flex items-center justify-between py-4">
           <Brand href="/minha-conta" />
           <div className="flex items-center gap-3 text-sm">
             <span className="hidden text-muted sm:inline">{user.name}</span>
@@ -22,7 +22,7 @@ export default async function ClientLayout({ children }: { children: React.React
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-3xl px-4 pb-28 pt-8">{children}</main>
+      <main className="gutter pb-28 pt-8">{children}</main>
       <BottomNav items={items} />
     </div>
   );
