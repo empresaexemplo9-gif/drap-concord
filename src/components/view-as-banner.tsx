@@ -18,8 +18,19 @@ export async function ViewAsBanner() {
       role="status"
     >
       <span className="min-w-0">
-        Vendo como <strong>{user?.name}</strong> ({user && roleLabel[user.role]}).
-        <span className="block text-xs opacity-90">Ações aqui valem como se fosse essa pessoa.</span>
+        {user ? (
+          <>
+            Vendo como <strong>{user.name}</strong> ({roleLabel[user.role]}{user.isSandbox && ", prévia"}).
+            <span className="block text-xs opacity-90">
+              {user.isSandbox ? "Conta de prévia: pode testar à vontade." : "Ações aqui valem como se fosse essa pessoa."}
+            </span>
+          </>
+        ) : (
+          <>
+            Vendo como <strong>visitante</strong> (sem login).
+            <span className="block text-xs opacity-90">É o que qualquer pessoa vê antes de entrar.</span>
+          </>
+        )}
       </span>
       <form action={stopViewAs} className="ml-auto shrink-0">
         <button className="min-h-10 rounded-xl bg-white/20 px-3 font-semibold hover:bg-white/30">Voltar ao admin</button>

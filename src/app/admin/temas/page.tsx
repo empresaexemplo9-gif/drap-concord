@@ -77,7 +77,7 @@ export default async function Temas({ searchParams }: { searchParams: Promise<{ 
           const selected = new Set(t.profiles.map((p) => p.id));
           const example = t.profiles.map((p) => sampleByProfile.get(p.id)).find(Boolean);
           return (
-            <Card key={t.id} className="overflow-hidden p-0">
+            <Card key={t.id} className="overflow-hidden p-0!">
               <div className="relative aspect-[16/7] bg-surface">
                 {/* eslint-disable-next-line @next/next/no-img-element -- prévia servida pela API de temas */}
                 <img src={t.url} alt={`Prévia do tema ${t.name}`} className="h-full w-full object-cover" loading="lazy" />

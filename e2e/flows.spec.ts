@@ -256,3 +256,42 @@ test("admin envia imagem de tema, associa à profissão e a página do profissio
     .locator("xpath=ancestor::div[contains(@class,'overflow-hidden')]").getByRole("button", { name: "Excluir tema" }).click();
   await expect(page.getByText("Tema excluído.")).toBeVisible();
 });
+
+test("admin vê como qualquer profissão (prévia), como recepção e como visitante", async ({ page }) => {
+  await login(page, "admin@concord.dev");
+
+  // Profissão sem profissional real: Médico.
+  await page.goto("/admin/ver-como");
+  await page.getByRole("group", { name: "Profissão Médico(a)" }).getByRole("button", { name: /Ver como/ }).click();
+  await expect(page).toHaveURL(/\/app$/);
+  await expect(page.getByText(/Vendo como/)).toContainText("prévia");
+  await page.goto("/app/clientes");
+  await expect(page.getByRole("heading", { name: "Pacientes" })).toBeVisible();
+  await expect(page.getByText("Laura Mendes (exemplo)")).toBeVisible();
+  await page.getByRole("button", { name: "Voltar ao admin" }).click();
+  await expect(page).toHaveURL(/\/admin\/ver-como/);
+
+  // Recepção da psicóloga: não vê o prontuário (sigilo do perfil).
+  await page.getByRole("group", { name: "Ana Ribeiro" }).getByRole("button", { name: "Recepção" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+  await page.goto("/app/agenda?ver=lista");
+  await page.locator('a[href^="/app/atendimentos/"]').first().click();
+  await expect(page.getByText(/Seu papel não tem acesso ao registro/)).toBeVisible();
+  await page.getByRole("button", { name: "Voltar ao admin" }).click();
+
+  // Visitante: vitrine sem login.
+  await page.getByRole("button", { name: "Ver como visitante" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByText(/Vendo como/)).toContainText("visitante");
+  await expect(page.getByRole("link", { name: "Entrar" })).toBeVisible();
+  await page.getByRole("button", { name: "Voltar ao admin" }).click();
+  await expect(page).toHaveURL(/\/admin\/ver-como/);
+});
+
+test("contas de prévia não fazem login", async ({ page }) => {
+  await page.goto("/entrar");
+  await page.getByLabel("E-mail").fill("profissional.medico@previa.drapconcord.invalid");
+  await page.getByLabel("Senha").fill("qualquer-coisa");
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page.getByText("E-mail ou senha incorretos.")).toBeVisible();
+});

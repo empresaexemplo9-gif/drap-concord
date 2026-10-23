@@ -9,9 +9,11 @@ export async function applyProfile(input: {
   displayName: string;
   city?: string;
   registryNumber?: string;
+  /** Prévia do admin: permite perfis ainda não publicados. */
+  allowUnpublished?: boolean;
 }) {
   const profile = await db.professionProfile.findUniqueOrThrow({ where: { key: input.profileKey } });
-  if (profile.status !== "PUBLISHED") throw new Error("Perfil não publicado");
+  if (profile.status !== "PUBLISHED" && !input.allowUnpublished) throw new Error("Perfil não publicado");
   const cfg = profileConfigSchema.parse(profile.config);
 
   let slug = slugify(input.displayName) || "profissional";

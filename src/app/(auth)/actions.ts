@@ -21,7 +21,7 @@ export async function login(form: FormData) {
   const key = `login:${ip}:${email}`;
   if (failures.blocked(key)) back("/entrar", "Muitas tentativas erradas. Aguarde alguns minutos.");
   const user = await db.user.findUnique({ where: { email }, include: { professional: true } });
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+  if (!user || user.isSandbox || !(await verifyPassword(password, user.passwordHash))) {
     failures.add(key);
     back("/entrar", "E-mail ou senha incorretos.", next ? { next } : {});
   }

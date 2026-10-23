@@ -87,6 +87,9 @@ model User {
   phone        String?
   passwordHash String
   role         UserRole
+  // Conta de prévia criada pelo admin para ver a plataforma como uma profissão
+  // ou papel de equipe. Não faz login, não aparece na vitrine nem em listas.
+  isSandbox    Boolean   @default(false)
   createdAt    DateTime  @default(now())
 
   sessions      Session[]

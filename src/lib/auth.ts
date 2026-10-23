@@ -37,6 +37,9 @@ export async function destroySession() {
 
 const withRelations = { memberships: true, professional: true } as const;
 
+/** Valor de "Ver como" que representa um visitante sem login. */
+export const VIEW_AS_VISITOR = "visitor";
+
 /**
  * Sessão da requisição: quem fez login (`real`) e quem está sendo visto
  * (`acting`). São a mesma pessoa, exceto quando um admin da plataforma usa
@@ -52,10 +55,11 @@ const getSession = cache(async () => {
   if (!session || session.expiresAt < new Date()) return null;
   const real = session.user;
   if (session.actAsUserId && real.role === "PLATFORM_ADMIN") {
+    if (session.actAsUserId === VIEW_AS_VISITOR) return { id: session.id, real, acting: null };
     const acting = await db.user.findUnique({ where: { id: session.actAsUserId }, include: withRelations });
     if (acting) return { id: session.id, real, acting };
   }
-  return { id: session.id, real, acting: real };
+  return { id: session.id, real, acting: real as typeof real | null };
 });
 
 export async function getUser() {
@@ -65,7 +69,7 @@ export async function getUser() {
 /** O admin por trás do "Ver como", ou null quando ninguém está sendo personificado. */
 export async function getImpersonator() {
   const s = await getSession();
-  return s && s.real.id !== s.acting.id ? s.real : null;
+  return s && s.real.id !== s.acting?.id ? s.real : null;
 }
 
 export async function startActAs(targetUserId: string) {
@@ -90,11 +94,20 @@ export async function requireUser(roles?: UserRole[], next = "/entrar") {
   return user;
 }
 
-/** Profissional logado + organização (tenant) a que pertence. */
+/**
+ * Profissional logado + organização (tenant) a que pertence. Membros da equipe
+ * (recepção, financeiro) entram na área do profissional da organização, com
+ * as restrições do papel (ex.: recepção não vê registros sigilosos).
+ */
 export async function requireProfessional() {
   const user = await requireUser(["PROFESSIONAL", "PLATFORM_ADMIN"]);
-  if (!user.professional) redirect("/onboarding");
-  const membership = user.memberships.find((m) => m.orgId === user.professional!.orgId);
-  if (!membership) redirect("/onboarding");
-  return { user, professional: user.professional, orgId: user.professional.orgId, memberRole: membership.role };
+  if (user.professional) {
+    const membership = user.memberships.find((m) => m.orgId === user.professional!.orgId);
+    if (!membership) redirect("/onboarding");
+    return { user, professional: user.professional, orgId: user.professional.orgId, memberRole: membership.role };
+  }
+  const team = user.memberships.find((m) => m.role !== "OWNER");
+  const professional = team ? await db.professional.findFirst({ where: { orgId: team.orgId }, orderBy: { createdAt: "asc" } }) : null;
+  if (!team || !professional) redirect("/onboarding");
+  return { user, professional, orgId: team.orgId, memberRole: team.role };
 }

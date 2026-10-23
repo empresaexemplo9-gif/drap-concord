@@ -3,13 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Avatar, Badge, Card, Stars } from "@/components/ui";
 import { db } from "@/lib/db";
+import { getImpersonator } from "@/lib/auth";
 import { availableSlots } from "@/lib/booking";
 import { professionalConfig } from "@/lib/profiles/registry";
 import { fmt, modalityLabel, money } from "@/lib/format";
 
 async function load(slug: string) {
+  // Profissionais de prévia (não públicos) só abrem para o admin no "Ver como".
+  const admin = await getImpersonator();
   return db.professional.findFirst({
-    where: { slug, isPublic: true },
+    where: { slug, ...(admin ? {} : { isPublic: true }) },
     include: {
       profile: true,
       services: { where: { active: true }, orderBy: { priceCents: "asc" } },

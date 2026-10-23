@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
-import { requireUser, startActAs } from "@/lib/auth";
+import { requireUser, startActAs, VIEW_AS_VISITOR } from "@/lib/auth";
+import { ensureSandboxProfessional, ensureTeamMember } from "@/lib/sandbox";
 import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { parseProfileConfig } from "@/lib/profiles/schema";
@@ -175,4 +176,30 @@ export async function deleteTheme(form: FormData) {
   await db.professionTheme.delete({ where: { id } });
   await audit({ userId: user.id, action: "theme.deleted", entity: "ProfessionTheme", entityId: id });
   redirect("/admin/temas?ok=excluido");
+}
+
+export async function viewAsVisitor() {
+  const user = await admin();
+  await startActAs(VIEW_AS_VISITOR);
+  await audit({ userId: user.id, action: "admin.view_as.start", entity: "User", entityId: VIEW_AS_VISITOR });
+  redirect("/");
+}
+
+/** Ver como uma profissão: usa a conta de prévia daquela profissão (criada se preciso). */
+export async function viewAsProfession(form: FormData) {
+  const user = await admin();
+  const sandbox = await ensureSandboxProfessional(str(form, "profileId"));
+  await startActAs(sandbox.id);
+  await audit({ userId: user.id, action: "admin.view_as.start", entity: "User", entityId: sandbox.id, meta: { profession: str(form, "profileId") } });
+  redirect("/app");
+}
+
+/** Ver como recepção ou financeiro da equipe de um profissional. */
+export async function viewAsTeam(form: FormData) {
+  const user = await admin();
+  const role = str(form, "role") === "FINANCE" ? "FINANCE" : "RECEPTION";
+  const member = await ensureTeamMember(str(form, "professionalId"), role);
+  await startActAs(member.id);
+  await audit({ userId: user.id, action: "admin.view_as.start", entity: "User", entityId: member.id, meta: { role } });
+  redirect("/app");
 }
