@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BottomNav, Icon, SideNav, type NavItem } from "@/components/app-nav";
 import { Brand, ButtonLink } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { requireProfessional } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { logout } from "../(auth)/actions";
@@ -49,12 +50,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             Sua página pública:{" "}
             <Link href={`/p/${professional.slug}`} className="font-medium text-primary hover:underline">/p/{professional.slug}</Link>
           </div>
+          <div className="flex items-center gap-1">
+          <ThemeToggle />
           <Link href="/app/notificacoes" className="relative inline-flex size-11 items-center justify-center rounded-xl text-ink hover:bg-surface" aria-label={`Notificações${unread ? `, ${unread} não lidas` : ""}`}>
             <Icon name="bell" />
             {unread > 0 && (
               <span className="absolute right-1.5 top-1.5 min-w-5 rounded-full bg-accent px-1 text-center text-[11px] font-bold leading-5 text-white">{unread > 9 ? "9+" : unread}</span>
             )}
           </Link>
+          </div>
         </header>
         <main className="gutter pb-28 pt-6 md:pb-12">{children}</main>
         <Link href="/app/agendar" className="fixed bottom-20 right-4 z-30 inline-flex size-14 items-center justify-center rounded-full bg-primary text-2xl text-on-primary shadow-soft md:hidden" aria-label="Novo agendamento">+</Link>

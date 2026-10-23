@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import { Fraunces, Inter } from "next/font/google";
 import { PwaClient } from "@/components/pwa-client";
 import { ViewAsBanner } from "@/components/view-as-banner";
+import { THEME_COOKIE } from "@/lib/theme";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -18,15 +20,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FBF7F2" },
-    { media: "(prefers-color-scheme: dark)", color: "#171513" },
-  ],
+  themeColor: "#FBF7F2",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const theme = (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="pt-BR" data-theme={theme} className={`${inter.variable} ${fraunces.variable}`}>
       <body className="min-h-dvh antialiased">
         <ViewAsBanner />
         {children}

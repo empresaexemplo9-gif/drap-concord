@@ -1,5 +1,6 @@
 import { BottomNav, type NavItem } from "@/components/app-nav";
 import { Brand } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { requireUser } from "@/lib/auth";
 import { logout } from "../(auth)/actions";
 
@@ -18,6 +19,7 @@ export default async function ClientLayout({ children }: { children: React.React
           <Brand href="/minha-conta" />
           <div className="flex items-center gap-3 text-sm">
             <span className="hidden text-muted sm:inline">{user.name}</span>
+            <ThemeToggle />
             <form action={logout}><button className="min-h-11 rounded-xl px-3 font-semibold text-primary hover:bg-surface">Sair</button></form>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Brand, ButtonLink } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { getUser } from "@/lib/auth";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -11,6 +12,7 @@ export default async function PublicLayout({ children }: { children: React.React
         <div className="gutter flex items-center justify-between gap-3 py-4">
           <Brand />
           <nav className="flex items-center gap-1 text-sm">
+            <ThemeToggle />
             {user ? (
               <ButtonLink href={home} variant="secondary">Minha área</ButtonLink>
             ) : (

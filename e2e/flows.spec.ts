@@ -214,3 +214,18 @@ test("visitante continua vendo a vitrine na página inicial", async ({ page }) =
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Encontre quem cuida de você/ })).toBeVisible();
 });
+
+test("modo claro é o padrão (mesmo com o sistema escuro) e a escolha fica salva", async ({ browser }) => {
+  const ctx = await browser.newContext({ colorScheme: "dark" });
+  const page = await ctx.newPage();
+  await page.goto("/");
+  const html = page.locator("html");
+  await expect(html).toHaveAttribute("data-theme", "light");
+  await page.getByRole("button", { name: "Mudar para modo escuro" }).click();
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await page.reload();
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Mudar para modo claro" }).click();
+  await expect(html).toHaveAttribute("data-theme", "light");
+  await ctx.close();
+});

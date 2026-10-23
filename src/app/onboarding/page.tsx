@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Badge, Brand, Card, Field, Input } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { SubmitButton } from "@/components/submit-button";
 import { requireUser } from "@/lib/auth";
 import { publishedProfiles } from "@/lib/profiles/registry";
@@ -18,7 +19,7 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
 
   return (
     <div className="min-h-dvh">
-      <header className="gutter py-5"><Brand /></header>
+      <header className="gutter flex items-center justify-between py-5"><Brand /><ThemeToggle /></header>
       <main className="gutter pb-20">
         <ol className="mb-8 flex gap-2 text-xs font-semibold text-muted" aria-label="Etapas">
           <li className={!chosen ? "text-primary" : ""}>1. Sua profissão</li>

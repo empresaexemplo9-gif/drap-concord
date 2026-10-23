@@ -1,4 +1,5 @@
 import { Brand, Logo } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const points = [
   "Agenda, clientes e fichas no mesmo lugar",
@@ -24,7 +25,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <Logo size={520} className="pointer-events-none absolute -bottom-24 -right-24 !text-on-primary opacity-[0.06]" />
       </aside>
       <div className="flex flex-col">
-        <header className="gutter py-5 lg:hidden"><Brand /></header>
+        <header className="gutter flex items-center justify-between py-5"><span className="lg:invisible"><Brand /></span><ThemeToggle /></header>
         <main className="gutter flex flex-1 items-center py-10">
           <div className="w-full [&>div]:border-0 [&>div]:bg-transparent [&>div]:p-0 [&>div]:shadow-none sm:[&>div]:p-0">{children}</div>
         </main>
