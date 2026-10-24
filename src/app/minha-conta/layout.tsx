@@ -1,6 +1,7 @@
 import { BottomNav, type NavItem } from "@/components/app-nav";
 import { Brand } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserTheme } from "@/components/user-theme";
 import { requireUser } from "@/lib/auth";
 import { accessLabel } from "@/lib/format";
 import { logout } from "../(auth)/actions";
@@ -15,6 +16,7 @@ export default async function ClientLayout({ children }: { children: React.React
   const user = await requireUser(["CLIENT"], "/entrar?next=/minha-conta");
   return (
     <div className="min-h-dvh">
+      <UserTheme />
       <header className="border-b border-line/60">
         <div className="gutter flex items-center justify-between py-4">
           <Brand href="/minha-conta" />

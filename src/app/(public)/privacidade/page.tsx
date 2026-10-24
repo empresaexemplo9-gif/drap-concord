@@ -1,7 +1,10 @@
+import { UserTheme } from "@/components/user-theme";
 export const metadata = { title: "Política de privacidade" };
 
 export default function Privacidade() {
   return (
+    <>
+      <UserTheme />
     <article className="gutter columns-1 gap-12 space-y-4 py-12 leading-relaxed xl:columns-2 [&>h1]:[column-span:all] [&>p:first-of-type]:[column-span:all]">
       <h1 className="text-3xl font-semibold">Política de privacidade</h1>
       <p className="rounded-xl bg-warning-bg p-4 text-sm text-warning">Modelo inicial. Precisa ser revisado por um especialista em LGPD antes do lançamento.</p>
@@ -16,5 +19,6 @@ export default function Privacidade() {
       <h2 className="text-xl font-semibold">Contato do encarregado (DPO)</h2>
       <p>privacidade@drapconcord.com.br (definir antes do lançamento).</p>
     </article>
+    </>
   );
 }

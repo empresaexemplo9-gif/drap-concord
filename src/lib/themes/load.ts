@@ -28,3 +28,31 @@ export async function allThemes() {
   });
   return rows.map((r) => ({ ...toInfo(r), width: r.width, height: r.height, profiles: r.profiles }));
 }
+
+/**
+ * Tema da conta logada: o da profissão do profissional (ou da organização,
+ * para a equipe); para clientes, o do profissional do próximo atendimento ou,
+ * sem agenda, o do vínculo mais recente.
+ */
+export async function themeForUser(user: { id: string; role: string; professional: { profileId: string } | null; memberships: { orgId: string }[] } | null) {
+  if (!user) return null;
+  if (user.professional) return themeForProfile(user.professional.profileId);
+  if (user.memberships.length) {
+    const pro = await db.professional.findFirst({ where: { orgId: { in: user.memberships.map((m) => m.orgId) } }, orderBy: { createdAt: "asc" }, select: { profileId: true } });
+    return pro ? themeForProfile(pro.profileId) : null;
+  }
+  if (user.role !== "CLIENT") return null;
+  const next = await db.appointment.findFirst({
+    where: { client: { userId: user.id }, startsAt: { gte: new Date() }, status: { in: ["PENDING", "CONFIRMED"] } },
+    orderBy: { startsAt: "asc" },
+    select: { professional: { select: { profileId: true } } },
+  });
+  if (next) return themeForProfile(next.professional.profileId);
+  const link = await db.client.findFirst({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    select: { org: { select: { professionals: { select: { profileId: true }, take: 1 } } } },
+  });
+  const profileId = link?.org.professionals[0]?.profileId;
+  return profileId ? themeForProfile(profileId) : null;
+}

@@ -1,4 +1,6 @@
-// Seed de demonstração: perfis profissionais (dados), usuários e agenda fictícios.
+// Seed da plataforma: perfis profissionais, temas e admin (vindo do ambiente).
+// Dados fictícios de demonstração (usuários, agenda) só com SEED_DEMO=1, para
+// desenvolvimento e testes. Sem essa variável (produção), eles são removidos.
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { addDays, startOfDay, subDays } from "date-fns";
@@ -84,10 +86,32 @@ async function pro(email: string, name: string, profileKey: string, extra: { cit
   });
 }
 
+const DEMO_EMAILS = ["admin@concord.dev", "ana@concord.dev", "carlos@concord.dev", "juliana@concord.dev", "rafael@concord.dev", "maria@exemplo.com"];
+
+/**
+ * Remove as contas fictícias de demonstração e as contas de prévia do admin,
+ * com as organizações delas (clientes, agenda, avaliações etc. vão junto).
+ * Contas reais nunca são tocadas.
+ */
+async function purgeDemoData() {
+  const fake = await db.user.findMany({
+    where: { OR: [{ email: { in: DEMO_EMAILS } }, { isSandbox: true }] },
+    select: { id: true, professional: { select: { orgId: true } } },
+  });
+  if (!fake.length) return;
+  const orgIds = fake.flatMap((u) => (u.professional ? [u.professional.orgId] : []));
+  const userIds = fake.map((u) => u.id);
+  await db.session.updateMany({ where: { actAsUserId: { in: userIds } }, data: { actAsUserId: null } });
+  // Atendimentos antes dos serviços (a relação atendimento → serviço não cascateia).
+  await db.appointment.deleteMany({ where: { orgId: { in: orgIds } } });
+  await db.organization.deleteMany({ where: { id: { in: orgIds } } });
+  await db.user.deleteMany({ where: { id: { in: userIds } } });
+  console.log(`Dados de demonstração removidos: ${userIds.length} conta(s), ${orgIds.length} organização(ões).`);
+}
+
 async function main() {
   await upsertProfiles();
   await upsertThemes();
-  await user("admin@concord.dev", "Admin da Plataforma", "PLATFORM_ADMIN");
 
   // Admin real da plataforma, vindo de variáveis de ambiente (nunca do código).
   // A senha é reaplicada a cada seed, então trocar a variável troca a senha.
@@ -102,6 +126,14 @@ async function main() {
     });
     console.log(`Admin da plataforma pronto: ${adminEmail}`);
   }
+
+  if (process.env.SEED_DEMO === "1") await seedDemo();
+  else await purgeDemoData();
+}
+
+/** Usuários e agenda fictícios para desenvolvimento e testes automatizados. */
+async function seedDemo() {
+  await user("admin@concord.dev", "Admin da Plataforma", "PLATFORM_ADMIN");
 
   const ana = await pro("ana@concord.dev", "Ana Ribeiro", "psicologo", {
     city: "São Paulo",

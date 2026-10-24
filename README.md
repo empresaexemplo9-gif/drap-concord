@@ -12,11 +12,13 @@ Requisitos: Node 22+, PostgreSQL 16+.
 cp .env.example .env          # ajuste DATABASE_URL e os segredos
 npm install
 npx prisma migrate deploy     # cria as tabelas
-npm run db:seed               # 10 perfis profissionais + dados de demonstração
+npm run db:seed:demo          # perfis, temas + dados de demonstração (só local/testes)
 npm run dev                   # http://localhost:3000
 ```
 
 ### Contas de demonstração (senha `concord123`)
+
+Só existem com `npm run db:seed:demo`. Em produção o seed (`npm run db:seed`) cria apenas perfis, temas e o admin de `ADMIN_EMAIL`/`ADMIN_PASSWORD`, e remove essas contas se existirem.
 
 | Quem | E-mail | Onde entra |
 | --- | --- | --- |

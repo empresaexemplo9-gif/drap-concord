@@ -1,7 +1,10 @@
+import { UserTheme } from "@/components/user-theme";
 export const metadata = { title: "Termos de uso" };
 
 export default function Termos() {
   return (
+    <>
+      <UserTheme />
     <article className="gutter columns-1 gap-12 space-y-4 py-12 leading-relaxed xl:columns-2 [&>h1]:[column-span:all] [&>p:first-of-type]:[column-span:all]">
       <h1 className="text-3xl font-semibold">Termos de uso</h1>
       <p className="rounded-xl bg-warning-bg p-4 text-sm text-warning">Modelo inicial. Precisa ser revisado por um advogado antes do lançamento.</p>
@@ -13,5 +16,6 @@ export default function Termos() {
       <h2 className="text-xl font-semibold">Conta</h2>
       <p>Você é responsável por manter sua senha em sigilo. Podemos suspender contas usadas para fraude ou abuso.</p>
     </article>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { Avatar, Badge, Card, EmptyState, Input, Select, Stars } from "@/compone
 import { categories } from "@/lib/profiles/registry";
 import { searchProfessionals, type SearchParams } from "@/lib/search";
 import { fmt, modalityLabel, money } from "@/lib/format";
+import { UserTheme } from "./user-theme";
 
 /** Vitrine pública (busca + profissionais). `basePath` mantém os filtros na mesma rota. */
 export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: string }) {
@@ -12,6 +13,7 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
 
   return (
     <>
+      <UserTheme />
       <section className="bg-surface/70">
         <div className="gutter pb-10 pt-12 sm:pt-16">
           <div className="grid items-end gap-8 lg:grid-cols-[1.5fr_1fr]">
@@ -69,7 +71,11 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
           {filtering && <Link href={basePath} className="text-sm font-semibold text-primary">Limpar filtros</Link>}
         </div>
         {results.length === 0 ? (
-          <EmptyState title="Ninguém por aqui ainda" text="Tente outra cidade, modalidade ou palavra. Novos profissionais entram todos os dias." />
+          filtering ? (
+            <EmptyState title="Ninguém por aqui ainda" text="Tente outra cidade, modalidade ou palavra. Novos profissionais entram todos os dias." />
+          ) : (
+            <EmptyState title="Os primeiros profissionais estão chegando" text="É profissional? Crie sua conta grátis e seja um dos primeiros a receber agendamentos por aqui." action={<Link href="/cadastro" className="inline-flex min-h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-on-primary">Sou profissional</Link>} />
+          )
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {results.map(({ pro, next, rating, category }) => (

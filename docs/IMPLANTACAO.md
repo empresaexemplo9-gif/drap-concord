@@ -10,7 +10,7 @@ Recomendado: **Vercel** (app) + **PostgreSQL gerenciado** (Supabase, Neon ou sim
 3. Rode as migrações e o seed uma vez, apontando para o banco de produção:
    ```bash
    DATABASE_URL=... npx prisma migrate deploy
-   DATABASE_URL=... npm run db:seed   # perfis profissionais; remova os usuários de demonstração depois
+   DATABASE_URL=... npm run db:seed   # perfis, temas e admin do ambiente; sem dados fictícios
    ```
 4. Agende o job diário das regras, chamando `GET /api/cron/regras` com o cabeçalho `Authorization: Bearer $CRON_SECRET` (ex.: Vercel Cron, 1x por dia).
 5. Troque a senha do `admin@concord.dev` ou crie seu próprio admin e apague as contas de demonstração.

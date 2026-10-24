@@ -14,7 +14,8 @@
     "rules:daily": "tsx scripts/run-daily-rules.ts",
     "e2e": "playwright test",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma migrate deploy && prisma db seed && next build"
+    "vercel-build": "prisma migrate deploy && prisma db seed && next build",
+    "db:seed:demo": "SEED_DEMO=1 prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",

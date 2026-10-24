@@ -450,3 +450,19 @@ test("profissional não aceita convite com conta de Acesso 1", async ({ page }) 
   await page.goto(link);
   await expect(page.getByRole("heading", { name: "Este convite é para clientes" })).toBeVisible();
 });
+
+test("o tema da profissão acompanha a conta: portal do cliente e vitrine do profissional", async ({ page }) => {
+  const themed = page.locator('img[src^="/api/temas/"]');
+  await login(page, "maria@exemplo.com");
+  await page.goto("/minha-conta");
+  await expect(themed).toHaveCount(1);
+  await page.goto("/termos");
+  await expect(themed).toHaveCount(1);
+  await logout(page);
+  await login(page, "ana@concord.dev");
+  await page.goto("/vitrine");
+  await expect(themed).toHaveCount(1);
+  await logout(page);
+  await page.goto("/");
+  await expect(themed).toHaveCount(0);
+});

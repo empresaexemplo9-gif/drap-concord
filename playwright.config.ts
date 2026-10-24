@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// E2E dos fluxos principais. Requer banco com seed (npm run db:seed) e build (npm run build).
+// E2E dos fluxos principais. Requer banco com dados de demonstração (npm run db:seed:demo) e build (npm run build).
 export default defineConfig({
   testDir: "e2e",
   timeout: 60_000,
