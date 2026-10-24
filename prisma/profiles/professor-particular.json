@@ -49,6 +49,24 @@
         "durationMin": 60,
         "priceCents": 8000,
         "modality": "ONLINE"
+      },
+      {
+        "name": "Acompanhamento escolar",
+        "durationMin": 60,
+        "priceCents": 8000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Preparatório ENEM e vestibular",
+        "durationMin": 90,
+        "priceCents": 14000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Aula de idiomas",
+        "durationMin": 60,
+        "priceCents": 9000,
+        "modality": "ONLINE"
       }
     ],
     "recordTemplate": {
@@ -119,6 +137,349 @@
           }
         ],
         "mode": "AUTO"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "reforco",
+        "name": "Reforço escolar",
+        "description": "Ajuda com matérias da escola, recuperação e organização dos estudos.",
+        "services": [
+          "Acompanhamento escolar",
+          "Aula particular",
+          "Aula online"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "serie",
+              "label": "Etapa escolar",
+              "type": "select",
+              "options": [
+                "Educação infantil",
+                "Fundamental I (1º ao 5º ano)",
+                "Fundamental II (6º ao 9º ano)",
+                "Ensino médio"
+              ],
+              "required": true
+            },
+            {
+              "key": "materias",
+              "label": "Matérias",
+              "type": "multiselect",
+              "options": [
+                "Matemática",
+                "Português",
+                "Ciências",
+                "Física",
+                "Química",
+                "Inglês",
+                "História ou Geografia"
+              ],
+              "required": true
+            },
+            {
+              "key": "motivo",
+              "label": "Principal motivo",
+              "type": "select",
+              "options": [
+                "Notas baixas",
+                "Recuperação ou prova próxima",
+                "Dificuldade de aprendizagem",
+                "Organização dos estudos"
+              ],
+              "required": true
+            },
+            {
+              "key": "prova",
+              "label": "Tem prova nos próximos 15 dias?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "diagnostico",
+              "label": "Tem algum diagnóstico (TDAH, dislexia, TEA)?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim",
+                "Em investigação"
+              ],
+              "required": false
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "serie",
+                "in": [
+                  "Educação infantil",
+                  "Fundamental I (1º ao 5º ano)",
+                  "Fundamental II (6º ao 9º ano)",
+                  "Ensino médio"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "menor-de-idade"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "prova",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Prova próxima: aulas focadas no conteúdo da prova."
+              }
+            },
+            {
+              "if": {
+                "field": "motivo",
+                "equals": "Recuperação ou prova próxima"
+              },
+              "then": {
+                "priority": "ALTA"
+              }
+            },
+            {
+              "if": {
+                "field": "diagnostico",
+                "in": [
+                  "Sim",
+                  "Em investigação"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "atendimento-especializado"
+                ],
+                "recommend": "Adaptar a metodologia; trazer orientações da escola ou do especialista."
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Aula online",
+                "modality": "ONLINE"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "vestibular",
+        "name": "ENEM, vestibular e concursos",
+        "description": "Plano de estudos e aulas para provas e concursos.",
+        "services": [
+          "Preparatório ENEM e vestibular",
+          "Aula online"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "prova",
+              "label": "Qual prova?",
+              "type": "select",
+              "options": [
+                "ENEM",
+                "Vestibular específico",
+                "Concurso público",
+                "Outra"
+              ],
+              "required": true
+            },
+            {
+              "key": "data_prova",
+              "label": "Data da prova (se souber)",
+              "type": "date",
+              "required": false
+            },
+            {
+              "key": "disciplinas",
+              "label": "Disciplinas com mais dificuldade",
+              "type": "multiselect",
+              "options": [
+                "Matemática",
+                "Redação",
+                "Linguagens",
+                "Ciências da Natureza",
+                "Ciências Humanas",
+                "Conhecimentos específicos"
+              ],
+              "required": false
+            },
+            {
+              "key": "horas",
+              "label": "Horas de estudo por semana",
+              "type": "select",
+              "options": [
+                "Até 5",
+                "6 a 15",
+                "Mais de 15"
+              ],
+              "required": false
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Aula online",
+                "modality": "ONLINE"
+              }
+            },
+            {
+              "if": {
+                "field": "disciplinas",
+                "equals": "Redação"
+              },
+              "then": {
+                "recommend": "Incluir correção semanal de redação."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "idiomas",
+        "name": "Idiomas",
+        "description": "Inglês, espanhol e outros idiomas para viagem, trabalho ou certificação.",
+        "services": [
+          "Aula de idiomas"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "idioma",
+              "label": "Idioma",
+              "type": "select",
+              "options": [
+                "Inglês",
+                "Espanhol",
+                "Francês",
+                "Alemão",
+                "Italiano",
+                "Português para estrangeiros"
+              ],
+              "required": true
+            },
+            {
+              "key": "nivel",
+              "label": "Seu nível",
+              "type": "select",
+              "options": [
+                "Nunca estudei",
+                "Básico",
+                "Intermediário",
+                "Avançado"
+              ],
+              "required": true
+            },
+            {
+              "key": "objetivo",
+              "label": "Objetivo",
+              "type": "select",
+              "options": [
+                "Viagem",
+                "Trabalho",
+                "Prova de proficiência",
+                "Intercâmbio",
+                "Conversação"
+              ],
+              "required": true
+            },
+            {
+              "key": "data_prova",
+              "label": "Data da prova",
+              "type": "date",
+              "required": false,
+              "showIf": {
+                "field": "objetivo",
+                "equals": "Prova de proficiência"
+              }
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "objetivo",
+                "equals": "Prova de proficiência"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Preparação focada no formato da prova."
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Presencial"
+              },
+              "then": {
+                "modality": "IN_PERSON"
+              }
+            },
+            {
+              "if": {
+                "field": "nivel",
+                "in": [
+                  "Básico",
+                  "Intermediário",
+                  "Avançado"
+                ]
+              },
+              "then": {
+                "recommend": "Primeira aula com teste de nivelamento."
+              }
+            }
+          ]
+        }
       }
     ]
   }

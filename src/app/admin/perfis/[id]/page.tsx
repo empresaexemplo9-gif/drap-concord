@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Alert, Badge, Button, Card, Field, Input } from "@/components/ui";
 import { db } from "@/lib/db";
 import { fmt } from "@/lib/format";
+import { profileConfigSchema } from "@/lib/profiles/schema";
 import { publishProfile, saveProfileDraft, sendProfileToReview, unpublishProfile } from "../../actions";
 
 export const metadata = { title: "Editar perfil" };
@@ -62,6 +63,25 @@ export default async function EditarPerfil({ params, searchParams }: { params: P
               <ul className="space-y-1">{p.versions.map((v) => <li key={v.id}>v{v.version} <span className="text-muted">· {fmt(v.createdAt, "dd/MM/yyyy HH:mm")}</span></li>)}</ul>
             )}
           </Card>
+          {(() => {
+            const parsed = profileConfigSchema.safeParse(p.config);
+            const types = parsed.success ? parsed.data.careTypes : [];
+            return (
+              <Card className="text-sm">
+                <h2 className="mb-2 font-semibold">Tipos de atendimento e triagens</h2>
+                {types.length === 0 ? <p className="text-muted">Nenhum. Adicione em <code>careTypes</code>.</p> : (
+                  <ul className="space-y-2">
+                    {types.map((t) => (
+                      <li key={t.key}>
+                        <p className="font-medium">{t.name}</p>
+                        <p className="text-xs text-muted">{t.triage.questions.length} perguntas · {t.triage.rules.length} regras · serviços: {t.services.join(", ")}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
+            );
+          })()}
           {p.status === "PUBLISHED" && (
             <form action={unpublishProfile}><input type="hidden" name="id" value={p.id} /><Button variant="danger" className="w-full">Despublicar</Button></form>
           )}

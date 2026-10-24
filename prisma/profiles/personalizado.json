@@ -63,6 +63,87 @@
     "cancellationPolicy": {
       "minHoursBefore": 12
     },
-    "rules": []
+    "rules": [],
+    "careTypes": [
+      {
+        "key": "geral",
+        "name": "Atendimento",
+        "description": "Conte o que você precisa e o profissional prepara o atendimento.",
+        "services": [
+          "Atendimento"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "necessidade",
+              "label": "O que você precisa?",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "urgencia",
+              "label": "Para quando?",
+              "type": "select",
+              "options": [
+                "Sem pressa",
+                "Nesta semana",
+                "Hoje ou o quanto antes"
+              ],
+              "required": true
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Em domicílio"
+              ],
+              "required": true
+            },
+            {
+              "key": "primeira",
+              "label": "É a primeira vez com este profissional?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Não"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "urgencia",
+                "equals": "Hoje ou o quanto antes"
+              },
+              "then": {
+                "priority": "ALTA"
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "modality": "ONLINE"
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Em domicílio"
+              },
+              "then": {
+                "modality": "HOME"
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }

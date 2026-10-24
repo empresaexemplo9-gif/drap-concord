@@ -64,6 +64,18 @@
         "durationMin": 60,
         "priceCents": 10000,
         "modality": "IN_PERSON"
+      },
+      {
+        "name": "Aula em turma",
+        "durationMin": 60,
+        "priceCents": 6000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Treino para competição",
+        "durationMin": 90,
+        "priceCents": 22000,
+        "modality": "IN_PERSON"
       }
     ],
     "recordTemplate": {
@@ -131,6 +143,243 @@
           }
         ],
         "mode": "AUTO"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "iniciacao",
+        "name": "Iniciação (começar do zero)",
+        "description": "Para quem nunca praticou ou está voltando depois de muito tempo.",
+        "services": [
+          "Aula experimental",
+          "Aula em turma",
+          "Aula individual"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "para_quem",
+              "label": "Para quem é?",
+              "type": "select",
+              "options": [
+                "Para mim",
+                "Para meu filho ou filha"
+              ],
+              "required": true
+            },
+            {
+              "key": "idade",
+              "label": "Faixa de idade",
+              "type": "select",
+              "options": [
+                "4 a 7 anos",
+                "8 a 12 anos",
+                "13 a 17 anos",
+                "18 a 39 anos",
+                "40 a 59 anos",
+                "60 anos ou mais"
+              ],
+              "required": true
+            },
+            {
+              "key": "formato",
+              "label": "Prefere aula:",
+              "type": "select",
+              "options": [
+                "Individual",
+                "Em turma",
+                "Tanto faz"
+              ],
+              "required": true
+            },
+            {
+              "key": "saude",
+              "label": "Tem alguma condição de saúde ou lesão?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "idade",
+                "in": [
+                  "4 a 7 anos",
+                  "8 a 12 anos",
+                  "13 a 17 anos"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "menor-de-idade"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "formato",
+                "equals": "Individual"
+              },
+              "then": {
+                "recommend": "Depois da aula experimental, seguir em aulas individuais."
+              }
+            },
+            {
+              "if": {
+                "field": "formato",
+                "equals": "Em turma"
+              },
+              "then": {
+                "recommend": "Depois da aula experimental, indicar uma turma do mesmo nível."
+              }
+            },
+            {
+              "if": {
+                "field": "saude",
+                "equals": "Sim"
+              },
+              "then": {
+                "tags": [
+                  "exige-atestado"
+                ],
+                "recommend": "Trazer atestado médico."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "aperfeicoamento",
+        "name": "Aperfeiçoamento técnico",
+        "description": "Para quem já pratica e quer evoluir técnica e tática.",
+        "services": [
+          "Aula individual",
+          "Aula em dupla",
+          "Aula em turma"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "nivel",
+              "label": "Seu nível",
+              "type": "select",
+              "options": [
+                "Iniciante",
+                "Intermediário",
+                "Avançado"
+              ],
+              "required": true
+            },
+            {
+              "key": "foco",
+              "label": "O que quer melhorar?",
+              "type": "multiselect",
+              "options": [
+                "Técnica",
+                "Tática ou leitura de jogo",
+                "Condicionamento",
+                "Mental"
+              ],
+              "required": false
+            },
+            {
+              "key": "formato",
+              "label": "Formato",
+              "type": "select",
+              "options": [
+                "Individual",
+                "Em dupla",
+                "Em turma"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "formato",
+                "equals": "Em dupla"
+              },
+              "then": {
+                "service": "Aula em dupla"
+              }
+            },
+            {
+              "if": {
+                "field": "formato",
+                "equals": "Em turma"
+              },
+              "then": {
+                "service": "Aula em turma"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "competicao",
+        "name": "Preparação para competição",
+        "description": "Treino focado em torneios e campeonatos.",
+        "services": [
+          "Treino para competição"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "tem_data",
+              "label": "Já tem competição marcada?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "data",
+              "label": "Data da competição",
+              "type": "date",
+              "required": false,
+              "showIf": {
+                "field": "tem_data",
+                "equals": "Sim"
+              }
+            },
+            {
+              "key": "nivel",
+              "label": "Nível da competição",
+              "type": "select",
+              "options": [
+                "Amador ou clube",
+                "Estadual",
+                "Nacional ou internacional"
+              ],
+              "required": false
+            },
+            {
+              "key": "lesoes",
+              "label": "Tem lesões ou dores?",
+              "type": "textarea",
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "tem_data",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Montar plano de treino até a data da competição."
+              }
+            }
+          ]
+        }
       }
     ]
   }

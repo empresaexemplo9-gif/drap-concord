@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Alert, Badge, Button, Card, PageHeader } from "@/components/ui";
 import { DynamicFields } from "@/components/dynamic-fields";
+import { TriageSummary } from "@/components/triage-summary";
+import { db } from "@/lib/db";
+import { outcomeOf } from "@/lib/triage/service";
 import { SlotPicker } from "@/components/slot-picker";
 import { SubmitButton } from "@/components/submit-button";
 import { requireProfessional } from "@/lib/auth";
@@ -31,6 +34,8 @@ export default async function Atendimento({ params, searchParams }: { params: Pr
   const showRecords = canSeeRecords(memberRole, cfg);
   const records = showRecords ? (await tenant(orgId).records.forClient(appt.clientId)).filter((r) => r.appointmentId === appt.id) : [];
   if (records.length) await audit({ orgId, userId: user.id, action: "record.viewed", entity: "Appointment", entityId: appt.id });
+  const triage = await db.triageResponse.findFirst({ where: { appointmentId: appt.id, orgId } });
+  if (triage && showRecords) await audit({ orgId, userId: user.id, action: "triage.viewed", entity: "TriageResponse", entityId: triage.id });
   const active = appt.status === "PENDING" || appt.status === "CONFIRMED";
   const slots = active ? await availableSlots(professional.id, appt.serviceId, 21) : [];
   const allFields = cfg.recordTemplate.sections.flatMap((s) => s.fields);
@@ -60,6 +65,14 @@ export default async function Atendimento({ params, searchParams }: { params: Pr
             {appt.cancelReason && <p><span className="text-muted">Motivo:</span> {appt.cancelReason}</p>}
             <Link href={`/app/clientes/${appt.clientId}`} className="inline-block pt-2 font-semibold text-primary">Ver ficha de {appt.client.name.split(" ")[0]} →</Link>
           </Card>
+
+          {triage && (
+            <Card>
+              <h2 className="mb-3 text-lg font-semibold">Triagem</h2>
+              <TriageSummary outcome={outcomeOf(triage)} careTypeName={triage.careTypeName} audience="professional" showAnswers={showRecords} />
+              {!showRecords && <p className="mt-3 text-xs text-muted">As respostas da triagem são sigilosas para o seu papel.</p>}
+            </Card>
+          )}
 
           {(active || appt.status === "DONE" || appt.status === "NO_SHOW") && (
             <Card>

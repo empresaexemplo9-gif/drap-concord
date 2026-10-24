@@ -77,6 +77,43 @@ export const ruleSchema = z.object({
   mode: z.enum(["SUGGEST", "AUTO"]).default("SUGGEST"),
 });
 
+// ---------- Triagem por tipo de atendimento ----------
+
+export const PRIORITIES = ["NORMAL", "ALTA", "URGENTE"] as const;
+
+export const triageRuleSchema = z.object({
+  // Condição sobre uma resposta: igual a, alguma entre (vale para múltipla escolha) ou número >= valor.
+  if: z.object({
+    field: z.string(),
+    equals: z.string().optional(),
+    in: z.array(z.string()).optional(),
+    gte: z.number().optional(),
+  }),
+  then: z.object({
+    service: z.string().optional(),
+    modality: z.enum(["IN_PERSON", "ONLINE", "HOME"]).optional(),
+    priority: z.enum(PRIORITIES).optional(),
+    tags: z.array(z.string()).optional(),
+    alert: z.string().optional(),
+    recommend: z.string().optional(),
+    // Interrompe o agendamento online e mostra a orientação (ex.: emergência).
+    stop: z.string().optional(),
+  }),
+});
+
+export const careTypeSchema = z.object({
+  key: z.string().regex(/^[a-z0-9-]+$/, "use letras minúsculas, números e -"),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  /** Serviços (pelo nome) que atendem este tipo; o primeiro é o padrão. */
+  services: z.array(z.string()).min(1),
+  triage: z.object({
+    intro: z.string().optional(),
+    questions: z.array(formFieldSchema).min(1),
+    rules: z.array(triageRuleSchema).default([]),
+  }),
+});
+
 export const profileConfigSchema = z
   .object({
     category: z.string().min(1),
@@ -127,8 +164,26 @@ export const profileConfigSchema = z
     }),
     cancellationPolicy: z.object({ minHoursBefore: z.number().int().min(0) }),
     rules: z.array(ruleSchema).default([]),
+    careTypes: z.array(careTypeSchema).default([]),
   })
   .superRefine((cfg, ctx) => {
+    const serviceNames = new Set(cfg.services.map((s) => s.name));
+    cfg.careTypes.forEach((ct, i) => {
+      const fields = new Set(ct.triage.questions.map((q) => q.key));
+      ct.services.forEach((name, j) => {
+        if (!serviceNames.has(name)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["careTypes", i, "services", j], message: `Serviço “${name}” não existe em services.` });
+        }
+      });
+      ct.triage.rules.forEach((r, j) => {
+        if (!fields.has(r.if.field)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["careTypes", i, "triage", "rules", j, "if", "field"], message: `Pergunta “${r.if.field}” não existe.` });
+        }
+        if (r.then.service && !ct.services.includes(r.then.service)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["careTypes", i, "triage", "rules", j, "then", "service"], message: `Serviço “${r.then.service}” não está na lista deste tipo de atendimento.` });
+        }
+      });
+    });
     cfg.rules.forEach((rule, i) => {
       const sensitive = rule.actions.some((a) =>
         (SENSITIVE_ACTIONS as readonly string[]).includes(a.type),
@@ -149,6 +204,9 @@ export type FormField = z.infer<typeof formFieldSchema>;
 export type FormTemplate = z.infer<typeof formTemplateSchema>;
 export type RuleConfig = z.infer<typeof ruleSchema>;
 export type RuleAction = z.infer<typeof ruleActionSchema>;
+export type CareType = z.infer<typeof careTypeSchema>;
+export type TriageRule = z.infer<typeof triageRuleSchema>;
+export type Priority = (typeof PRIORITIES)[number];
 
 export const profileOverridesSchema = z
   .object({

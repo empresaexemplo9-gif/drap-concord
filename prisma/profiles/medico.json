@@ -86,6 +86,18 @@
         "durationMin": 30,
         "priceCents": 25000,
         "modality": "ONLINE"
+      },
+      {
+        "name": "Check-up",
+        "durationMin": 40,
+        "priceCents": 35000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Renovação de receita",
+        "durationMin": 20,
+        "priceCents": 15000,
+        "modality": "ONLINE"
       }
     ],
     "recordTemplate": {
@@ -192,6 +204,395 @@
           }
         ],
         "mode": "AUTO"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "sintoma",
+        "name": "Sintoma ou queixa nova",
+        "description": "Para quando algo começou a incomodar: dor, febre, mal-estar, alterações no corpo.",
+        "services": [
+          "Consulta",
+          "Teleconsulta"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "alerta",
+              "label": "Você tem algum destes sinais agora?",
+              "type": "multiselect",
+              "options": [
+                "Dor ou aperto no peito",
+                "Falta de ar intensa",
+                "Desmaio",
+                "Fraqueza, boca torta ou fala enrolada de repente",
+                "Sangramento intenso",
+                "Nenhum destes"
+              ],
+              "required": true
+            },
+            {
+              "key": "queixa",
+              "label": "Conte o que está sentindo",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "tempo",
+              "label": "Desde quando?",
+              "type": "select",
+              "options": [
+                "Começou hoje",
+                "Há alguns dias",
+                "Há semanas",
+                "Há meses ou mais"
+              ],
+              "required": true
+            },
+            {
+              "key": "febre",
+              "label": "Está com febre?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim, até 38,5 °C",
+                "Sim, acima de 38,5 °C"
+              ],
+              "required": false
+            },
+            {
+              "key": "dor",
+              "label": "Intensidade da dor (0 = sem dor, 10 = pior possível)",
+              "type": "scale",
+              "min": 0,
+              "max": 10,
+              "required": false
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "alerta",
+                "in": [
+                  "Dor ou aperto no peito",
+                  "Falta de ar intensa",
+                  "Desmaio",
+                  "Fraqueza, boca torta ou fala enrolada de repente",
+                  "Sangramento intenso"
+                ]
+              },
+              "then": {
+                "stop": "Esses sinais podem ser uma emergência. Ligue 192 (SAMU) ou vá ao pronto-socorro mais próximo agora. Não espere por uma consulta agendada.",
+                "priority": "URGENTE"
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Teleconsulta",
+                "modality": "ONLINE"
+              }
+            },
+            {
+              "if": {
+                "field": "tempo",
+                "equals": "Começou hoje"
+              },
+              "then": {
+                "priority": "ALTA"
+              }
+            },
+            {
+              "if": {
+                "field": "febre",
+                "equals": "Sim, acima de 38,5 °C"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Febre alta: orientar hidratação e antitérmico conforme prescrição até a consulta."
+              }
+            },
+            {
+              "if": {
+                "field": "dor",
+                "gte": 7
+              },
+              "then": {
+                "priority": "ALTA"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "checkup",
+        "name": "Check-up e prevenção",
+        "description": "Avaliação geral de saúde, exames de rotina e prevenção.",
+        "services": [
+          "Check-up"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "idade",
+              "label": "Sua faixa de idade",
+              "type": "select",
+              "options": [
+                "Até 39 anos",
+                "40 a 59 anos",
+                "60 anos ou mais"
+              ],
+              "required": true
+            },
+            {
+              "key": "historico",
+              "label": "Você ou sua família têm histórico de:",
+              "type": "multiselect",
+              "options": [
+                "Pressão alta",
+                "Diabetes",
+                "Colesterol alto",
+                "Câncer na família",
+                "Doença do coração na família",
+                "Nenhum"
+              ],
+              "required": false
+            },
+            {
+              "key": "exames",
+              "label": "Fez exames de sangue no último ano?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Não"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "idade",
+                "in": [
+                  "Até 39 anos",
+                  "40 a 59 anos",
+                  "60 anos ou mais"
+                ]
+              },
+              "then": {
+                "recommend": "Trazer exames recentes e a lista de medicamentos em uso."
+              }
+            },
+            {
+              "if": {
+                "field": "idade",
+                "equals": "60 anos ou mais"
+              },
+              "then": {
+                "tags": [
+                  "idoso"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "exames",
+                "equals": "Não"
+              },
+              "then": {
+                "recommend": "O médico pode pedir exames de rotina antes do retorno."
+              }
+            },
+            {
+              "if": {
+                "field": "historico",
+                "in": [
+                  "Pressão alta",
+                  "Diabetes",
+                  "Colesterol alto",
+                  "Doença do coração na família"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "risco-cardiovascular"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "cronico",
+        "name": "Acompanhamento de doença crônica",
+        "description": "Pressão alta, diabetes, asma, tireoide e outras condições que pedem acompanhamento.",
+        "services": [
+          "Consulta",
+          "Teleconsulta"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "condicao",
+              "label": "Qual condição você acompanha?",
+              "type": "multiselect",
+              "options": [
+                "Pressão alta",
+                "Diabetes",
+                "Asma ou DPOC",
+                "Tireoide",
+                "Outra"
+              ],
+              "required": true
+            },
+            {
+              "key": "controle",
+              "label": "Como está o controle?",
+              "type": "select",
+              "options": [
+                "Bem controlada",
+                "Às vezes descompensa",
+                "Descontrolada"
+              ],
+              "required": true
+            },
+            {
+              "key": "remedios",
+              "label": "Quais remédios você usa?",
+              "type": "textarea",
+              "required": false
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Teleconsulta",
+                "modality": "ONLINE"
+              }
+            },
+            {
+              "if": {
+                "field": "controle",
+                "equals": "Descontrolada"
+              },
+              "then": {
+                "priority": "ALTA",
+                "service": "Consulta",
+                "modality": "IN_PERSON",
+                "recommend": "Condição descontrolada: preferir consulta presencial."
+              }
+            },
+            {
+              "if": {
+                "field": "condicao",
+                "in": [
+                  "Pressão alta",
+                  "Diabetes",
+                  "Asma ou DPOC",
+                  "Tireoide",
+                  "Outra"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "doença-crônica"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "receita",
+        "name": "Renovação de receita",
+        "description": "Para renovar a receita de um remédio de uso contínuo.",
+        "services": [
+          "Renovação de receita",
+          "Consulta"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "remedio",
+              "label": "Qual remédio você precisa renovar?",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "ultima",
+              "label": "Quando foi sua última consulta sobre esse remédio?",
+              "type": "select",
+              "options": [
+                "Menos de 6 meses",
+                "6 a 12 meses",
+                "Mais de 1 ano"
+              ],
+              "required": true
+            },
+            {
+              "key": "efeitos",
+              "label": "Teve efeitos colaterais ou mudou algo na saúde?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "ultima",
+                "equals": "Mais de 1 ano"
+              },
+              "then": {
+                "service": "Consulta",
+                "modality": "IN_PERSON",
+                "recommend": "Mais de 1 ano desde a última consulta: é preciso consulta completa para renovar."
+              }
+            },
+            {
+              "if": {
+                "field": "efeitos",
+                "equals": "Sim"
+              },
+              "then": {
+                "service": "Consulta",
+                "recommend": "Efeitos colaterais ou mudanças de saúde precisam ser avaliados em consulta."
+              }
+            }
+          ]
+        }
       }
     ]
   }

@@ -17,7 +17,7 @@ export function tenant(orgId: string) {
       list: (where: Prisma.AppointmentWhereInput = {}) =>
         db.appointment.findMany({
           where: { ...where, orgId },
-          include: { client: true, service: true },
+          include: { client: true, service: true, triage: { select: { outcome: true, careTypeName: true } } },
           orderBy: { startsAt: "asc" },
         }),
       get: (id: string) =>

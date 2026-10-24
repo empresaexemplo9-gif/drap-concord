@@ -123,6 +123,8 @@ test("admin adiciona uma nova profissão sem código e ela aparece no cadastro e
   config.description = "Consultas e vacinas para cães e gatos.";
   config.terminology.client = { singular: "tutor", plural: "tutores" };
   config.services = [{ name: "Consulta veterinária", durationMin: 40, priceCents: 15000, modality: "IN_PERSON" }];
+  // O tipo de atendimento herdado precisa apontar para um serviço que existe.
+  config.careTypes[0].services = ["Consulta veterinária"];
   await editor.fill(JSON.stringify(config, null, 2));
   await page.getByRole("button", { name: "Publicar nova versão" }).click();
   await expect(page.getByText("Publicado! Já aparece no cadastro e na vitrine.")).toBeVisible();
@@ -294,4 +296,60 @@ test("contas de prévia não fazem login", async ({ page }) => {
   await page.getByLabel("Senha").fill("qualquer-coisa");
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page.getByText("E-mail ou senha incorretos.")).toBeVisible();
+});
+
+test("triagem: cliente responde, recebe recomendação, agenda; profissional vê prioridade e respostas", async ({ page }) => {
+  const name = `Paciente Triagem ${uid()}`;
+  await page.goto("/p/ana-ribeiro");
+  await page.getByRole("link", { name: "Agendar com triagem" }).click();
+  await expect(page.getByRole("heading", { name: "O que você procura?" })).toBeVisible();
+  await page.getByRole("link", { name: /Terapia individual \(adultos\)/ }).click();
+
+  await page.getByLabel("Ansiedade").check();
+  await page.getByLabel(/pensamentos de se machucar/).selectOption("Às vezes");
+  await page.getByLabel(/Como prefere ser atendido/).selectOption("Online");
+  await page.getByRole("button", { name: "Ver recomendação e horários" }).click();
+
+  await expect(page.getByRole("heading", { name: "Recomendado para você" })).toBeVisible();
+  await expect(page.locator("main").getByText("Sessão online").first()).toBeVisible();
+  await expect(page.getByText(/188/).first()).toBeVisible();
+
+  await page.locator('label:has(input[name="horario"])').nth(20).click();
+  await page.getByRole("button", { name: "Continuar" }).click();
+  await page.getByLabel("Nome completo").fill(name);
+  await page.getByLabel("E-mail").fill(`triagem-${uid()}@teste.dev`);
+  await page.getByLabel("Celular / WhatsApp").fill("(11) 90000-0001");
+  await page.getByLabel("Crie uma senha").fill(PASSWORD);
+  await page.getByRole("checkbox", { name: /Autorizo o tratamento/ }).check();
+  await page.getByRole("button", { name: "Confirmar agendamento" }).click();
+  await expect(page.getByRole("heading", { name: "Pedido enviado!" })).toBeVisible();
+
+  await page.context().clearCookies();
+  await login(page, "ana@concord.dev");
+  await page.goto("/app/clientes?q=" + encodeURIComponent(name));
+  await page.getByRole("link", { name: new RegExp(name) }).click();
+  await expect(page.getByText("atenção-risco").first()).toBeVisible();
+  await page.getByRole("link", { name: "Ver respostas no atendimento →" }).click();
+  const card = page.locator("div", { has: page.getByRole("heading", { name: "Triagem", exact: true }) }).last();
+  await expect(card.getByText("Urgente")).toBeVisible();
+  await expect(card.getByText("Às vezes")).toBeVisible();
+});
+
+test("triagem: sinal de emergência interrompe o agendamento online", async ({ page }) => {
+  await login(page, "admin@concord.dev");
+  await page.goto("/admin/ver-como");
+  await page.getByRole("group", { name: "Profissão Médico(a)" }).getByRole("button", { name: /Ver como/ }).click();
+  await expect(page).toHaveURL(/\/app$/);
+  const slug = (await page.getByRole("link", { name: /^\/p\// }).first().textContent())!.replace("/p/", "").trim();
+  await page.goto(`/p/${slug}/agendar`);
+  await page.getByRole("link", { name: /Sintoma ou queixa nova/ }).click();
+  await page.getByLabel("Dor ou aperto no peito").check();
+  await page.getByLabel(/Conte o que está sentindo/).fill("Aperto no peito desde cedo");
+  await page.getByLabel(/Desde quando/).selectOption("Começou hoje");
+  await page.getByLabel(/Como prefere ser atendido/).selectOption("Presencial");
+  await page.getByRole("button", { name: "Ver recomendação e horários" }).click();
+  await expect(page.getByRole("heading", { name: "Procure atendimento imediato" })).toBeVisible();
+  await expect(page.getByText(/192/).first()).toBeVisible();
+  await expect(page.locator('input[name="horario"]')).toHaveCount(0);
+  await page.getByRole("button", { name: "Voltar ao admin" }).click();
 });

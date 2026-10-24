@@ -81,6 +81,37 @@ Sem código e sem deploy.
 }
 ```
 
+## Tipos de atendimento e triagem (`careTypes`)
+
+Cada profissão pode ter vários tipos de atendimento. O cliente escolhe um ("O que você procura?"), responde a triagem e a plataforma configura o atendimento.
+
+```json
+{
+  "key": "terapia-adulto",
+  "name": "Terapia individual (adultos)",
+  "description": "Ansiedade, tristeza, luto, conflitos…",
+  "services": ["Primeira sessão (acolhimento)", "Sessão online"],
+  "triage": {
+    "intro": "Suas respostas são confidenciais.",
+    "questions": [
+      { "key": "risco", "label": "Tem pensamentos de se machucar?", "type": "select", "options": ["Não", "Às vezes", "Sim"], "required": true },
+      { "key": "modalidade", "label": "Como prefere?", "type": "select", "options": ["Presencial", "Online"], "required": true }
+    ],
+    "rules": [
+      { "if": { "field": "modalidade", "equals": "Online" }, "then": { "service": "Sessão online", "modality": "ONLINE" } },
+      { "if": { "field": "risco", "in": ["Às vezes", "Sim"] }, "then": { "priority": "URGENTE", "tags": ["atenção-risco"], "alert": "Ligue 188 (CVV)." } }
+    ]
+  }
+}
+```
+
+- `services`: nomes de serviços da profissão que atendem esse tipo. O primeiro é o padrão.
+- Perguntas usam os mesmos tipos de campo dos formulários (inclusive `showIf`).
+- Condições: `equals` (igual a), `in` (alguma das opções, vale para múltipla escolha) e `gte` (número maior ou igual).
+- Resultados: `service`, `modality`, `priority` (`NORMAL`, `ALTA`, `URGENTE`, prevalece a mais alta), `tags` (vão para o cadastro do cliente), `recommend`, `alert` e `stop` (interrompe o agendamento online e mostra a orientação, por exemplo em emergência).
+- As regras rodam em ordem: se duas definem o serviço, vale a última.
+- O schema recusa regras que apontam para pergunta ou serviço inexistente.
+
 ## Para quem desenvolve
 
 Os perfis iniciais ficam em `prisma/profiles/*.json` e entram no banco com `npm run db:seed`. `tests/profiles.test.ts` valida todos eles. Adicionar um arquivo novo nessa pasta também funciona, mas o caminho principal é o painel admin.

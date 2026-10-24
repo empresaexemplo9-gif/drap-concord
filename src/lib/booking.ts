@@ -55,6 +55,8 @@ export async function book(input: {
   startsAt: Date;
   byProfessional?: boolean;
   notes?: string;
+  /** Modalidade definida pela triagem (quando difere da modalidade padrão do serviço). */
+  modality?: "IN_PERSON" | "ONLINE" | "HOME";
 }) {
   const pro = await db.professional.findUniqueOrThrow({ where: { id: input.professionalId } });
   const service = await db.service.findFirstOrThrow({ where: { id: input.serviceId, professionalId: pro.id } });
@@ -88,7 +90,7 @@ export async function book(input: {
           serviceId: service.id,
           startsAt: input.startsAt,
           endsAt,
-          modality: service.modality,
+          modality: input.modality ?? service.modality,
           status: input.byProfessional ? "CONFIRMED" : "PENDING",
           notes: input.notes,
         },

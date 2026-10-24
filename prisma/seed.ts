@@ -47,6 +47,27 @@ async function upsertThemes() {
   }
 }
 
+/**
+ * Serviços novos do perfil (ex.: dos tipos de atendimento) entram nos
+ * profissionais de demonstração e de prévia. Profissionais reais não são tocados.
+ */
+async function syncDemoServices(demoEmails: string[]) {
+  const pros = await db.professional.findMany({
+    where: { user: { OR: [{ email: { in: demoEmails } }, { isSandbox: true }] } },
+    include: { services: true, profile: true },
+  });
+  for (const pro of pros) {
+    const cfg = profileConfigSchema.parse(pro.profile.config);
+    const have = new Set(pro.services.map((s) => s.name));
+    const missing = cfg.services.filter((s) => !have.has(s.name));
+    if (missing.length) {
+      await db.service.createMany({
+        data: missing.map((s) => ({ orgId: pro.orgId, professionalId: pro.id, name: s.name, durationMin: s.durationMin, priceCents: s.priceCents, modality: s.modality })),
+      });
+    }
+  }
+}
+
 async function user(email: string, name: string, role: "PLATFORM_ADMIN" | "PROFESSIONAL" | "CLIENT") {
   const passwordHash = await bcrypt.hash(PASSWORD, 10);
   return db.user.upsert({ where: { email }, update: {}, create: { email, name, role, passwordHash } });
@@ -106,6 +127,8 @@ async function main() {
     specialties: ["Tênis", "Iniciantes", "Crianças"],
     bio: "Professor de tênis há 8 anos. Do primeiro saque ao torneio.",
   });
+
+  await syncDemoServices(["ana@concord.dev", "carlos@concord.dev", "juliana@concord.dev", "rafael@concord.dev"]);
 
   // Paciente de demonstração com histórico na agenda da Ana.
   const maria = await user("maria@exemplo.com", "Maria Oliveira", "CLIENT");

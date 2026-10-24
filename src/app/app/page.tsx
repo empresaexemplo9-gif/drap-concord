@@ -29,6 +29,8 @@ export default async function Hoje({ searchParams }: { searchParams: Promise<{ b
     db.appointment.count({ where: { orgId, professionalId: professional.id, status: "PENDING", startsAt: { gte: new Date() } } }),
   ]);
   const expected = week.reduce((s, a) => s + a.service.priceCents, 0);
+  const prio = (a: (typeof week)[number]) => (a.triage?.outcome as { priority?: string } | undefined)?.priority;
+  const flagged = week.filter((a) => prio(a) === "URGENTE" || prio(a) === "ALTA");
 
   return (
     <>
@@ -53,6 +55,21 @@ export default async function Hoje({ searchParams }: { searchParams: Promise<{ b
         <Card><p className="text-sm text-muted">Aguardando confirmação</p><p className="mt-1 font-serif text-3xl font-semibold">{pendingConfirm}</p></Card>
         <Card><p className="text-sm text-muted">Receita prevista (7 dias)</p><p className="mt-1 font-serif text-2xl font-semibold">{money(expected) === "Gratuito" ? "R$ 0,00" : money(expected)}</p></Card>
       </div>
+
+      {flagged.length > 0 && (
+        <div className="mb-6 rounded-2xl border border-danger/30 bg-danger-bg p-4 text-sm text-danger" role="status">
+          <p className="font-semibold">{flagged.length} {flagged.length === 1 ? "atendimento com triagem prioritária" : "atendimentos com triagem prioritária"} nos próximos 7 dias</p>
+          <ul className="mt-2 space-y-1">
+            {flagged.slice(0, 5).map((a) => (
+              <li key={a.id}>
+                <Link href={`/app/atendimentos/${a.id}`} className="underline">
+                  {prio(a) === "URGENTE" ? "Urgente" : "Alta"}: {a.client.name} · {a.triage?.careTypeName} · {dateLong(a.startsAt, tz)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {pendingRules > 0 && (
         <Link href="/app/regras" className="mb-6 block rounded-2xl border border-accent/40 bg-warning-bg p-4 text-sm text-warning">

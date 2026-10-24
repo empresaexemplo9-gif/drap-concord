@@ -21,6 +21,7 @@ export default async function Cliente({ params }: { params: Promise<{ id: string
   const cfg = await professionalConfig(professional);
   const tz = professional.timezone;
   const showRecords = canSeeRecords(memberRole, cfg);
+  const triages = showRecords ? await db.triageResponse.findMany({ where: { orgId, clientId: id }, orderBy: { createdAt: "desc" } }) : [];
   const [appts, records, events] = await Promise.all([
     tenant(orgId).appointments.list({ clientId: id }),
     showRecords ? tenant(orgId).records.forClient(id) : Promise.resolve([]),
@@ -53,6 +54,20 @@ export default async function Cliente({ params }: { params: Promise<{ id: string
         </div>
       ),
     })),
+    ...triages.map((t) => {
+      const o = t.outcome as { priority: string; recommendations: string[] };
+      return {
+        at: t.createdAt,
+        kind: "triage",
+        node: (
+          <div className="text-sm">
+            <p><Badge tone={o.priority === "URGENTE" ? "danger" : o.priority === "ALTA" ? "warning" : "info"}>Triagem</Badge> <strong className="ml-1">{t.careTypeName}</strong> <span className="text-muted">· {fmt(t.createdAt, "dd/MM/yyyy", tz)}</span></p>
+            {o.recommendations.length > 0 && <p className="mt-1 text-muted">{o.recommendations.join(" · ")}</p>}
+            {t.appointmentId && <Link href={`/app/atendimentos/${t.appointmentId}`} className="text-xs font-semibold text-primary">Ver respostas no atendimento →</Link>}
+          </div>
+        ),
+      };
+    }),
     ...events.map((e) => ({
       at: e.createdAt,
       kind: "rule",

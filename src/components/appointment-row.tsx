@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "./ui";
 import { modalityLabel, statusLabel, statusTone, time } from "@/lib/format";
+import { priorityLabel, priorityTone, type TriageOutcome } from "@/lib/triage/engine";
 
 type Row = {
   id: string;
@@ -10,6 +11,7 @@ type Row = {
   modality: string;
   client: { name: string };
   service: { name: string };
+  triage?: { outcome: unknown } | null;
 };
 
 export function AppointmentRow({ a, href, tz }: { a: Row; href: string; tz?: string }) {
@@ -23,6 +25,10 @@ export function AppointmentRow({ a, href, tz }: { a: Row; href: string; tz?: str
         <p className="truncate font-semibold">{a.client.name}</p>
         <p className="truncate text-sm text-muted">{a.service.name} · {modalityLabel[a.modality]}</p>
       </div>
+      {(() => {
+        const p = (a.triage?.outcome as TriageOutcome | undefined)?.priority;
+        return p && p !== "NORMAL" ? <Badge tone={priorityTone[p]}>{priorityLabel[p]}</Badge> : null;
+      })()}
       <Badge tone={statusTone[a.status]}>{statusLabel[a.status]}</Badge>
     </Link>
   );

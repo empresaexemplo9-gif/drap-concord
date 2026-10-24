@@ -76,6 +76,18 @@
         "durationMin": 50,
         "priceCents": 20000,
         "modality": "ONLINE"
+      },
+      {
+        "name": "Nutrição esportiva",
+        "durationMin": 60,
+        "priceCents": 28000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Nutrição materno-infantil",
+        "durationMin": 60,
+        "priceCents": 26000,
+        "modality": "IN_PERSON"
       }
     ],
     "recordTemplate": {
@@ -158,6 +170,368 @@
           }
         ],
         "mode": "AUTO"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "emagrecimento",
+        "name": "Emagrecimento e reeducação alimentar",
+        "description": "Para perder peso com saúde e mudar hábitos de forma sustentável.",
+        "services": [
+          "Primeira consulta",
+          "Consulta online"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "meta",
+              "label": "Quanto gostaria de perder?",
+              "type": "select",
+              "options": [
+                "Até 5 kg",
+                "5 a 15 kg",
+                "Mais de 15 kg",
+                "Não sei"
+              ],
+              "required": true
+            },
+            {
+              "key": "condicoes",
+              "label": "Você tem alguma destas condições?",
+              "type": "multiselect",
+              "options": [
+                "Diabetes",
+                "Pressão alta",
+                "Colesterol alto",
+                "Tireoide",
+                "Gastrite ou refluxo",
+                "Nenhuma"
+              ],
+              "required": false
+            },
+            {
+              "key": "comportamento",
+              "label": "Já teve episódios de compulsão, vômito provocado ou restrição extrema?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim",
+                "Prefiro não responder"
+              ],
+              "required": true
+            },
+            {
+              "key": "exames",
+              "label": "Tem exames de sangue recentes?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Não"
+              ],
+              "required": false
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Consulta online",
+                "modality": "ONLINE"
+              }
+            },
+            {
+              "if": {
+                "field": "comportamento",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA",
+                "tags": [
+                  "cuidado-comportamento-alimentar"
+                ],
+                "recommend": "Acompanhamento conjunto com psicólogo pode ser indicado."
+              }
+            },
+            {
+              "if": {
+                "field": "exames",
+                "equals": "Não"
+              },
+              "then": {
+                "recommend": "Peça exames de rotina ao seu médico ou traga os mais recentes."
+              }
+            },
+            {
+              "if": {
+                "field": "condicoes",
+                "in": [
+                  "Diabetes",
+                  "Pressão alta",
+                  "Colesterol alto",
+                  "Tireoide",
+                  "Gastrite ou refluxo"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "condição-clínica"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "esportiva",
+        "name": "Nutrição esportiva",
+        "description": "Ganho de massa, performance e preparação para provas.",
+        "services": [
+          "Nutrição esportiva"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "esporte",
+              "label": "Qual esporte ou atividade você pratica?",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "objetivo",
+              "label": "Seu objetivo",
+              "type": "select",
+              "options": [
+                "Ganho de massa",
+                "Performance ou prova",
+                "Perda de gordura"
+              ],
+              "required": true
+            },
+            {
+              "key": "treinos",
+              "label": "Quantos treinos por semana?",
+              "type": "select",
+              "options": [
+                "1 a 2",
+                "3 a 4",
+                "5 ou mais"
+              ],
+              "required": false
+            },
+            {
+              "key": "prova",
+              "label": "Tem prova ou competição marcada?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "data_prova",
+              "label": "Data da prova",
+              "type": "date",
+              "required": false,
+              "showIf": {
+                "field": "prova",
+                "equals": "Sim"
+              }
+            },
+            {
+              "key": "suplementos",
+              "label": "Usa suplementos? Quais?",
+              "type": "textarea",
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "prova",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Planejar a estratégia nutricional até a data da prova."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "clinica",
+        "name": "Condição de saúde",
+        "description": "Diabetes, doença renal, intestino, alergias e pós-bariátrica.",
+        "services": [
+          "Primeira consulta",
+          "Consulta online"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "condicao",
+              "label": "Qual condição?",
+              "type": "multiselect",
+              "options": [
+                "Diabetes",
+                "Doença renal",
+                "Doenças intestinais",
+                "Alergia ou intolerância alimentar",
+                "Pós-cirurgia bariátrica",
+                "Outra"
+              ],
+              "required": true
+            },
+            {
+              "key": "pedido",
+              "label": "Tem encaminhamento médico?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "condicao",
+                "in": [
+                  "Doença renal",
+                  "Pós-cirurgia bariátrica",
+                  "Diabetes"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "condição-clínica"
+                ],
+                "recommend": "Trazer exames e relatório médico; o plano será ajustado ao tratamento."
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Consulta online",
+                "modality": "ONLINE"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "materno-infantil",
+        "name": "Gestação, amamentação e infância",
+        "description": "Alimentação na gestação e amamentação, introdução alimentar e crianças.",
+        "services": [
+          "Nutrição materno-infantil"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "fase",
+              "label": "Qual a fase?",
+              "type": "select",
+              "options": [
+                "Gestante",
+                "Amamentando",
+                "Introdução alimentar do bebê",
+                "Criança até 12 anos"
+              ],
+              "required": true
+            },
+            {
+              "key": "semanas",
+              "label": "Quantas semanas de gestação?",
+              "type": "number",
+              "required": false,
+              "showIf": {
+                "field": "fase",
+                "equals": "Gestante"
+              }
+            },
+            {
+              "key": "condicoes",
+              "label": "Alguma destas condições?",
+              "type": "multiselect",
+              "options": [
+                "Diabetes gestacional",
+                "Pressão alta",
+                "Anemia",
+                "Nenhuma"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "fase",
+                "equals": "Gestante"
+              },
+              "then": {
+                "tags": [
+                  "gestante"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "condicoes",
+                "equals": "Diabetes gestacional"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Diabetes gestacional: alinhar o plano com o pré-natal."
+              }
+            },
+            {
+              "if": {
+                "field": "fase",
+                "in": [
+                  "Introdução alimentar do bebê",
+                  "Criança até 12 anos"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "menor-de-idade"
+                ],
+                "recommend": "Comparecer com o responsável."
+              }
+            }
+          ]
+        }
       }
     ]
   }

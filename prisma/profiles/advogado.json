@@ -5,18 +5,50 @@
     "category": "Jurídico",
     "description": "Consultas jurídicas, acompanhamento de processos e elaboração de pareceres.",
     "terminology": {
-      "client": { "singular": "cliente", "plural": "clientes" },
-      "appointment": { "singular": "reunião", "plural": "reuniões" },
+      "client": {
+        "singular": "cliente",
+        "plural": "clientes"
+      },
+      "appointment": {
+        "singular": "reunião",
+        "plural": "reuniões"
+      },
       "record": "Ficha do caso",
       "professional": "Advogado(a)"
     },
-    "registry": { "label": "OAB", "required": true },
+    "registry": {
+      "label": "OAB",
+      "required": true
+    },
     "professionalFields": [
-      { "key": "practiceAreas", "label": "Áreas de atuação", "type": "multiselect", "options": ["Civil", "Trabalhista", "Família", "Consumidor", "Empresarial", "Previdenciário", "Criminal", "Tributário"] }
+      {
+        "key": "practiceAreas",
+        "label": "Áreas de atuação",
+        "type": "multiselect",
+        "options": [
+          "Civil",
+          "Trabalhista",
+          "Família",
+          "Consumidor",
+          "Empresarial",
+          "Previdenciário",
+          "Criminal",
+          "Tributário"
+        ]
+      }
     ],
     "clientFields": [
-      { "key": "document", "label": "CPF ou CNPJ", "type": "text", "required": true },
-      { "key": "address", "label": "Endereço", "type": "text" }
+      {
+        "key": "document",
+        "label": "CPF ou CNPJ",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "address",
+        "label": "Endereço",
+        "type": "text"
+      }
     ],
     "intakeForm": {
       "name": "Sobre o seu caso",
@@ -24,18 +56,87 @@
         {
           "title": "Resumo",
           "fields": [
-            { "key": "area", "label": "Área do problema", "type": "select", "options": ["Civil", "Trabalhista", "Família", "Consumidor", "Empresarial", "Outro"], "required": true },
-            { "key": "summary", "label": "Conte resumidamente o que aconteceu", "type": "textarea", "required": true },
-            { "key": "hasDeadline", "label": "Existe algum prazo correndo?", "type": "select", "options": ["Não sei", "Não", "Sim"], "required": true },
-            { "key": "deadlineDate", "label": "Qual a data do prazo?", "type": "date", "showIf": { "field": "hasDeadline", "equals": "Sim" } }
+            {
+              "key": "area",
+              "label": "Área do problema",
+              "type": "select",
+              "options": [
+                "Civil",
+                "Trabalhista",
+                "Família",
+                "Consumidor",
+                "Empresarial",
+                "Outro"
+              ],
+              "required": true
+            },
+            {
+              "key": "summary",
+              "label": "Conte resumidamente o que aconteceu",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "hasDeadline",
+              "label": "Existe algum prazo correndo?",
+              "type": "select",
+              "options": [
+                "Não sei",
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "deadlineDate",
+              "label": "Qual a data do prazo?",
+              "type": "date",
+              "showIf": {
+                "field": "hasDeadline",
+                "equals": "Sim"
+              }
+            }
           ]
         }
       ]
     },
     "services": [
-      { "name": "Consulta jurídica", "durationMin": 60, "priceCents": 35000, "modality": "IN_PERSON" },
-      { "name": "Consulta jurídica online", "durationMin": 60, "priceCents": 30000, "modality": "ONLINE" },
-      { "name": "Reunião de acompanhamento", "durationMin": 30, "priceCents": 0, "modality": "ONLINE" }
+      {
+        "name": "Consulta jurídica",
+        "durationMin": 60,
+        "priceCents": 35000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Consulta jurídica online",
+        "durationMin": 60,
+        "priceCents": 30000,
+        "modality": "ONLINE"
+      },
+      {
+        "name": "Reunião de acompanhamento",
+        "durationMin": 30,
+        "priceCents": 0,
+        "modality": "ONLINE"
+      },
+      {
+        "name": "Análise de contrato",
+        "durationMin": 60,
+        "priceCents": 40000,
+        "modality": "ONLINE"
+      },
+      {
+        "name": "Consulta trabalhista",
+        "durationMin": 60,
+        "priceCents": 30000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Consulta de família",
+        "durationMin": 60,
+        "priceCents": 35000,
+        "modality": "IN_PERSON"
+      }
     ],
     "recordTemplate": {
       "name": "Registro da reunião",
@@ -43,47 +144,636 @@
         {
           "title": "Caso",
           "fields": [
-            { "key": "processNumber", "label": "Número do processo", "type": "text" },
-            { "key": "facts", "label": "Fatos relatados", "type": "textarea", "required": true },
-            { "key": "opinion", "label": "Parecer / orientação dada", "type": "textarea", "required": true },
-            { "key": "nextDeadline", "label": "Próximo prazo", "type": "date" },
-            { "key": "pendingDocs", "label": "Documentos pendentes do cliente", "type": "checklist", "options": ["RG/CPF", "Comprovante de residência", "Contrato", "Provas"] }
+            {
+              "key": "processNumber",
+              "label": "Número do processo",
+              "type": "text"
+            },
+            {
+              "key": "facts",
+              "label": "Fatos relatados",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "opinion",
+              "label": "Parecer / orientação dada",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "nextDeadline",
+              "label": "Próximo prazo",
+              "type": "date"
+            },
+            {
+              "key": "pendingDocs",
+              "label": "Documentos pendentes do cliente",
+              "type": "checklist",
+              "options": [
+                "RG/CPF",
+                "Comprovante de residência",
+                "Contrato",
+                "Provas"
+              ]
+            }
           ]
         }
       ]
     },
     "documents": [
-      { "key": "procuracao", "name": "Procuração", "direction": "OUT", "signatureRequired": true },
-      { "key": "contrato-honorarios", "name": "Contrato de honorários", "direction": "BOTH", "signatureRequired": true },
-      { "key": "parecer", "name": "Parecer jurídico", "direction": "OUT", "signatureRequired": true },
-      { "key": "provas", "name": "Documentos e provas do cliente", "direction": "IN" }
+      {
+        "key": "procuracao",
+        "name": "Procuração",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "contrato-honorarios",
+        "name": "Contrato de honorários",
+        "direction": "BOTH",
+        "signatureRequired": true
+      },
+      {
+        "key": "parecer",
+        "name": "Parecer jurídico",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "provas",
+        "name": "Documentos e provas do cliente",
+        "direction": "IN"
+      }
     ],
     "compliance": {
       "validation": "PENDENTE_VALIDACAO",
       "confidentiality": "SIGILOSO",
       "retentionYears": 5,
       "signatureRequired": true,
-      "consents": ["Tratamento de dados pessoais para prestação de serviços jurídicos (LGPD)"],
-      "recordHiddenFrom": ["FINANCE"],
+      "consents": [
+        "Tratamento de dados pessoais para prestação de serviços jurídicos (LGPD)"
+      ],
+      "recordHiddenFrom": [
+        "FINANCE"
+      ],
       "notes": "Sigilo profissional e guarda de documentos a validar por especialista conforme normas da OAB."
     },
-    "cancellationPolicy": { "minHoursBefore": 12 },
+    "cancellationPolicy": {
+      "minHoursBefore": 12
+    },
     "rules": [
       {
         "key": "prazo-proximo",
         "name": "Avisar quando um prazo se aproxima",
         "trigger": "DEADLINE_APPROACHING",
-        "conditions": { "days": 5 },
-        "actions": [ { "type": "NOTIFY_PROFESSIONAL", "message": "O prazo do caso de {{client}} vence em {{days}} dias." } ],
+        "conditions": {
+          "days": 5
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_PROFESSIONAL",
+            "message": "O prazo do caso de {{client}} vence em {{days}} dias."
+          }
+        ],
         "mode": "AUTO"
       },
       {
         "key": "faltas-aviso",
         "name": "Avisar o profissional após 2 faltas",
         "trigger": "NO_SHOW",
-        "conditions": { "consecutiveGte": 2 },
-        "actions": [ { "type": "NOTIFY_PROFESSIONAL", "message": "{{client}} faltou a {{count}} reuniões seguidas." } ],
+        "conditions": {
+          "consecutiveGte": 2
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_PROFESSIONAL",
+            "message": "{{client}} faltou a {{count}} reuniões seguidas."
+          }
+        ],
         "mode": "AUTO"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "consumidor",
+        "name": "Direito do consumidor",
+        "description": "Produto com defeito, cobrança indevida, nome negativado, voos, planos de saúde e bancos.",
+        "services": [
+          "Consulta jurídica online",
+          "Consulta jurídica"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "problema",
+              "label": "Qual o problema?",
+              "type": "select",
+              "options": [
+                "Produto ou serviço com defeito",
+                "Cobrança indevida",
+                "Nome negativado",
+                "Voo ou viagem",
+                "Plano de saúde",
+                "Banco ou empréstimo",
+                "Outro"
+              ],
+              "required": true
+            },
+            {
+              "key": "urgencia",
+              "label": "Há algo urgente acontecendo?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Corte de serviço essencial (água, luz)",
+                "Negativa de tratamento ou cirurgia"
+              ],
+              "required": true
+            },
+            {
+              "key": "valor",
+              "label": "Valor envolvido (aproximado)",
+              "type": "select",
+              "options": [
+                "Até R$ 1 mil",
+                "R$ 1 mil a R$ 10 mil",
+                "Mais de R$ 10 mil"
+              ],
+              "required": false
+            },
+            {
+              "key": "tentou",
+              "label": "Já tentou resolver com a empresa?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Não"
+              ],
+              "required": false
+            },
+            {
+              "key": "provas",
+              "label": "O que você tem guardado?",
+              "type": "multiselect",
+              "options": [
+                "Notas fiscais ou contrato",
+                "Conversas ou e-mails",
+                "Números de protocolo",
+                "Fotos",
+                "Nada ainda"
+              ],
+              "required": false
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "urgencia",
+                "in": [
+                  "Corte de serviço essencial (água, luz)",
+                  "Negativa de tratamento ou cirurgia"
+                ]
+              },
+              "then": {
+                "priority": "URGENTE",
+                "recommend": "Pode caber pedido de liminar: priorizar o atendimento."
+              }
+            },
+            {
+              "if": {
+                "field": "valor",
+                "equals": "Até R$ 1 mil"
+              },
+              "then": {
+                "recommend": "Causas de menor valor podem ir ao Juizado Especial Cível."
+              }
+            },
+            {
+              "if": {
+                "field": "tentou",
+                "equals": "Não"
+              },
+              "then": {
+                "recommend": "Registre reclamação no consumidor.gov.br e guarde o protocolo."
+              }
+            },
+            {
+              "if": {
+                "field": "provas",
+                "equals": "Nada ainda"
+              },
+              "then": {
+                "recommend": "Comece a guardar notas, conversas e protocolos: são as provas do caso."
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Presencial"
+              },
+              "then": {
+                "service": "Consulta jurídica",
+                "modality": "IN_PERSON"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "trabalhista",
+        "name": "Trabalhista",
+        "description": "Demissão, verbas rescisórias, horas extras, acidente de trabalho e assédio.",
+        "services": [
+          "Consulta trabalhista"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "lado",
+              "label": "Você é:",
+              "type": "select",
+              "options": [
+                "Trabalhador(a)",
+                "Empresa ou empregador"
+              ],
+              "required": true
+            },
+            {
+              "key": "situacao",
+              "label": "Qual a situação?",
+              "type": "select",
+              "options": [
+                "Fui demitido(a) ou pedi demissão",
+                "Ainda trabalho na empresa",
+                "Acidente de trabalho",
+                "Assédio",
+                "Outra"
+              ],
+              "required": true
+            },
+            {
+              "key": "data_saida",
+              "label": "Data da saída",
+              "type": "date",
+              "required": false,
+              "showIf": {
+                "field": "situacao",
+                "equals": "Fui demitido(a) ou pedi demissão"
+              }
+            },
+            {
+              "key": "carteira",
+              "label": "Tinha carteira assinada?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Não",
+                "Em parte do período"
+              ],
+              "required": false
+            },
+            {
+              "key": "documentos",
+              "label": "Quais documentos você tem?",
+              "type": "multiselect",
+              "options": [
+                "Carteira de trabalho",
+                "Contracheques",
+                "Termo de rescisão (TRCT)",
+                "Mensagens ou e-mails",
+                "Nenhum"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "situacao",
+                "equals": "Fui demitido(a) ou pedi demissão"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Prazo para ação trabalhista: até 2 anos após a saída. Traga TRCT, contracheques e carteira."
+              }
+            },
+            {
+              "if": {
+                "field": "situacao",
+                "equals": "Acidente de trabalho"
+              },
+              "then": {
+                "priority": "ALTA",
+                "tags": [
+                  "acidente-de-trabalho"
+                ],
+                "recommend": "Trazer CAT, atestados e laudos médicos."
+              }
+            },
+            {
+              "if": {
+                "field": "situacao",
+                "equals": "Assédio"
+              },
+              "then": {
+                "tags": [
+                  "assédio"
+                ],
+                "recommend": "Guardar mensagens e nomes de testemunhas."
+              }
+            },
+            {
+              "if": {
+                "field": "lado",
+                "equals": "Empresa ou empregador"
+              },
+              "then": {
+                "tags": [
+                  "empresa"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "familia",
+        "name": "Família",
+        "description": "Divórcio, pensão alimentícia, guarda, união estável e inventário.",
+        "services": [
+          "Consulta de família"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "assunto",
+              "label": "Qual o assunto?",
+              "type": "select",
+              "options": [
+                "Divórcio",
+                "Pensão alimentícia",
+                "Guarda ou convivência",
+                "União estável",
+                "Inventário",
+                "Outro"
+              ],
+              "required": true
+            },
+            {
+              "key": "violencia",
+              "label": "Existe situação de violência doméstica?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "filhos",
+              "label": "Há filhos menores de idade?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "acordo",
+              "label": "As partes estão de acordo?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Não",
+                "Ainda não conversamos"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "violencia",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "URGENTE",
+                "tags": [
+                  "violência-doméstica"
+                ],
+                "alert": "Em risco, ligue 190 ou 180. Medida protetiva pode ser pedida com urgência."
+              }
+            },
+            {
+              "if": {
+                "field": "acordo",
+                "equals": "Sim"
+              },
+              "then": {
+                "recommend": "Com acordo e sem filhos menores, o divórcio pode ser feito em cartório."
+              }
+            },
+            {
+              "if": {
+                "field": "filhos",
+                "equals": "Sim"
+              },
+              "then": {
+                "tags": [
+                  "filhos-menores"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "assunto",
+                "equals": "Inventário"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Inventário tem prazo de abertura e multa: confirmar a data do falecimento."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "contratos",
+        "name": "Contratos e empresas",
+        "description": "Revisar contrato antes de assinar, problemas em contratos e assuntos da empresa.",
+        "services": [
+          "Análise de contrato",
+          "Consulta jurídica"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "tipo",
+              "label": "O que você precisa?",
+              "type": "select",
+              "options": [
+                "Revisar contrato antes de assinar",
+                "Problema em um contrato vigente",
+                "Abrir ou alterar empresa",
+                "Outro"
+              ],
+              "required": true
+            },
+            {
+              "key": "prazo",
+              "label": "Precisa assinar ou responder nos próximos dias?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "tamanho",
+              "label": "Tamanho do contrato",
+              "type": "select",
+              "options": [
+                "Até 10 páginas",
+                "Mais de 10 páginas"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "prazo",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA"
+              }
+            },
+            {
+              "if": {
+                "field": "tipo",
+                "in": [
+                  "Problema em um contrato vigente",
+                  "Abrir ou alterar empresa",
+                  "Outro"
+                ]
+              },
+              "then": {
+                "service": "Consulta jurídica"
+              }
+            },
+            {
+              "if": {
+                "field": "tamanho",
+                "equals": "Mais de 10 páginas"
+              },
+              "then": {
+                "recommend": "Contrato longo: enviar com antecedência para análise."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "outro",
+        "name": "Outro assunto jurídico",
+        "description": "Civil, previdenciário, imobiliário e outros.",
+        "services": [
+          "Consulta jurídica online",
+          "Consulta jurídica"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "area",
+              "label": "Área (se souber)",
+              "type": "select",
+              "options": [
+                "Civil",
+                "Previdenciário (INSS)",
+                "Imobiliário",
+                "Criminal",
+                "Tributário",
+                "Não sei"
+              ],
+              "required": true
+            },
+            {
+              "key": "resumo",
+              "label": "Conte resumidamente o que aconteceu",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "prazo",
+              "label": "Recebeu intimação ou tem prazo correndo?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim",
+                "Não sei"
+              ],
+              "required": true
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "prazo",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Trazer a intimação ou o documento com o prazo."
+              }
+            },
+            {
+              "if": {
+                "field": "area",
+                "equals": "Criminal"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Assunto criminal: atendimento prioritário."
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Presencial"
+              },
+              "then": {
+                "service": "Consulta jurídica",
+                "modality": "IN_PERSON"
+              }
+            }
+          ]
+        }
       }
     ]
   }

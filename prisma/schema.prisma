@@ -127,6 +127,7 @@ model Organization {
   rules         Rule[]
   records       AttendanceRecord[]
   auditLogs     AuditLog[]
+  triages       TriageResponse[]
 }
 
 model Membership {
@@ -214,6 +215,7 @@ model Professional {
   reviews      Review[]
   rules        Rule[]
   records      AttendanceRecord[]
+  triages      TriageResponse[]
 
   @@index([orgId])
 }
@@ -278,6 +280,7 @@ model Client {
   records      AttendanceRecord[]
   reviews      Review[]
   ruleEvents   RuleEvent[]
+  triages      TriageResponse[]
 
   @@unique([orgId, userId])
   @@index([orgId])
@@ -304,6 +307,7 @@ model Appointment {
   client       Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
   service      Service      @relation(fields: [serviceId], references: [id])
   records      AttendanceRecord[]
+  triage       TriageResponse?
 
   @@index([orgId, startsAt])
   @@index([professionalId, startsAt])
@@ -413,4 +417,27 @@ model AuditLog {
   org       Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId, createdAt])
+}
+
+// Triagem inicial respondida pelo cliente (ou pelo profissional) para um tipo
+// de atendimento. O resultado configura o atendimento: serviço, modalidade,
+// prioridade, etiquetas, recomendações e alertas.
+model TriageResponse {
+  id             String   @id @default(cuid())
+  orgId          String
+  professionalId String
+  clientId       String?
+  appointmentId  String?  @unique
+  careTypeKey    String
+  careTypeName   String
+  answers        Json
+  outcome        Json
+  createdAt      DateTime @default(now())
+
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  client       Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  appointment  Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, clientId])
 }

@@ -75,7 +75,11 @@ export default async function Agenda({ searchParams }: { searchParams: Promise<{
                   {list.length === 0 && <p className="px-1 text-xs text-muted md:hidden">Livre</p>}
                   {list.map((a) => (
                     <Link key={a.id} href={`/app/atendimentos/${a.id}`} className={cx("block rounded-xl border-l-4 bg-card px-2.5 py-2 text-xs shadow-soft hover:bg-surface", toneBorder[statusTone[a.status]])}>
-                      <p className="font-semibold text-primary">{time(a.startsAt, tz)}</p>
+                      <p className="flex items-center justify-between gap-1 font-semibold text-primary">
+                        {time(a.startsAt, tz)}
+                        {(a.triage?.outcome as { priority?: string } | undefined)?.priority === "URGENTE" && <span className="rounded-full bg-danger-bg px-1.5 text-[10px] font-bold text-danger">URGENTE</span>}
+                        {(a.triage?.outcome as { priority?: string } | undefined)?.priority === "ALTA" && <span className="rounded-full bg-warning-bg px-1.5 text-[10px] font-bold text-warning">ALTA</span>}
+                      </p>
                       <p className="truncate font-medium text-ink">{a.client.name}</p>
                       <p className="truncate text-muted">{a.service.name}</p>
                     </Link>

@@ -5,16 +5,34 @@
     "category": "Esporte e bem-estar",
     "description": "Treinos personalizados, presenciais, a domicílio ou online.",
     "terminology": {
-      "client": { "singular": "aluno", "plural": "alunos" },
-      "appointment": { "singular": "treino", "plural": "treinos" },
+      "client": {
+        "singular": "aluno",
+        "plural": "alunos"
+      },
+      "appointment": {
+        "singular": "treino",
+        "plural": "treinos"
+      },
       "record": "Ficha de treino",
       "professional": "Personal Trainer"
     },
-    "registry": { "label": "CREF", "required": true },
+    "registry": {
+      "label": "CREF",
+      "required": true
+    },
     "professionalFields": [],
     "clientFields": [
-      { "key": "birthDate", "label": "Data de nascimento", "type": "date", "required": true },
-      { "key": "medicalClearance", "label": "Atestado médico para atividade física", "type": "upload" }
+      {
+        "key": "birthDate",
+        "label": "Data de nascimento",
+        "type": "date",
+        "required": true
+      },
+      {
+        "key": "medicalClearance",
+        "label": "Atestado médico para atividade física",
+        "type": "upload"
+      }
     ],
     "intakeForm": {
       "name": "Avaliação inicial (PAR-Q simplificado)",
@@ -22,18 +40,70 @@
         {
           "title": "Saúde",
           "fields": [
-            { "key": "goal", "label": "Seu principal objetivo", "type": "select", "options": ["Emagrecimento", "Hipertrofia", "Condicionamento", "Saúde e qualidade de vida", "Reabilitação"], "required": true },
-            { "key": "heartIssue", "label": "Algum médico já disse que você tem problema no coração?", "type": "select", "options": ["Não", "Sim"], "required": true },
-            { "key": "injuries", "label": "Lesões ou dores atuais", "type": "textarea" }
+            {
+              "key": "goal",
+              "label": "Seu principal objetivo",
+              "type": "select",
+              "options": [
+                "Emagrecimento",
+                "Hipertrofia",
+                "Condicionamento",
+                "Saúde e qualidade de vida",
+                "Reabilitação"
+              ],
+              "required": true
+            },
+            {
+              "key": "heartIssue",
+              "label": "Algum médico já disse que você tem problema no coração?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "injuries",
+              "label": "Lesões ou dores atuais",
+              "type": "textarea"
+            }
           ]
         }
       ]
     },
     "services": [
-      { "name": "Aula experimental", "durationMin": 60, "priceCents": 0, "modality": "IN_PERSON" },
-      { "name": "Treino personalizado", "durationMin": 60, "priceCents": 12000, "modality": "IN_PERSON", "recurrence": "2 a 3x por semana" },
-      { "name": "Treino a domicílio", "durationMin": 60, "priceCents": 15000, "modality": "HOME" },
-      { "name": "Treino online", "durationMin": 45, "priceCents": 8000, "modality": "ONLINE" }
+      {
+        "name": "Aula experimental",
+        "durationMin": 60,
+        "priceCents": 0,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Treino personalizado",
+        "durationMin": 60,
+        "priceCents": 12000,
+        "modality": "IN_PERSON",
+        "recurrence": "2 a 3x por semana"
+      },
+      {
+        "name": "Treino a domicílio",
+        "durationMin": 60,
+        "priceCents": 15000,
+        "modality": "HOME"
+      },
+      {
+        "name": "Treino online",
+        "durationMin": 45,
+        "priceCents": 8000,
+        "modality": "ONLINE"
+      },
+      {
+        "name": "Avaliação física",
+        "durationMin": 45,
+        "priceCents": 10000,
+        "modality": "IN_PERSON"
+      }
     ],
     "recordTemplate": {
       "name": "Registro do treino",
@@ -41,45 +111,506 @@
         {
           "title": "Treino",
           "fields": [
-            { "key": "focus", "label": "Foco do treino", "type": "multiselect", "options": ["Superiores", "Inferiores", "Core", "Cardio", "Mobilidade"], "required": true },
-            { "key": "exercises", "label": "Exercícios, séries e cargas", "type": "textarea", "required": true },
-            { "key": "effort", "label": "Esforço percebido (1 a 10)", "type": "scale", "min": 1, "max": 10 },
-            { "key": "notes", "label": "Observações", "type": "textarea" }
+            {
+              "key": "focus",
+              "label": "Foco do treino",
+              "type": "multiselect",
+              "options": [
+                "Superiores",
+                "Inferiores",
+                "Core",
+                "Cardio",
+                "Mobilidade"
+              ],
+              "required": true
+            },
+            {
+              "key": "exercises",
+              "label": "Exercícios, séries e cargas",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "effort",
+              "label": "Esforço percebido (1 a 10)",
+              "type": "scale",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "key": "notes",
+              "label": "Observações",
+              "type": "textarea"
+            }
           ]
         }
       ]
     },
     "documents": [
-      { "key": "ficha-treino", "name": "Ficha de treino", "direction": "OUT" },
-      { "key": "avaliacao-fisica", "name": "Avaliação física", "direction": "OUT" },
-      { "key": "atestado", "name": "Atestado médico", "direction": "IN" }
+      {
+        "key": "ficha-treino",
+        "name": "Ficha de treino",
+        "direction": "OUT"
+      },
+      {
+        "key": "avaliacao-fisica",
+        "name": "Avaliação física",
+        "direction": "OUT"
+      },
+      {
+        "key": "atestado",
+        "name": "Atestado médico",
+        "direction": "IN"
+      }
     ],
     "compliance": {
       "validation": "PENDENTE_VALIDACAO",
       "confidentiality": "NORMAL",
       "retentionYears": 2,
       "signatureRequired": false,
-      "consents": ["Tratamento de dados pessoais e de saúde para prescrição de exercícios (LGPD)"],
-      "recordHiddenFrom": ["FINANCE"],
+      "consents": [
+        "Tratamento de dados pessoais e de saúde para prescrição de exercícios (LGPD)"
+      ],
+      "recordHiddenFrom": [
+        "FINANCE"
+      ],
       "notes": "Exigência de atestado e prazos de guarda a validar por especialista."
     },
-    "cancellationPolicy": { "minHoursBefore": 6 },
+    "cancellationPolicy": {
+      "minHoursBefore": 6
+    },
     "rules": [
       {
         "key": "sem-retorno",
         "name": "Chamar aluno sumido há 14 dias",
         "trigger": "DAYS_WITHOUT_RETURN",
-        "conditions": { "days": 14 },
-        "actions": [ { "type": "NOTIFY_CLIENT", "message": "Faz {{days}} dias desde o seu último treino. Bora voltar? Escolha um horário no app." } ],
+        "conditions": {
+          "days": 14
+        },
+        "actions": [
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Faz {{days}} dias desde o seu último treino. Bora voltar? Escolha um horário no app."
+          }
+        ],
         "mode": "AUTO"
       },
       {
         "key": "faltas-bloqueio",
         "name": "Sugerir bloqueio após 3 faltas",
         "trigger": "NO_SHOW",
-        "conditions": { "consecutiveGte": 3 },
-        "actions": [ { "type": "BLOCK_BOOKING", "message": "Bloquear novos agendamentos de {{client}} após {{count}} faltas seguidas?" } ],
+        "conditions": {
+          "consecutiveGte": 3
+        },
+        "actions": [
+          {
+            "type": "BLOCK_BOOKING",
+            "message": "Bloquear novos agendamentos de {{client}} após {{count}} faltas seguidas?"
+          }
+        ],
         "mode": "SUGGEST"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "condicionamento",
+        "name": "Emagrecimento e condicionamento",
+        "description": "Perder gordura, ganhar fôlego e criar o hábito de treinar.",
+        "services": [
+          "Aula experimental",
+          "Treino personalizado",
+          "Treino a domicílio",
+          "Treino online"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "objetivo",
+              "label": "Seu objetivo principal",
+              "type": "select",
+              "options": [
+                "Emagrecer",
+                "Ganhar fôlego",
+                "Saúde e disposição"
+              ],
+              "required": true
+            },
+            {
+              "key": "parq",
+              "label": "Você tem algum destes? (questionário de prontidão PAR-Q)",
+              "type": "multiselect",
+              "options": [
+                "Dor no peito ao fazer esforço",
+                "Tontura ou desmaio",
+                "Problema no coração diagnosticado",
+                "Pressão alta sem controle",
+                "Problema ósseo ou articular que piora com exercício",
+                "Nenhum destes"
+              ],
+              "required": true
+            },
+            {
+              "key": "nivel",
+              "label": "Como está sua rotina de exercícios?",
+              "type": "select",
+              "options": [
+                "Sedentário(a)",
+                "Ativo(a) às vezes",
+                "Treino regularmente"
+              ],
+              "required": true
+            },
+            {
+              "key": "local",
+              "label": "Onde quer treinar?",
+              "type": "select",
+              "options": [
+                "Academia ou estúdio",
+                "Em casa",
+                "Online",
+                "Ao ar livre"
+              ],
+              "required": true
+            },
+            {
+              "key": "dias",
+              "label": "Quantos dias por semana?",
+              "type": "select",
+              "options": [
+                "1 a 2",
+                "3",
+                "4 ou mais"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "parq",
+                "in": [
+                  "Dor no peito ao fazer esforço",
+                  "Tontura ou desmaio",
+                  "Problema no coração diagnosticado",
+                  "Pressão alta sem controle",
+                  "Problema ósseo ou articular que piora com exercício"
+                ]
+              },
+              "then": {
+                "priority": "ALTA",
+                "tags": [
+                  "exige-atestado"
+                ],
+                "alert": "Antes de começar, traga liberação médica para atividade física.",
+                "recommend": "Iniciar com avaliação física e intensidade leve."
+              }
+            },
+            {
+              "if": {
+                "field": "local",
+                "equals": "Em casa"
+              },
+              "then": {
+                "service": "Treino a domicílio",
+                "modality": "HOME"
+              }
+            },
+            {
+              "if": {
+                "field": "local",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Treino online",
+                "modality": "ONLINE"
+              }
+            },
+            {
+              "if": {
+                "field": "nivel",
+                "equals": "Sedentário(a)"
+              },
+              "then": {
+                "recommend": "Começar com 2 a 3 treinos por semana, intensidade leve."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "hipertrofia",
+        "name": "Ganho de massa e força",
+        "description": "Treino de força com progressão e acompanhamento.",
+        "services": [
+          "Avaliação física",
+          "Treino personalizado",
+          "Treino online"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "experiencia",
+              "label": "Há quanto tempo treina musculação?",
+              "type": "select",
+              "options": [
+                "Nunca treinei",
+                "Menos de 1 ano",
+                "Mais de 1 ano"
+              ],
+              "required": true
+            },
+            {
+              "key": "parq",
+              "label": "Você tem algum destes? (PAR-Q)",
+              "type": "multiselect",
+              "options": [
+                "Dor no peito ao fazer esforço",
+                "Tontura ou desmaio",
+                "Problema no coração diagnosticado",
+                "Pressão alta sem controle",
+                "Problema ósseo ou articular que piora com exercício",
+                "Nenhum destes"
+              ],
+              "required": true
+            },
+            {
+              "key": "lesoes",
+              "label": "Tem lesões ou dores?",
+              "type": "textarea",
+              "required": false
+            },
+            {
+              "key": "local",
+              "label": "Onde quer treinar?",
+              "type": "select",
+              "options": [
+                "Academia ou estúdio",
+                "Online"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "parq",
+                "in": [
+                  "Dor no peito ao fazer esforço",
+                  "Tontura ou desmaio",
+                  "Problema no coração diagnosticado",
+                  "Pressão alta sem controle",
+                  "Problema ósseo ou articular que piora com exercício"
+                ]
+              },
+              "then": {
+                "priority": "ALTA",
+                "tags": [
+                  "exige-atestado"
+                ],
+                "alert": "Antes de começar, traga liberação médica para atividade física.",
+                "recommend": "Iniciar com avaliação física e intensidade leve."
+              }
+            },
+            {
+              "if": {
+                "field": "experiencia",
+                "equals": "Mais de 1 ano"
+              },
+              "then": {
+                "service": "Treino personalizado"
+              }
+            },
+            {
+              "if": {
+                "field": "local",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Treino online",
+                "modality": "ONLINE"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "terceira-idade",
+        "name": "Terceira idade e mobilidade",
+        "description": "Força, equilíbrio e prevenção de quedas para 60+.",
+        "services": [
+          "Avaliação física",
+          "Treino a domicílio"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "idade",
+              "label": "Faixa de idade",
+              "type": "select",
+              "options": [
+                "60 a 69 anos",
+                "70 a 79 anos",
+                "80 anos ou mais"
+              ],
+              "required": true
+            },
+            {
+              "key": "quedas",
+              "label": "Teve alguma queda no último ano?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "condicoes",
+              "label": "Tem alguma destas condições?",
+              "type": "multiselect",
+              "options": [
+                "Osteoporose",
+                "Artrose",
+                "Pressão alta",
+                "Diabetes",
+                "Nenhuma"
+              ],
+              "required": false
+            },
+            {
+              "key": "local",
+              "label": "Onde prefere treinar?",
+              "type": "select",
+              "options": [
+                "No estúdio",
+                "Em casa"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "idade",
+                "in": [
+                  "60 a 69 anos",
+                  "70 a 79 anos",
+                  "80 anos ou mais"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "idoso"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "quedas",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Foco em equilíbrio e prevenção de quedas."
+              }
+            },
+            {
+              "if": {
+                "field": "condicoes",
+                "in": [
+                  "Osteoporose",
+                  "Artrose",
+                  "Pressão alta",
+                  "Diabetes"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "exige-atestado"
+                ],
+                "recommend": "Trazer liberação médica."
+              }
+            },
+            {
+              "if": {
+                "field": "local",
+                "equals": "Em casa"
+              },
+              "then": {
+                "service": "Treino a domicílio",
+                "modality": "HOME"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "gestante",
+        "name": "Gestantes e pós-parto",
+        "description": "Exercício seguro na gestação e na volta depois do parto.",
+        "services": [
+          "Avaliação física",
+          "Treino personalizado"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "fase",
+              "label": "Fase",
+              "type": "select",
+              "options": [
+                "Gestante",
+                "Pós-parto (até 6 meses)"
+              ],
+              "required": true
+            },
+            {
+              "key": "semanas",
+              "label": "Semanas de gestação",
+              "type": "number",
+              "required": false,
+              "showIf": {
+                "field": "fase",
+                "equals": "Gestante"
+              }
+            },
+            {
+              "key": "liberacao",
+              "label": "Tem liberação do obstetra para atividade física?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Não"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "fase",
+                "equals": "Gestante"
+              },
+              "then": {
+                "tags": [
+                  "gestante"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "liberacao",
+                "equals": "Não"
+              },
+              "then": {
+                "tags": [
+                  "exige-atestado"
+                ],
+                "alert": "É necessária a liberação do obstetra antes de iniciar os treinos."
+              }
+            }
+          ]
+        }
       }
     ]
   }

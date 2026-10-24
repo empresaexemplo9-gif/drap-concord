@@ -121,7 +121,11 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
                 ))}
               </div>
             )}
-            {first && <Link href={`/p/${pro.slug}/agendar?servico=${first.id}`} className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-primary font-semibold text-on-primary hover:bg-primary-hover">Ver todos os horários</Link>}
+            {cfg.careTypes.length > 0 && (
+              <Link href={`/p/${pro.slug}/agendar`} className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-primary font-semibold text-on-primary hover:bg-primary-hover">Agendar com triagem</Link>
+            )}
+            {first && <Link href={`/p/${pro.slug}/agendar?servico=${first.id}`} className={`mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-xl font-semibold ${cfg.careTypes.length ? "border border-line bg-card text-primary hover:bg-surface" : "bg-primary text-on-primary hover:bg-primary-hover"}`}>Ver todos os horários</Link>}
+            {cfg.careTypes.length > 0 && <p className="mt-3 text-center text-xs text-muted">A triagem leva 1 minuto e indica o atendimento certo para você.</p>}
             <p className="mt-3 text-center text-xs text-muted">Cancelamento gratuito até {cfg.cancellationPolicy.minHoursBefore}h antes.</p>
           </Card>
         </aside>

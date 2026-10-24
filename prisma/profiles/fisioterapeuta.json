@@ -76,6 +76,18 @@
         "durationMin": 60,
         "priceCents": 20000,
         "modality": "HOME"
+      },
+      {
+        "name": "Pilates clínico",
+        "durationMin": 50,
+        "priceCents": 12000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Fisioterapia respiratória",
+        "durationMin": 40,
+        "priceCents": 14000,
+        "modality": "IN_PERSON"
       }
     ],
     "recordTemplate": {
@@ -156,6 +168,366 @@
           }
         ],
         "mode": "AUTO"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "ortopedia",
+        "name": "Dor ou lesão (ortopedia)",
+        "description": "Coluna, ombro, joelho, entorses, lesões esportivas e pós-cirúrgico.",
+        "services": [
+          "Avaliação fisioterapêutica",
+          "Atendimento domiciliar"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "regiao",
+              "label": "Onde é a dor ou lesão?",
+              "type": "multiselect",
+              "options": [
+                "Coluna lombar",
+                "Pescoço",
+                "Ombro",
+                "Joelho",
+                "Quadril",
+                "Tornozelo ou pé",
+                "Mão ou punho"
+              ],
+              "required": true
+            },
+            {
+              "key": "dor",
+              "label": "Intensidade da dor (0 a 10)",
+              "type": "scale",
+              "min": 0,
+              "max": 10,
+              "required": true
+            },
+            {
+              "key": "origem",
+              "label": "Como começou?",
+              "type": "select",
+              "options": [
+                "Lesão no esporte",
+                "Acidente ou queda",
+                "Depois de uma cirurgia",
+                "Sem causa aparente",
+                "Trabalho ou postura"
+              ],
+              "required": true
+            },
+            {
+              "key": "sinais",
+              "label": "Tem algum destes sinais?",
+              "type": "multiselect",
+              "options": [
+                "Perda de força nas pernas",
+                "Perda de controle da urina ou das fezes",
+                "Febre com dor nas costas",
+                "Nenhum destes"
+              ],
+              "required": true
+            },
+            {
+              "key": "pedido",
+              "label": "Tem pedido médico?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "local",
+              "label": "Onde prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Na clínica",
+                "Em casa"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "sinais",
+                "in": [
+                  "Perda de força nas pernas",
+                  "Perda de controle da urina ou das fezes",
+                  "Febre com dor nas costas"
+                ]
+              },
+              "then": {
+                "stop": "Esses sinais precisam de avaliação médica urgente. Procure um pronto-socorro.",
+                "priority": "URGENTE"
+              }
+            },
+            {
+              "if": {
+                "field": "origem",
+                "equals": "Depois de uma cirurgia"
+              },
+              "then": {
+                "tags": [
+                  "pós-operatório"
+                ],
+                "recommend": "Trazer relatório da cirurgia e pedido médico."
+              }
+            },
+            {
+              "if": {
+                "field": "local",
+                "equals": "Em casa"
+              },
+              "then": {
+                "service": "Atendimento domiciliar",
+                "modality": "HOME"
+              }
+            },
+            {
+              "if": {
+                "field": "dor",
+                "gte": 8
+              },
+              "then": {
+                "priority": "ALTA"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "respiratoria",
+        "name": "Fisioterapia respiratória",
+        "description": "Asma, DPOC, pós-COVID, pneumonia, pós-cirúrgico e crianças com secreção.",
+        "services": [
+          "Fisioterapia respiratória"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "condicao",
+              "label": "Qual a situação?",
+              "type": "select",
+              "options": [
+                "Asma ou DPOC",
+                "Pós-COVID ou pneumonia",
+                "Depois de uma cirurgia",
+                "Criança com secreção",
+                "Outra"
+              ],
+              "required": true
+            },
+            {
+              "key": "falta_ar",
+              "label": "Sente falta de ar?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Aos esforços",
+                "Em repouso"
+              ],
+              "required": true
+            },
+            {
+              "key": "oxigenio",
+              "label": "Usa oxigênio em casa?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "falta_ar",
+                "equals": "Em repouso"
+              },
+              "then": {
+                "stop": "Falta de ar em repouso pede avaliação médica imediata. Ligue 192 (SAMU).",
+                "priority": "URGENTE"
+              }
+            },
+            {
+              "if": {
+                "field": "condicao",
+                "equals": "Criança com secreção"
+              },
+              "then": {
+                "tags": [
+                  "menor-de-idade"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "oxigenio",
+                "equals": "Sim"
+              },
+              "then": {
+                "tags": [
+                  "oxigenoterapia"
+                ],
+                "recommend": "Paciente em oxigenoterapia: avaliar atendimento domiciliar."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "pilates",
+        "name": "Pilates clínico e prevenção",
+        "description": "Postura, dor crônica, condicionamento, gestação e pós-reabilitação.",
+        "services": [
+          "Pilates clínico"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "objetivo",
+              "label": "Seu objetivo principal",
+              "type": "select",
+              "options": [
+                "Postura",
+                "Dor crônica",
+                "Condicionamento",
+                "Gestação",
+                "Pós-reabilitação"
+              ],
+              "required": true
+            },
+            {
+              "key": "gestante",
+              "label": "Está gestante?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "frequencia",
+              "label": "Quantas vezes por semana?",
+              "type": "select",
+              "options": [
+                "1x",
+                "2x",
+                "3x"
+              ],
+              "required": false
+            },
+            {
+              "key": "restricao",
+              "label": "Tem alguma restrição médica?",
+              "type": "textarea",
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "gestante",
+                "equals": "Sim"
+              },
+              "then": {
+                "tags": [
+                  "gestante"
+                ],
+                "recommend": "Necessária liberação do obstetra."
+              }
+            },
+            {
+              "if": {
+                "field": "objetivo",
+                "equals": "Dor crônica"
+              },
+              "then": {
+                "recommend": "Começar com avaliação postural na primeira aula."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "neurologica",
+        "name": "Fisioterapia neurológica",
+        "description": "AVC, Parkinson, lesão medular, paralisia cerebral e outras condições.",
+        "services": [
+          "Avaliação fisioterapêutica",
+          "Atendimento domiciliar"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "condicao",
+              "label": "Qual a condição?",
+              "type": "select",
+              "options": [
+                "AVC",
+                "Parkinson",
+                "Lesão medular",
+                "Paralisia cerebral",
+                "Outra"
+              ],
+              "required": true
+            },
+            {
+              "key": "independencia",
+              "label": "Como está a locomoção?",
+              "type": "select",
+              "options": [
+                "Anda sozinho(a)",
+                "Anda com ajuda",
+                "Usa cadeira de rodas",
+                "Acamado(a)"
+              ],
+              "required": true
+            },
+            {
+              "key": "local",
+              "label": "Onde prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Na clínica",
+                "Em casa"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "independencia",
+                "in": [
+                  "Usa cadeira de rodas",
+                  "Acamado(a)"
+                ]
+              },
+              "then": {
+                "service": "Atendimento domiciliar",
+                "modality": "HOME",
+                "recommend": "Atendimento domiciliar indicado pela mobilidade."
+              }
+            },
+            {
+              "if": {
+                "field": "local",
+                "equals": "Em casa"
+              },
+              "then": {
+                "service": "Atendimento domiciliar",
+                "modality": "HOME"
+              }
+            }
+          ]
+        }
       }
     ]
   }

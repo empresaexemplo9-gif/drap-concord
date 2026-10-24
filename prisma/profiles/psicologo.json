@@ -5,18 +5,42 @@
     "category": "Saúde mental",
     "description": "Psicoterapia individual, de casal e infantil, presencial ou online.",
     "terminology": {
-      "client": { "singular": "paciente", "plural": "pacientes" },
-      "appointment": { "singular": "sessão", "plural": "sessões" },
+      "client": {
+        "singular": "paciente",
+        "plural": "pacientes"
+      },
+      "appointment": {
+        "singular": "sessão",
+        "plural": "sessões"
+      },
       "record": "Prontuário",
       "professional": "Psicólogo(a)"
     },
-    "registry": { "label": "CRP", "required": true },
+    "registry": {
+      "label": "CRP",
+      "required": true
+    },
     "professionalFields": [
-      { "key": "approach", "label": "Abordagem terapêutica", "type": "text", "required": false }
+      {
+        "key": "approach",
+        "label": "Abordagem terapêutica",
+        "type": "text",
+        "required": false
+      }
     ],
     "clientFields": [
-      { "key": "birthDate", "label": "Data de nascimento", "type": "date", "required": true },
-      { "key": "emergencyContact", "label": "Contato de emergência", "type": "text", "required": true }
+      {
+        "key": "birthDate",
+        "label": "Data de nascimento",
+        "type": "date",
+        "required": true
+      },
+      {
+        "key": "emergencyContact",
+        "label": "Contato de emergência",
+        "type": "text",
+        "required": true
+      }
     ],
     "intakeForm": {
       "name": "Antes da primeira sessão",
@@ -24,17 +48,76 @@
         {
           "title": "Sobre você",
           "fields": [
-            { "key": "reason", "label": "O que te traz à terapia?", "type": "textarea", "required": true },
-            { "key": "previousTherapy", "label": "Já fez terapia antes?", "type": "select", "options": ["Sim", "Não"], "required": true },
-            { "key": "medication", "label": "Usa alguma medicação contínua?", "type": "text" }
+            {
+              "key": "reason",
+              "label": "O que te traz à terapia?",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "previousTherapy",
+              "label": "Já fez terapia antes?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Não"
+              ],
+              "required": true
+            },
+            {
+              "key": "medication",
+              "label": "Usa alguma medicação contínua?",
+              "type": "text"
+            }
           ]
         }
       ]
     },
     "services": [
-      { "name": "Primeira sessão (acolhimento)", "durationMin": 50, "priceCents": 18000, "modality": "IN_PERSON" },
-      { "name": "Sessão individual", "durationMin": 50, "priceCents": 18000, "modality": "IN_PERSON", "recurrence": "semanal" },
-      { "name": "Sessão online", "durationMin": 50, "priceCents": 16000, "modality": "ONLINE", "recurrence": "semanal" }
+      {
+        "name": "Primeira sessão (acolhimento)",
+        "durationMin": 50,
+        "priceCents": 18000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Sessão individual",
+        "durationMin": 50,
+        "priceCents": 18000,
+        "modality": "IN_PERSON",
+        "recurrence": "semanal"
+      },
+      {
+        "name": "Sessão online",
+        "durationMin": 50,
+        "priceCents": 16000,
+        "modality": "ONLINE",
+        "recurrence": "semanal"
+      },
+      {
+        "name": "Terapia de casal",
+        "durationMin": 80,
+        "priceCents": 26000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Sessão infantil",
+        "durationMin": 50,
+        "priceCents": 18000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Avaliação psicológica",
+        "durationMin": 60,
+        "priceCents": 30000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Orientação profissional",
+        "durationMin": 50,
+        "priceCents": 18000,
+        "modality": "ONLINE"
+      }
     ],
     "recordTemplate": {
       "name": "Evolução da sessão",
@@ -42,39 +125,103 @@
         {
           "title": "Registro",
           "fields": [
-            { "key": "demand", "label": "Demanda trabalhada", "type": "textarea", "required": true },
-            { "key": "mood", "label": "Humor percebido (1 a 10)", "type": "scale", "min": 1, "max": 10 },
-            { "key": "riskSigns", "label": "Sinais de risco observados?", "type": "select", "options": ["Não", "Sim"], "required": true },
-            { "key": "riskDetail", "label": "Descreva e o encaminhamento dado", "type": "textarea", "showIf": { "field": "riskSigns", "equals": "Sim" } },
-            { "key": "plan", "label": "Plano para a próxima sessão", "type": "textarea" }
+            {
+              "key": "demand",
+              "label": "Demanda trabalhada",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "mood",
+              "label": "Humor percebido (1 a 10)",
+              "type": "scale",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "key": "riskSigns",
+              "label": "Sinais de risco observados?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "riskDetail",
+              "label": "Descreva e o encaminhamento dado",
+              "type": "textarea",
+              "showIf": {
+                "field": "riskSigns",
+                "equals": "Sim"
+              }
+            },
+            {
+              "key": "plan",
+              "label": "Plano para a próxima sessão",
+              "type": "textarea"
+            }
           ]
         }
       ]
     },
     "documents": [
-      { "key": "declaracao", "name": "Declaração de comparecimento", "direction": "OUT", "signatureRequired": true },
-      { "key": "laudo", "name": "Laudo psicológico", "direction": "OUT", "signatureRequired": true },
-      { "key": "contrato", "name": "Contrato terapêutico", "direction": "BOTH", "signatureRequired": true },
-      { "key": "exames", "name": "Exames e relatórios de outros profissionais", "direction": "IN" }
+      {
+        "key": "declaracao",
+        "name": "Declaração de comparecimento",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "laudo",
+        "name": "Laudo psicológico",
+        "direction": "OUT",
+        "signatureRequired": true
+      },
+      {
+        "key": "contrato",
+        "name": "Contrato terapêutico",
+        "direction": "BOTH",
+        "signatureRequired": true
+      },
+      {
+        "key": "exames",
+        "name": "Exames e relatórios de outros profissionais",
+        "direction": "IN"
+      }
     ],
     "compliance": {
       "validation": "PENDENTE_VALIDACAO",
       "confidentiality": "SIGILOSO",
       "retentionYears": 5,
       "signatureRequired": true,
-      "consents": ["Tratamento de dados pessoais sensíveis de saúde (LGPD)", "Atendimento online, quando aplicável"],
-      "recordHiddenFrom": ["RECEPTION", "FINANCE"],
+      "consents": [
+        "Tratamento de dados pessoais sensíveis de saúde (LGPD)",
+        "Atendimento online, quando aplicável"
+      ],
+      "recordHiddenFrom": [
+        "RECEPTION",
+        "FINANCE"
+      ],
       "notes": "Prazos e obrigações a validar por especialista à luz das resoluções do conselho de Psicologia vigentes."
     },
-    "cancellationPolicy": { "minHoursBefore": 24 },
+    "cancellationPolicy": {
+      "minHoursBefore": 24
+    },
     "rules": [
       {
         "key": "faltas-aviso",
         "name": "Aviso após 2 faltas seguidas",
         "trigger": "NO_SHOW",
-        "conditions": { "consecutiveGte": 2 },
+        "conditions": {
+          "consecutiveGte": 2
+        },
         "actions": [
-          { "type": "NOTIFY_CLIENT", "message": "Sentimos sua falta nas últimas {{count}} sessões. Está tudo bem? Se precisar, podemos reagendar." }
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Sentimos sua falta nas últimas {{count}} sessões. Está tudo bem? Se precisar, podemos reagendar."
+          }
         ],
         "mode": "AUTO"
       },
@@ -82,12 +229,545 @@
         "key": "faltas-cancelamento",
         "name": "Cancelar sessões futuras após 3 faltas seguidas",
         "trigger": "NO_SHOW",
-        "conditions": { "consecutiveGte": 3 },
+        "conditions": {
+          "consecutiveGte": 3
+        },
         "actions": [
-          { "type": "NOTIFY_CLIENT", "message": "Você faltou a {{count}} sessões seguidas. Se não houver retorno em {{graceDays}} dias, suas sessões futuras serão canceladas." },
-          { "type": "CANCEL_FUTURE", "graceDays": 7, "message": "Cancelar as sessões futuras de {{client}} após {{count}} faltas seguidas?" }
+          {
+            "type": "NOTIFY_CLIENT",
+            "message": "Você faltou a {{count}} sessões seguidas. Se não houver retorno em {{graceDays}} dias, suas sessões futuras serão canceladas."
+          },
+          {
+            "type": "CANCEL_FUTURE",
+            "graceDays": 7,
+            "message": "Cancelar as sessões futuras de {{client}} após {{count}} faltas seguidas?"
+          }
         ],
         "mode": "SUGGEST"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "terapia-adulto",
+        "name": "Terapia individual (adultos)",
+        "description": "Para quem está passando por ansiedade, tristeza, luto, conflitos, estresse ou quer se conhecer melhor.",
+        "services": [
+          "Primeira sessão (acolhimento)",
+          "Sessão online",
+          "Sessão individual"
+        ],
+        "triage": {
+          "intro": "Suas respostas são confidenciais e ajudam a preparar o seu primeiro atendimento.",
+          "questions": [
+            {
+              "key": "motivo",
+              "label": "O que te traz à terapia?",
+              "type": "multiselect",
+              "options": [
+                "Ansiedade",
+                "Tristeza ou desânimo",
+                "Luto",
+                "Relacionamentos",
+                "Estresse no trabalho",
+                "Autoestima",
+                "Outro"
+              ],
+              "required": true
+            },
+            {
+              "key": "tempo",
+              "label": "Há quanto tempo isso acontece?",
+              "type": "select",
+              "options": [
+                "Menos de 1 mês",
+                "1 a 6 meses",
+                "Mais de 6 meses"
+              ],
+              "required": false
+            },
+            {
+              "key": "impacto",
+              "label": "Quanto isso atrapalha sua rotina? (1 = pouco, 5 = muito)",
+              "type": "scale",
+              "min": 1,
+              "max": 5,
+              "required": false
+            },
+            {
+              "key": "risco",
+              "label": "Você tem tido pensamentos de se machucar ou de não querer viver?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Às vezes",
+                "Sim, com frequência"
+              ],
+              "required": true
+            },
+            {
+              "key": "terapia_antes",
+              "label": "Já fez terapia antes?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "frequencia",
+              "label": "Com que frequência gostaria de ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Semanal",
+                "Quinzenal",
+                "Ainda não sei"
+              ],
+              "required": false
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "service": "Sessão online",
+                "modality": "ONLINE"
+              }
+            },
+            {
+              "if": {
+                "field": "risco",
+                "in": [
+                  "Às vezes",
+                  "Sim, com frequência"
+                ]
+              },
+              "then": {
+                "priority": "URGENTE",
+                "tags": [
+                  "atenção-risco"
+                ],
+                "alert": "Se você estiver em perigo agora, ligue 188 (CVV, 24 horas, gratuito) ou 192 (SAMU). Você não está sozinho(a).",
+                "recommend": "Priorizar acolhimento o quanto antes e avaliar rede de apoio."
+              }
+            },
+            {
+              "if": {
+                "field": "impacto",
+                "gte": 4
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Impacto alto na rotina: oferecer o primeiro horário disponível."
+              }
+            },
+            {
+              "if": {
+                "field": "frequencia",
+                "equals": "Semanal"
+              },
+              "then": {
+                "recommend": "Frequência desejada: semanal."
+              }
+            },
+            {
+              "if": {
+                "field": "frequencia",
+                "equals": "Quinzenal"
+              },
+              "then": {
+                "recommend": "Frequência desejada: quinzenal."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "infantil",
+        "name": "Crianças e adolescentes",
+        "description": "Atendimento para crianças e adolescentes, com participação dos responsáveis.",
+        "services": [
+          "Sessão infantil"
+        ],
+        "triage": {
+          "intro": "Responda como responsável pela criança ou adolescente.",
+          "questions": [
+            {
+              "key": "idade",
+              "label": "Idade da criança ou adolescente",
+              "type": "select",
+              "options": [
+                "Até 5 anos",
+                "6 a 11 anos",
+                "12 a 17 anos"
+              ],
+              "required": true
+            },
+            {
+              "key": "responsavel",
+              "label": "Nome do responsável",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "motivo",
+              "label": "O que motivou a busca?",
+              "type": "multiselect",
+              "options": [
+                "Comportamento",
+                "Escola ou aprendizagem",
+                "Ansiedade ou medos",
+                "Separação ou mudanças na família",
+                "Desenvolvimento",
+                "Outro"
+              ],
+              "required": true
+            },
+            {
+              "key": "escola",
+              "label": "A escola indicou o atendimento?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "laudo",
+              "label": "Já tem algum diagnóstico ou laudo?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim",
+                "Em investigação"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "idade",
+                "in": [
+                  "Até 5 anos",
+                  "6 a 11 anos",
+                  "12 a 17 anos"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "menor-de-idade"
+                ],
+                "recommend": "Consentimento do responsável obrigatório."
+              }
+            },
+            {
+              "if": {
+                "field": "idade",
+                "equals": "Até 5 anos"
+              },
+              "then": {
+                "recommend": "Primeira conversa apenas com os responsáveis."
+              }
+            },
+            {
+              "if": {
+                "field": "laudo",
+                "in": [
+                  "Sim",
+                  "Em investigação"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "possui-laudo"
+                ],
+                "recommend": "Trazer laudos e relatórios na primeira sessão."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "casal",
+        "name": "Terapia de casal",
+        "description": "Para casais que querem melhorar a comunicação, lidar com conflitos ou tomar decisões juntos.",
+        "services": [
+          "Terapia de casal"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "motivo",
+              "label": "O que vocês querem trabalhar?",
+              "type": "multiselect",
+              "options": [
+                "Comunicação",
+                "Conflitos frequentes",
+                "Confiança",
+                "Decisões (filhos, mudança, finanças)",
+                "Possível separação"
+              ],
+              "required": true
+            },
+            {
+              "key": "ambos",
+              "label": "Os dois querem participar?",
+              "type": "select",
+              "options": [
+                "Sim",
+                "Ainda não",
+                "Não sei"
+              ],
+              "required": true
+            },
+            {
+              "key": "violencia",
+              "label": "Existe alguma situação de violência na relação?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim",
+                "Prefiro não responder"
+              ],
+              "required": true
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Online"
+              },
+              "then": {
+                "modality": "ONLINE"
+              }
+            },
+            {
+              "if": {
+                "field": "ambos",
+                "in": [
+                  "Ainda não",
+                  "Não sei"
+                ]
+              },
+              "then": {
+                "recommend": "Começar com uma sessão de acolhimento de quem procurou o atendimento."
+              }
+            },
+            {
+              "if": {
+                "field": "violencia",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "URGENTE",
+                "tags": [
+                  "atenção-violência"
+                ],
+                "alert": "Se houver risco, ligue 190 (Polícia) ou 180 (Central de Atendimento à Mulher). O atendimento individual pode ser mais indicado neste momento.",
+                "recommend": "Avaliar atendimento individual antes da terapia de casal."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "avaliacao",
+        "name": "Avaliação psicológica (laudo)",
+        "description": "Avaliação com testes e laudo para concurso, CNH, porte de arma, escola, diagnóstico ou processo judicial.",
+        "services": [
+          "Avaliação psicológica"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "finalidade",
+              "label": "Para que é a avaliação?",
+              "type": "select",
+              "options": [
+                "Concurso, CNH ou porte de arma",
+                "Escolar",
+                "Diagnóstico clínico",
+                "Processo judicial",
+                "Outra"
+              ],
+              "required": true
+            },
+            {
+              "key": "prazo",
+              "label": "Tem prazo para entregar o laudo?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "data_prazo",
+              "label": "Até quando?",
+              "type": "date",
+              "required": false,
+              "showIf": {
+                "field": "prazo",
+                "equals": "Sim"
+              }
+            },
+            {
+              "key": "pedido",
+              "label": "Você tem o pedido, edital ou ofício que solicita a avaliação?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "finalidade",
+                "in": [
+                  "Concurso, CNH ou porte de arma",
+                  "Escolar",
+                  "Diagnóstico clínico",
+                  "Processo judicial",
+                  "Outra"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "laudo"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "prazo",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA",
+                "recommend": "Confirmar o prazo e o número de sessões necessárias logo no primeiro contato."
+              }
+            },
+            {
+              "if": {
+                "field": "finalidade",
+                "equals": "Processo judicial"
+              },
+              "then": {
+                "recommend": "Verificar se há perito nomeado e o que o juízo solicitou."
+              }
+            },
+            {
+              "if": {
+                "field": "pedido",
+                "equals": "Sim"
+              },
+              "then": {
+                "recommend": "Trazer o pedido, edital ou ofício na primeira sessão."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "orientacao",
+        "name": "Orientação profissional e carreira",
+        "description": "Para escolher curso, mudar de carreira ou se recolocar no mercado.",
+        "services": [
+          "Orientação profissional"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "momento",
+              "label": "Em que momento você está?",
+              "type": "select",
+              "options": [
+                "Escolhendo curso ou faculdade",
+                "Mudança de carreira",
+                "Recolocação",
+                "Outro"
+              ],
+              "required": true
+            },
+            {
+              "key": "idade",
+              "label": "Sua idade",
+              "type": "select",
+              "options": [
+                "Até 17 anos",
+                "18 a 24 anos",
+                "25 anos ou mais"
+              ],
+              "required": true
+            },
+            {
+              "key": "modalidade",
+              "label": "Como prefere ser atendido(a)?",
+              "type": "select",
+              "options": [
+                "Presencial",
+                "Online",
+                "Tanto faz"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "idade",
+                "equals": "Até 17 anos"
+              },
+              "then": {
+                "tags": [
+                  "menor-de-idade"
+                ],
+                "recommend": "Necessária autorização do responsável."
+              }
+            },
+            {
+              "if": {
+                "field": "modalidade",
+                "equals": "Presencial"
+              },
+              "then": {
+                "modality": "IN_PERSON"
+              }
+            }
+          ]
+        }
       }
     ]
   }

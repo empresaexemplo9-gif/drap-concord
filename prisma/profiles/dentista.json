@@ -73,6 +73,30 @@
         "durationMin": 60,
         "priceCents": 30000,
         "modality": "IN_PERSON"
+      },
+      {
+        "name": "Atendimento de urgência",
+        "durationMin": 40,
+        "priceCents": 25000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Clareamento",
+        "durationMin": 60,
+        "priceCents": 45000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Avaliação ortodôntica",
+        "durationMin": 40,
+        "priceCents": 15000,
+        "modality": "IN_PERSON"
+      },
+      {
+        "name": "Odontopediatria",
+        "durationMin": 40,
+        "priceCents": 18000,
+        "modality": "IN_PERSON"
       }
     ],
     "recordTemplate": {
@@ -153,6 +177,448 @@
           }
         ],
         "mode": "AUTO"
+      }
+    ],
+    "careTypes": [
+      {
+        "key": "urgencia",
+        "name": "Dor ou urgência",
+        "description": "Dor de dente, inchaço, dente quebrado ou batido.",
+        "services": [
+          "Atendimento de urgência"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "dor",
+              "label": "Intensidade da dor (0 a 10)",
+              "type": "scale",
+              "min": 0,
+              "max": 10,
+              "required": true
+            },
+            {
+              "key": "inchaco",
+              "label": "Tem inchaço?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim, só na gengiva",
+                "Sim, no rosto ou pescoço"
+              ],
+              "required": true
+            },
+            {
+              "key": "respirar",
+              "label": "Tem dificuldade para engolir ou respirar?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            },
+            {
+              "key": "trauma",
+              "label": "O dente quebrou ou saiu por pancada?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "febre",
+              "label": "Está com febre?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "respirar",
+                "equals": "Sim"
+              },
+              "then": {
+                "stop": "Dificuldade para engolir ou respirar com inchaço é emergência. Procure um pronto-socorro agora ou ligue 192.",
+                "priority": "URGENTE"
+              }
+            },
+            {
+              "if": {
+                "field": "inchaco",
+                "equals": "Sim, no rosto ou pescoço"
+              },
+              "then": {
+                "priority": "URGENTE",
+                "alert": "Inchaço no rosto pode indicar infecção: se piorar ou vier febre alta, procure um pronto-socorro."
+              }
+            },
+            {
+              "if": {
+                "field": "dor",
+                "gte": 7
+              },
+              "then": {
+                "priority": "URGENTE"
+              }
+            },
+            {
+              "if": {
+                "field": "trauma",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "URGENTE",
+                "recommend": "Se o dente saiu inteiro, guarde-o no leite ou na saliva e venha em até 1 hora."
+              }
+            },
+            {
+              "if": {
+                "field": "febre",
+                "equals": "Sim"
+              },
+              "then": {
+                "priority": "ALTA"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "rotina",
+        "name": "Avaliação e limpeza",
+        "description": "Check-up, limpeza e prevenção.",
+        "services": [
+          "Avaliação",
+          "Limpeza (profilaxia)"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "ultima",
+              "label": "Quando foi ao dentista pela última vez?",
+              "type": "select",
+              "options": [
+                "Menos de 6 meses",
+                "6 meses a 1 ano",
+                "Mais de 1 ano",
+                "Nunca fui"
+              ],
+              "required": true
+            },
+            {
+              "key": "sangramento",
+              "label": "Sua gengiva sangra ao escovar?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "sensibilidade",
+              "label": "Sente sensibilidade a gelado ou doce?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "ultima",
+                "equals": "Menos de 6 meses"
+              },
+              "then": {
+                "service": "Limpeza (profilaxia)"
+              }
+            },
+            {
+              "if": {
+                "field": "sangramento",
+                "equals": "Sim"
+              },
+              "then": {
+                "recommend": "Gengiva sangrando: avaliar saúde gengival na consulta."
+              }
+            },
+            {
+              "if": {
+                "field": "sensibilidade",
+                "equals": "Sim"
+              },
+              "then": {
+                "recommend": "Sensibilidade relatada: verificar cáries e desgaste."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "estetica",
+        "name": "Estética do sorriso",
+        "description": "Clareamento, facetas e harmonização do sorriso.",
+        "services": [
+          "Avaliação",
+          "Clareamento"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "interesse",
+              "label": "O que você gostaria?",
+              "type": "multiselect",
+              "options": [
+                "Clareamento",
+                "Facetas ou lentes",
+                "Harmonização do sorriso"
+              ],
+              "required": true
+            },
+            {
+              "key": "sensibilidade",
+              "label": "Tem sensibilidade nos dentes?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "gestante",
+              "label": "Está gestante ou amamentando?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": true
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "interesse",
+                "equals": "Clareamento"
+              },
+              "then": {
+                "service": "Clareamento"
+              }
+            },
+            {
+              "if": {
+                "field": "sensibilidade",
+                "equals": "Sim"
+              },
+              "then": {
+                "recommend": "Sensibilidade: o dentista pode indicar tratamento antes do clareamento."
+              }
+            },
+            {
+              "if": {
+                "field": "gestante",
+                "equals": "Sim"
+              },
+              "then": {
+                "service": "Avaliação",
+                "tags": [
+                  "gestante"
+                ],
+                "recommend": "Clareamento não é indicado na gestação e amamentação; nesta fase, só avaliação."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "ortodontia",
+        "name": "Aparelho e ortodontia",
+        "description": "Dentes tortos, mordida e problemas de mandíbula.",
+        "services": [
+          "Avaliação ortodôntica"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "para_quem",
+              "label": "Para quem é?",
+              "type": "select",
+              "options": [
+                "Para mim",
+                "Para meu filho ou filha"
+              ],
+              "required": true
+            },
+            {
+              "key": "incomodo",
+              "label": "O que incomoda?",
+              "type": "multiselect",
+              "options": [
+                "Dentes tortos",
+                "Mordida",
+                "Dor ou estalos na mandíbula",
+                "Respira pela boca"
+              ],
+              "required": true
+            },
+            {
+              "key": "ja_usou",
+              "label": "Já usou aparelho?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "para_quem",
+                "equals": "Para meu filho ou filha"
+              },
+              "then": {
+                "tags": [
+                  "menor-de-idade"
+                ],
+                "recommend": "Comparecer com o responsável."
+              }
+            },
+            {
+              "if": {
+                "field": "incomodo",
+                "equals": "Dor ou estalos na mandíbula"
+              },
+              "then": {
+                "recommend": "Avaliar a articulação da mandíbula (ATM) na consulta."
+              }
+            },
+            {
+              "if": {
+                "field": "incomodo",
+                "equals": "Respira pela boca"
+              },
+              "then": {
+                "recommend": "Respiração pela boca pode pedir avaliação com otorrino."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "infantil",
+        "name": "Odontopediatria",
+        "description": "Atendimento para bebês e crianças.",
+        "services": [
+          "Odontopediatria"
+        ],
+        "triage": {
+          "questions": [
+            {
+              "key": "idade",
+              "label": "Idade da criança",
+              "type": "select",
+              "options": [
+                "0 a 3 anos",
+                "4 a 7 anos",
+                "8 a 12 anos"
+              ],
+              "required": true
+            },
+            {
+              "key": "primeira",
+              "label": "É a primeira vez no dentista?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "medo",
+              "label": "A criança tem medo de dentista?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Um pouco",
+                "Muito"
+              ],
+              "required": false
+            },
+            {
+              "key": "especial",
+              "label": "Tem alguma condição que precisamos saber (autismo, deficiência, alergia)?",
+              "type": "select",
+              "options": [
+                "Não",
+                "Sim"
+              ],
+              "required": false
+            },
+            {
+              "key": "especial_detalhe",
+              "label": "Conte um pouco",
+              "type": "textarea",
+              "required": false,
+              "showIf": {
+                "field": "especial",
+                "equals": "Sim"
+              }
+            }
+          ],
+          "rules": [
+            {
+              "if": {
+                "field": "idade",
+                "in": [
+                  "0 a 3 anos",
+                  "4 a 7 anos",
+                  "8 a 12 anos"
+                ]
+              },
+              "then": {
+                "tags": [
+                  "menor-de-idade"
+                ]
+              }
+            },
+            {
+              "if": {
+                "field": "medo",
+                "equals": "Muito"
+              },
+              "then": {
+                "recommend": "Primeira visita de adaptação, sem procedimentos."
+              }
+            },
+            {
+              "if": {
+                "field": "especial",
+                "equals": "Sim"
+              },
+              "then": {
+                "tags": [
+                  "atendimento-especial"
+                ],
+                "recommend": "Preparar ambiente e tempo extra para a consulta."
+              }
+            }
+          ]
+        }
       }
     ]
   }

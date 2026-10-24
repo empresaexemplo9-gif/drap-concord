@@ -52,6 +52,20 @@ export default async function Perfil({ searchParams }: { searchParams: Promise<{
               <Input id="minHours" name="minHours" type="number" min={0} defaultValue={cfg.cancellationPolicy.minHoursBefore} className="max-w-32" />
             </Field>
           </Card>
+          {cfg.careTypes.length > 0 && (
+            <Card className="space-y-3 text-sm">
+              <h2 className="text-lg font-semibold">Links de triagem</h2>
+              <p className="text-muted">Envie para quem quer agendar (WhatsApp, Instagram): a pessoa responde a triagem do tipo de atendimento e já escolhe o horário.</p>
+              <ul className="space-y-2">
+                {cfg.careTypes.map((c) => (
+                  <li key={c.key} className="rounded-xl bg-surface px-3 py-2">
+                    <p className="font-medium">{c.name}</p>
+                    <code className="block break-all text-xs text-muted">{`${process.env.APP_URL ?? ""}/p/${professional.slug}/agendar?tipo=${c.key}`}</code>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
           <Card className="space-y-2 text-sm">
             <h2 className="text-lg font-semibold">Compliance do perfil</h2>
             <Badge tone="warning">Pendente de validação por especialista</Badge>
