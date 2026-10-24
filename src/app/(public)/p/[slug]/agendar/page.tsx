@@ -41,7 +41,7 @@ export default async function AgendarPublico({ params, searchParams }: { params:
     : outcome && !outcome.stop
       ? await resolveService(pro.id, outcome.service, careType?.services)
       : undefined;
-  const slots = service ? await availableSlots(pro.id, service.id, 21) : [];
+  const slots = service ? await availableSlots(pro.id, service.id, 21, new Date(), { client: true }) : [];
   const chosen = sp.horario && slots.find((s) => s.toISOString() === sp.horario) ? new Date(sp.horario) : null;
   const modality = outcome?.modality ?? service?.modality;
   const keep = (extra: Record<string, string | undefined>) => {

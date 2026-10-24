@@ -213,8 +213,24 @@ export const profileOverridesSchema = z
     terminology: profileConfigSchema.innerType().shape.terminology.partial().optional(),
     recordTemplate: formTemplateSchema.optional(),
     cancellationPolicy: z.object({ minHoursBefore: z.number().int().min(0) }).optional(),
+    /** Como o profissional recebe agendamentos online. */
+    booking: z
+      .object({
+        // AUTO: o horário já entra confirmado; MANUAL: entra pendente até confirmar.
+        confirmation: z.enum(["AUTO", "MANUAL"]).default("MANUAL"),
+        minNoticeHours: z.number().int().min(0).max(720).default(0),
+        maxAdvanceDays: z.number().int().min(1).max(365).default(60),
+        triage: z.boolean().default(true),
+        /** Tipos de atendimento da profissão que este profissional não oferece. */
+        careTypesOff: z.array(z.string()).default([]),
+      })
+      .optional(),
   })
   .default({});
+
+export type BookingSettings = NonNullable<ProfileOverrides["booking"]>;
+export const bookingDefaults = (o: unknown): BookingSettings =>
+  ({ confirmation: "MANUAL", minNoticeHours: 0, maxAdvanceDays: 60, triage: true, careTypesOff: [], ...(profileOverridesSchema.parse(o ?? {}).booking ?? {}) });
 
 export type ProfileOverrides = z.infer<typeof profileOverridesSchema>;
 
@@ -226,6 +242,7 @@ export function resolveProfile(base: ProfileConfig, overrides: unknown): Profile
     terminology: { ...base.terminology, ...(o.terminology ?? {}) },
     recordTemplate: o.recordTemplate ?? base.recordTemplate,
     cancellationPolicy: o.cancellationPolicy ?? base.cancellationPolicy,
+    careTypes: o.booking?.triage === false ? [] : base.careTypes.filter((c) => !o.booking?.careTypesOff.includes(c.key)),
   };
 }
 

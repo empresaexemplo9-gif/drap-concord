@@ -16,3 +16,19 @@ export async function processThemeImage(input: Buffer) {
   const palette: Palette = buildPalette(small, 3);
   return { data, mime: "image/webp", width: info.width, height: info.height, palette };
 }
+
+export const MAX_LOGO_UPLOAD = 2 * 1024 * 1024;
+
+/** Logo da marca: aceita JPG, PNG, WebP, AVIF ou SVG e guarda como WebP (até 512 px, com transparência). */
+export async function processLogo(input: Buffer) {
+  const meta = await sharp(input, { density: 300 }).metadata();
+  if (!meta.width || !meta.height || !["jpeg", "png", "webp", "avif", "svg"].includes(meta.format ?? "")) {
+    throw new Error("Envie o logo em PNG, SVG, JPG ou WebP.");
+  }
+  const { data, info } = await sharp(input, { density: 300 })
+    .rotate()
+    .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: meta.format !== "svg" })
+    .webp({ quality: 90, alphaQuality: 100 })
+    .toBuffer({ resolveWithObject: true });
+  return { data, mime: "image/webp", width: info.width, height: info.height };
+}

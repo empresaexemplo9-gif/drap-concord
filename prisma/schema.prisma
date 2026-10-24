@@ -202,6 +202,8 @@ model Professional {
   isPublic         Boolean  @default(true)
   // Personalizações do profissional por cima do perfil-base (não altera o perfil).
   overrides        Json     @default("{}")
+  // Marca própria: nome da empresa, visual da página e contatos (ver lib/brand.ts).
+  brand            Json     @default("{}")
   timezone         String   @default("America/Sao_Paulo")
   bufferMin        Int      @default(0)
   createdAt        DateTime @default(now())
@@ -218,8 +220,26 @@ model Professional {
   records      AttendanceRecord[]
   triages      TriageResponse[]
   invites      Invite[]
+  brandAssets  BrandAsset[]
 
   @@index([orgId])
+}
+
+/// Imagens da marca do profissional: logo e imagem de fundo própria.
+model BrandAsset {
+  id             String   @id @default(cuid())
+  professionalId String
+  kind           String // LOGO | BACKGROUND
+  data           Bytes
+  mime           String
+  width          Int
+  height         Int
+  palette        Json?
+  updatedAt      DateTime @updatedAt
+
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@unique([professionalId, kind])
 }
 
 model Service {

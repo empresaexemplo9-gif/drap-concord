@@ -97,7 +97,9 @@ const PAPER: RGB = [247, 242, 234];
  * Tokens de tema para o modo claro e escuro. Os nomes batem com as variáveis
  * de globals.css, então todo componente da plataforma "veste" o tema.
  */
-export function themeTokens(p: Palette): { light: ThemeTokens; dark: ThemeTokens } {
+export function themeTokens(p: Palette, opts: { solid?: boolean } = {}): { light: ThemeTokens; dark: ThemeTokens } {
+  // Sem efeito de vidro, os cartões ficam quase opacos para manter a leitura sobre a imagem.
+  const a = (glass: number, solid: number) => (opts.solid ? solid : glass);
   const lightPrimary = ensureContrast(p.vibrant, WHITE, 4.6, "darken");
   const darkPrimary = ensureContrast(p.vibrant, NIGHT, 7, "lighten");
   const lightGlass = mix(WHITE, p.average, 0.1);
@@ -110,8 +112,8 @@ export function themeTokens(p: Palette): { light: ThemeTokens; dark: ThemeTokens
     light: {
       ...common,
       "--bg": rgba(lightGlass, 0.2),
-      "--surface": rgba(lightGlass, 0.5),
-      "--card": rgba(lightGlass, 0.74),
+      "--surface": rgba(lightGlass, a(0.5, 0.88)),
+      "--card": rgba(lightGlass, a(0.74, 0.95)),
       "--primary": hex(lightPrimary),
       "--primary-hover": hex(mix(lightPrimary, [0, 0, 0], 0.15)),
       "--on-primary": "#ffffff",
@@ -125,8 +127,8 @@ export function themeTokens(p: Palette): { light: ThemeTokens; dark: ThemeTokens
     },
     dark: {
       "--bg": rgba(darkGlass, 0.25),
-      "--surface": rgba(darkGlass, 0.5),
-      "--card": rgba(darkGlass, 0.64),
+      "--surface": rgba(darkGlass, a(0.5, 0.88)),
+      "--card": rgba(darkGlass, a(0.64, 0.95)),
       "--primary": hex(darkPrimary),
       "--primary-hover": hex(mix(darkPrimary, WHITE, 0.15)),
       "--on-primary": hex(NIGHT),

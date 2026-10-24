@@ -19,7 +19,7 @@ export default async function Remarcar({ params, searchParams }: { params: Promi
   if (!appt) notFound();
   const tz = appt.professional.timezone;
   const policy = await clientCanChange(appt);
-  const slots = policy.allowed ? await availableSlots(appt.professionalId, appt.serviceId, 21) : [];
+  const slots = policy.allowed ? await availableSlots(appt.professionalId, appt.serviceId, 21, new Date(), { client: true }) : [];
   return (
     <>
       <Link href="/minha-conta" className="text-sm font-semibold text-primary">← Voltar</Link>

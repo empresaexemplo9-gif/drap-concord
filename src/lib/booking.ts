@@ -4,17 +4,28 @@ import { audit } from "./audit";
 import { notify } from "./notify";
 import { computeSlots } from "./slots";
 import { professionalConfig } from "./profiles/registry";
+import { bookingDefaults } from "./profiles/schema";
 import { dateLong, time } from "./format";
 
 const ACTIVE = ["PENDING", "CONFIRMED"] as const;
 
 export class BookingError extends Error {}
 
-export async function availableSlots(professionalId: string, serviceId: string, days = 14, from = new Date()) {
+/**
+ * Horários livres. Com `client: true` (agendamento feito pelo cliente) valem a
+ * antecedência mínima e o limite de dias à frente definidos pelo profissional.
+ */
+export async function availableSlots(professionalId: string, serviceId: string, days = 14, from = new Date(), opts: { client?: boolean } = {}) {
   const pro = await db.professional.findUniqueOrThrow({
     where: { id: professionalId },
     include: { availability: true, timeOff: true },
   });
+  if (opts.client) {
+    const b = bookingDefaults(pro.overrides);
+    const earliest = addMinutes(new Date(), b.minNoticeHours * 60);
+    if (earliest > from) from = earliest;
+    days = Math.min(days, b.maxAdvanceDays);
+  }
   const service = await db.service.findFirstOrThrow({ where: { id: serviceId, professionalId, active: true } });
   const until = addMinutes(from, days * 24 * 60 + 24 * 60);
   const appts = await db.appointment.findMany({
@@ -65,7 +76,7 @@ export async function book(input: {
     throw new BookingError("Novos agendamentos estão bloqueados. Fale com o profissional.");
   }
   if (!input.byProfessional) {
-    const valid = await availableSlots(pro.id, service.id, 60, new Date());
+    const valid = await availableSlots(pro.id, service.id, 365, new Date(), { client: true });
     if (!valid.some((s) => s.getTime() === input.startsAt.getTime())) {
       throw new BookingError("Esse horário não está disponível. Escolha outro.");
     }
@@ -91,7 +102,7 @@ export async function book(input: {
           startsAt: input.startsAt,
           endsAt,
           modality: input.modality ?? service.modality,
-          status: input.byProfessional ? "CONFIRMED" : "PENDING",
+          status: input.byProfessional || bookingDefaults(pro.overrides).confirmation === "AUTO" ? "CONFIRMED" : "PENDING",
           notes: input.notes,
         },
       });
@@ -122,7 +133,7 @@ export async function reschedule(appointmentId: string, newStart: Date, actor: {
   if (!actor.byProfessional) {
     const { allowed, minHours } = await clientCanChange(old);
     if (!allowed) throw new BookingError(`Remarcações só com ${minHours}h de antecedência. Fale com o profissional.`);
-    const valid = await availableSlots(old.professionalId, old.serviceId, 60);
+    const valid = await availableSlots(old.professionalId, old.serviceId, 365, new Date(), { client: true });
     if (!valid.some((s) => s.getTime() === newStart.getTime())) throw new BookingError("Esse horário não está disponível.");
   }
   const endsAt = addMinutes(newStart, old.service.durationMin);
@@ -131,7 +142,7 @@ export async function reschedule(appointmentId: string, newStart: Date, actor: {
     const created = await tx.appointment.create({
       data: {
         orgId: old.orgId, professionalId: old.professionalId, clientId: old.clientId, serviceId: old.serviceId,
-        startsAt: newStart, endsAt, modality: old.modality, status: actor.byProfessional ? "CONFIRMED" : "PENDING", notes: old.notes,
+        startsAt: newStart, endsAt, modality: old.modality, status: actor.byProfessional || bookingDefaults(old.professional.overrides).confirmation === "AUTO" ? "CONFIRMED" : "PENDING", notes: old.notes,
       },
     });
     await tx.appointment.update({ where: { id: old.id }, data: { status: "RESCHEDULED", rescheduledToId: created.id } });

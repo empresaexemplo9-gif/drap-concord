@@ -12,7 +12,7 @@ import { notify } from "@/lib/notify";
 import { book, reschedule, BookingError } from "@/lib/booking";
 import { onNoShow, decideEvent, undoEvent } from "@/lib/rules/run";
 import { canSeeRecords, professionalConfig } from "@/lib/profiles/registry";
-import { profileOverridesSchema, type RuleAction } from "@/lib/profiles/schema";
+import type { RuleAction } from "@/lib/profiles/schema";
 import { hhmmToMin, slugify } from "@/lib/format";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
@@ -240,14 +240,6 @@ export async function undoRuleEvent(form: FormData) {
 
 export async function saveProfile(form: FormData) {
   const { professional } = await requireProfessional();
-  const overrides = profileOverridesSchema.parse({
-    ...(professional.overrides as object),
-    terminology: {
-      client: { singular: str(form, "clientSingular"), plural: str(form, "clientPlural") },
-      appointment: { singular: str(form, "apptSingular"), plural: str(form, "apptPlural") },
-    },
-    cancellationPolicy: { minHoursBefore: Math.max(0, Number(str(form, "minHours")) || 0) },
-  });
   const slug = slugify(str(form, "slug")) || professional.slug;
   if (slug !== professional.slug && (await db.professional.findUnique({ where: { slug } }))) {
     fail("/app/perfil", "Esse endereço já está em uso. Escolha outro.");
@@ -263,7 +255,6 @@ export async function saveProfile(form: FormData) {
       specialties: str(form, "specialties").split(",").map((s) => s.trim()).filter(Boolean),
       registryNumber: str(form, "registryNumber") || null,
       isPublic: form.get("isPublic") === "on",
-      overrides,
     },
   });
   redirect("/app/perfil?ok=1");

@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { BottomNav, Icon, SideNav, type NavItem } from "@/components/app-nav";
-import { Brand, ButtonLink } from "@/components/ui";
+import { ButtonLink } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { requireProfessional } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { logout } from "../(auth)/actions";
 import { accessLabel } from "@/lib/format";
 import { ProfessionTheme } from "@/components/profession-theme";
-import { themeForProfile } from "@/lib/themes/load";
+import { BrandMark } from "@/components/brand-mark";
+import { logoUrl, parseBrand } from "@/lib/brand";
+import { themeForProfessional } from "@/lib/themes/load";
 
 const items: NavItem[] = [
   { href: "/app", label: "Hoje", icon: "home" },
@@ -18,16 +20,20 @@ const items: NavItem[] = [
   { href: "/app/horarios", label: "Horários", icon: "clock" },
   { href: "/app/relatorios", label: "Relatórios", icon: "chart" },
   { href: "/app/perfil", label: "Meu perfil", icon: "user" },
+  { href: "/app/marca", label: "Minha marca", icon: "brush" },
+  { href: "/app/atendimento", label: "Como atendo", icon: "sliders" },
   { href: "/app/convites", label: "Convidar clientes", icon: "invite" },
   { href: "/vitrine", label: "Vitrine pública", icon: "store" },
 ];
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, professional } = await requireProfessional();
-  const [unread, theme] = await Promise.all([
+  const [unread, theme, logo] = await Promise.all([
     db.notification.count({ where: { userId: user.id, readAt: null } }),
-    themeForProfile(professional.profileId),
+    themeForProfessional(professional),
+    logoUrl(professional.id),
   ]);
+  const brandName = parseBrand(professional.brand).businessName ?? professional.displayName;
   const mobile: NavItem[] = [
     items[0],
     items[1],
@@ -40,12 +46,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-dvh md:grid md:grid-cols-[248px_1fr]">
       <ProfessionTheme theme={theme} />
       <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-line bg-surface px-4 py-6 md:flex">
-        <Brand href="/app" />
+        <Link href="/app" className="flex items-center gap-3" aria-label={`${brandName}, início`}>
+          <BrandMark name={brandName} logoUrl={logo} size={40} />
+          <span className="min-w-0 truncate font-serif text-lg font-semibold leading-tight">{brandName}</span>
+        </Link>
         <ButtonLink href="/app/agendar" className="w-full">+ Novo agendamento</ButtonLink>
         <SideNav items={items} />
         <div className="mt-auto space-y-1 text-sm">
           <p className="truncate px-3 font-medium">{professional.displayName}</p>
           <p className="px-3 text-xs font-semibold text-accent">{accessLabel.PROFESSIONAL}</p>
+          <p className="px-3 text-xs text-muted">na DRAP Concord</p>
           <form action={logout}>
             <button className="min-h-11 w-full rounded-xl px-3 text-left text-muted hover:bg-card/60">Sair</button>
           </form>
@@ -54,7 +64,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       <div className="min-w-0">
         <header className="gutter sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-bg/90 py-3 backdrop-blur">
-          <div className="md:hidden"><Brand href="/app" /></div>
+          <Link href="/app" className="flex min-w-0 items-center gap-2 md:hidden"><BrandMark name={brandName} logoUrl={logo} size={32} /><span className="truncate font-serif font-semibold">{brandName}</span></Link>
           <div className="hidden text-sm text-muted md:block">
             Sua página pública:{" "}
             <Link href={`/p/${professional.slug}`} className="font-medium text-primary hover:underline">/p/{professional.slug}</Link>

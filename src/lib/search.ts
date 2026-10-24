@@ -19,6 +19,7 @@ export async function searchProfessionals(p: SearchParams) {
       ? {
           OR: [
             { displayName: { contains: q, mode: "insensitive" } },
+            { brand: { path: ["businessName"], string_contains: q } },
             { headline: { contains: q, mode: "insensitive" } },
             { bio: { contains: q, mode: "insensitive" } },
             { specialties: { has: q } },
@@ -42,6 +43,7 @@ export async function searchProfessionals(p: SearchParams) {
       profile: true,
       services: { where: { active: true }, orderBy: { priceCents: "asc" } },
       reviews: { where: { status: "APPROVED" }, select: { rating: true } },
+      brandAssets: { where: { kind: "LOGO" }, select: { updatedAt: true } },
     },
     take: 50,
   });
@@ -49,7 +51,7 @@ export async function searchProfessionals(p: SearchParams) {
   const withExtras = await Promise.all(
     pros.map(async (pro) => {
       const first = pro.services[0];
-      const next = first ? (await availableSlots(pro.id, first.id, 14))[0] ?? null : null;
+      const next = first ? (await availableSlots(pro.id, first.id, 14, new Date(), { client: true }))[0] ?? null : null;
       const rating = pro.reviews.length ? pro.reviews.reduce((s, r) => s + r.rating, 0) / pro.reviews.length : null;
       const category = profiles.find((x) => x.id === pro.profileId)?.config.category ?? "";
       return { pro, next, rating, category };

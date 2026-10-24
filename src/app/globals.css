@@ -96,10 +96,15 @@
   --color-info-bg: var(--info-bg);
   --color-line: var(--border);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-serif: var(--heading-font);
   --radius-xl: 1rem;
   --radius-2xl: 1.25rem;
   --shadow-soft: var(--shadow);
+}
+
+/* Fonte dos títulos: o profissional pode trocar na marca (lib/brand.ts). */
+:root {
+  --heading-font: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
 html {
@@ -115,7 +120,7 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: var(--font-serif);
+  font-family: var(--heading-font);
   letter-spacing: -0.01em;
   text-wrap: balance;
 }

@@ -7,6 +7,8 @@ const links = [
   ["/app/horarios", "Horários e bloqueios"],
   ["/app/relatorios", "Relatórios"],
   ["/app/perfil", "Meu perfil e página pública"],
+  ["/app/marca", "Minha marca"],
+  ["/app/atendimento", "Como atendo"],
   ["/app/notificacoes", "Notificações"],
   ["/app/convites", "Convidar clientes"],
   ["/vitrine", "Vitrine pública"],

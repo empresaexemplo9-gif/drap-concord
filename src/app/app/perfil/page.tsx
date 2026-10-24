@@ -13,7 +13,6 @@ export default async function Perfil({ searchParams }: { searchParams: Promise<{
   const { ok, erro } = await searchParams;
   const cfg = await professionalConfig(professional);
   const profile = await db.professionProfile.findUniqueOrThrow({ where: { id: professional.profileId } });
-  const t = cfg.terminology;
 
   return (
     <>
@@ -39,18 +38,9 @@ export default async function Perfil({ searchParams }: { searchParams: Promise<{
           {professional.registryVerified ? <Badge tone="success">Registro verificado</Badge> : <Badge tone="warning">Registro em verificação</Badge>}
         </Card>
         <div className="space-y-6">
-          <Card className="space-y-4">
-            <h2 className="text-lg font-semibold">Como você chama as coisas</h2>
-            <p className="text-sm text-muted">Personalize sem alterar o perfil-base da profissão.</p>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Cliente (singular)" htmlFor="clientSingular"><Input id="clientSingular" name="clientSingular" defaultValue={t.client.singular} /></Field>
-              <Field label="Cliente (plural)" htmlFor="clientPlural"><Input id="clientPlural" name="clientPlural" defaultValue={t.client.plural} /></Field>
-              <Field label="Atendimento (singular)" htmlFor="apptSingular"><Input id="apptSingular" name="apptSingular" defaultValue={t.appointment.singular} /></Field>
-              <Field label="Atendimento (plural)" htmlFor="apptPlural"><Input id="apptPlural" name="apptPlural" defaultValue={t.appointment.plural} /></Field>
-            </div>
-            <Field label="Antecedência mínima para o cliente cancelar ou remarcar (horas)" htmlFor="minHours">
-              <Input id="minHours" name="minHours" type="number" min={0} defaultValue={cfg.cancellationPolicy.minHoursBefore} className="max-w-32" />
-            </Field>
+          <Card className="space-y-3 text-sm">
+            <h2 className="text-lg font-semibold">Personalize do seu jeito</h2>
+            <p className="text-muted">Nome da empresa, logo, imagem, cores e contatos em <Link href="/app/marca" className="font-semibold text-primary">Minha marca</Link>. Confirmação, antecedência, triagem e nomes em <Link href="/app/atendimento" className="font-semibold text-primary">Como atendo</Link>.</p>
           </Card>
           {cfg.careTypes.length > 0 && (
             <Card className="space-y-3 text-sm">

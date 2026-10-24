@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Avatar, Badge, Card, EmptyState, Input, Select, Stars } from "@/components/ui";
+import { BrandMark } from "./brand-mark";
+import { assetUrl, parseBrand } from "@/lib/brand";
+import { Badge, Card, EmptyState, Input, Select, Stars } from "@/components/ui";
 import { categories } from "@/lib/profiles/registry";
 import { searchProfessionals, type SearchParams } from "@/lib/search";
 import { fmt, modalityLabel, money } from "@/lib/format";
@@ -81,10 +83,11 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
             {results.map(({ pro, next, rating, category }) => (
               <Card key={pro.id} className="flex flex-col gap-4">
                 <div className="flex gap-4">
-                  <Avatar name={pro.displayName} size={64} />
+                  <BrandMark name={parseBrand(pro.brand).businessName ?? pro.displayName} logoUrl={pro.brandAssets[0] ? assetUrl(pro.id, "logo", pro.brandAssets[0].updatedAt) : null} size={64} />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold uppercase tracking-wide text-accent">{category}</p>
-                    <Link href={`/p/${pro.slug}`} className="font-serif text-xl font-semibold hover:text-primary">{pro.displayName}</Link>
+                    <Link href={`/p/${pro.slug}`} className="font-serif text-xl font-semibold hover:text-primary">{parseBrand(pro.brand).businessName ?? pro.displayName}</Link>
+                    {parseBrand(pro.brand).businessName && <p className="text-sm">{pro.displayName}</p>}
                     <p className="text-sm text-muted">{pro.headline ?? pro.profile.name}{pro.city && ` · ${pro.city}`}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-2">
                       {pro.registryVerified && <Badge tone="success">✓ Registro verificado</Badge>}

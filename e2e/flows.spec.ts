@@ -437,7 +437,7 @@ test("cadastro mostra os dois tipos de conta e cria conta de cliente (Acesso 2)"
   await page.getByLabel("Senha").fill(PASSWORD);
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Criar minha conta" }).click();
-  await page.waitForURL(/\/minha-conta/);
+  await expect(page).toHaveURL(/\/minha-conta/, { timeout: 15_000 });
   await expect(page.getByText("Acesso 2 · Cliente")).toBeVisible();
 });
 
@@ -465,4 +465,97 @@ test("o tema da profissão acompanha a conta: portal do cliente e vitrine do pro
   await logout(page);
   await page.goto("/");
   await expect(themed).toHaveCount(0);
+});
+
+const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64");
+
+test("profissional cria a própria marca: nome, logo, fundo, cor, fonte e contatos aparecem na página pública", async ({ page }) => {
+  await login(page, "juliana@concord.dev");
+  await page.getByRole("link", { name: "Minha marca" }).first().click();
+  await expect(page.getByRole("heading", { name: "Minha marca" })).toBeVisible();
+
+  await page.getByLabel("Nome da marca ou empresa").fill("Studio Movimento");
+  await page.getByLabel("Frase de apresentação").fill("Treinos que cabem na sua rotina");
+  await page.getByLabel("Logo", { exact: true }).setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: PNG });
+  await page.getByRole("button", { name: "Salvar identidade" }).click();
+  await expect(page.getByText("Identidade salva.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Studio Movimento, início" })).toBeVisible();
+
+  await page.getByRole("radio", { name: /Sem imagem/ }).check();
+  await page.getByRole("radio", { name: "Usar a cor da minha marca" }).check();
+  await page.getByLabel("Cor da marca").fill("#1d4ed8");
+  await page.getByLabel("Fonte dos títulos").selectOption("moderna");
+  await page.getByRole("button", { name: "Salvar visual" }).click();
+  await expect(page.getByText("Visual salvo.")).toBeVisible();
+  await expect(page.locator('div.fixed.inset-0 img')).toHaveCount(0);
+
+  await page.getByLabel("WhatsApp").fill("(11) 98765-4321");
+  await page.getByLabel("Instagram").fill("@studiomovimento");
+  await page.getByLabel("Texto do botão de agendar").fill("Reservar treino");
+  await page.getByRole("checkbox", { name: "Preços dos serviços" }).uncheck();
+  await page.getByRole("button", { name: "Salvar página" }).click();
+  await expect(page.getByText("Página salva.")).toBeVisible();
+
+  await logout(page);
+  await page.goto("/p/juliana-costa");
+  await expect(page.getByRole("heading", { level: 1, name: "Studio Movimento" })).toBeVisible();
+  await expect(page.getByText("Treinos que cabem na sua rotina")).toBeVisible();
+  await expect(page.getByRole("img", { name: "Logo de Studio Movimento" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "WhatsApp" })).toHaveAttribute("href", "https://wa.me/5511987654321");
+  await expect(page.getByRole("link", { name: "@studiomovimento" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Reservar treino" }).first()).toBeVisible();
+  await expect(page.getByText(/R\$/)).toHaveCount(0);
+  const primary = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--primary").trim());
+  expect(primary).not.toBe("");
+  const font = await page.evaluate(() => getComputedStyle(document.querySelector("h1")!).fontFamily);
+  expect(font).toMatch(/inter/i);
+
+  // Volta ao padrão da profissão.
+  await login(page, "juliana@concord.dev");
+  await page.goto("/app/marca");
+  await page.getByRole("button", { name: "Voltar ao visual padrão da profissão" }).click();
+  await expect(page.getByText("Marca restaurada")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Juliana Costa, início" })).toBeVisible();
+});
+
+test("profissional define o próprio modo de atendimento: triagem, nomes e confirmação", async ({ page }) => {
+  await login(page, "rafael@concord.dev");
+  await page.getByRole("link", { name: "Como atendo" }).first().click();
+  await page.getByLabel("Cliente (plural)").fill("Alunos");
+  await page.getByLabel("Cliente (singular)").fill("Aluno");
+  await page.getByRole("radio", { name: /Confirmar na hora/ }).check();
+  const triage = page.getByRole("checkbox", { name: "Usar triagem na minha página" });
+  if (await triage.count()) await triage.uncheck();
+  await page.getByRole("button", { name: "Salvar modo de atendimento" }).click();
+  await expect(page.getByText("Modo de atendimento salvo.")).toBeVisible();
+  await page.goto("/app/clientes");
+  await expect(page.getByRole("heading", { name: "Alunos" })).toBeVisible();
+
+  await logout(page);
+  await page.goto("/p/rafael-souza");
+  await expect(page.getByRole("link", { name: /com triagem/ })).toHaveCount(0);
+
+  // Agendamento pelo cliente já entra confirmado.
+  await page.getByRole("link", { name: "Agendar" }).first().click();
+  await page.locator('label:has(input[name="horario"])').first().click();
+  await page.getByRole("button", { name: "Continuar" }).click();
+  await page.getByLabel("Nome completo").fill("Aluno Confirmado");
+  await page.getByLabel("E-mail").fill(`aluno-${uid()}@teste.dev`);
+  await page.getByLabel("Celular / WhatsApp").fill("(11) 90000-1111");
+  await page.getByLabel("Crie uma senha").fill(PASSWORD);
+  for (const box of await page.getByRole("checkbox").all()) await box.check();
+  await page.getByRole("button", { name: "Confirmar agendamento" }).click();
+  await page.waitForURL(/agendado|minha-conta/);
+  await page.goto("/minha-conta");
+  await expect(page.getByText("Confirmado").first()).toBeVisible();
+
+  await logout(page);
+  await login(page, "rafael@concord.dev");
+  await page.goto("/app/atendimento");
+  await page.getByLabel("Cliente (plural)").fill("Clientes");
+  await page.getByLabel("Cliente (singular)").fill("Cliente");
+  await page.getByRole("radio", { name: /Fica pendente/ }).check();
+  if (await triage.count()) await triage.check();
+  await page.getByRole("button", { name: "Salvar modo de atendimento" }).click();
+  await expect(page.getByText("Modo de atendimento salvo.")).toBeVisible();
 });

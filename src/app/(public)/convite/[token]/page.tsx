@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { Alert, Avatar, Badge, ButtonLink, Card, EmptyState, Field, Input } from "@/components/ui";
+import { BrandMark } from "@/components/brand-mark";
+import { logoUrl, parseBrand } from "@/lib/brand";
+import { Alert, Badge, ButtonLink, Card, EmptyState, Field, Input } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { ProfessionTheme } from "@/components/profession-theme";
 import { getUser } from "@/lib/auth";
 import { findInvite } from "@/lib/invites";
-import { themeForProfile } from "@/lib/themes/load";
+import { themeForProfessional } from "@/lib/themes/load";
 import { login, logout, signupClient } from "../../../(auth)/actions";
 import { linkInvite } from "./actions";
 
@@ -23,7 +25,8 @@ export default async function Convite({ params, searchParams }: { params: Promis
   }
   const pro = invite.professional;
   const term = (pro.profile.config as { terminology?: { professional?: string } }).terminology?.professional ?? pro.profile.name;
-  const [theme, user] = await Promise.all([themeForProfile(pro.profileId), getUser()]);
+  const [theme, user, logo] = await Promise.all([themeForProfessional(pro), getUser(), logoUrl(pro.id)]);
+  const business = parseBrand(pro.brand).businessName;
   const first = invite.client?.name.split(" ")[0];
   const hasAccount = modo === "entrar";
 
@@ -34,10 +37,10 @@ export default async function Convite({ params, searchParams }: { params: Promis
         <section className="space-y-5 rounded-3xl border border-line/60 bg-card/85 p-6 shadow-soft sm:p-8">
           <Badge tone="info">Convite · Acesso 2</Badge>
           <div className="flex items-center gap-4">
-            <Avatar name={pro.displayName} size={64} />
+            <BrandMark name={business ?? pro.displayName} logoUrl={logo} size={64} />
             <div>
-              <p className="text-sm text-muted">{term}</p>
-              <p className="text-xl font-semibold">{pro.displayName}</p>
+              <p className="text-sm text-muted">{business ? `${pro.displayName} · ${term}` : term}</p>
+              <p className="text-xl font-semibold">{business ?? pro.displayName}</p>
             </div>
           </div>
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
