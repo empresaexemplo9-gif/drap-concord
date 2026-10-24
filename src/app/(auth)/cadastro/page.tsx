@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Alert, Card, Field, Input } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
+import { AccessSwitch } from "@/components/access-switch";
 import { signupProfessional } from "../actions";
 
 export const metadata = { title: "Criar conta de profissional" };
@@ -9,6 +10,7 @@ export default async function Cadastro({ searchParams }: { searchParams: Promise
   const { erro } = await searchParams;
   return (
     <Card className="p-6 sm:p-8">
+      <AccessSwitch active="pro" />
       <p className="text-sm font-semibold text-accent">14 dias grátis, sem cartão</p>
       <h1 className="mt-1 text-2xl font-semibold">Organize seus atendimentos em minutos</h1>
       <p className="mt-1 text-sm text-muted">Você escolhe sua profissão e a plataforma já chega configurada para ela.</p>

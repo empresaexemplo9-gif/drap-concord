@@ -64,3 +64,10 @@ export function hhmmToMin(s: string) {
 }
 
 export const stageLabel: Record<string, string> = { LEAD: "Interessado", FIRST_VISIT: "1º atendimento", ACTIVE: "Ativo", INACTIVE: "Inativo" };
+
+/** Tipos de conta da plataforma. */
+export const accessLabel: Record<string, string> = {
+  PROFESSIONAL: "Acesso 1 · Profissional",
+  CLIENT: "Acesso 2 · Cliente",
+  PLATFORM_ADMIN: "Admin da plataforma",
+};

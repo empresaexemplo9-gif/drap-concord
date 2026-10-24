@@ -23,8 +23,10 @@ export default async function Entrar({ searchParams }: { searchParams: Promise<{
         <SubmitButton className="w-full" pendingText="Entrando…">Entrar</SubmitButton>
       </form>
       <p className="mt-6 text-center text-sm text-muted">
-        É profissional e ainda não tem conta?{" "}
-        <Link href="/cadastro" className="font-semibold text-primary underline-offset-4 hover:underline">Crie grátis</Link>
+        Ainda não tem conta?{" "}
+        <Link href="/cadastro/cliente" className="font-semibold text-primary underline-offset-4 hover:underline">Quero agendar</Link>
+        {" · "}
+        <Link href="/cadastro" className="font-semibold text-primary underline-offset-4 hover:underline">Sou profissional</Link>
       </p>
     </Card>
   );

@@ -13,9 +13,11 @@ const okMsg: Record<string, string> = {
   avaliado: "Obrigado pela avaliação! Ela aparece após moderação.",
 };
 
-export default async function MinhaConta({ searchParams }: { searchParams: Promise<{ ok?: string; erro?: string }> }) {
+export default async function MinhaConta({ searchParams }: { searchParams: Promise<{ ok?: string; erro?: string; bemvindo?: string; convite?: string }> }) {
   const user = await requireUser(["CLIENT"]);
-  const { ok, erro } = await searchParams;
+  const { ok, erro, bemvindo, convite } = await searchParams;
+  const mine = await db.client.findMany({ where: { userId: user.id }, include: { org: { include: { professionals: { where: { isPublic: true }, select: { displayName: true, slug: true }, take: 1 } } } } });
+  const pros = mine.flatMap((c) => c.org.professionals);
   const appts = await db.appointment.findMany({
     where: { client: { userId: user.id }, status: { not: "RESCHEDULED" } },
     include: { service: true, professional: true, client: { include: { reviews: { select: { id: true } } } } },
@@ -29,6 +31,13 @@ export default async function MinhaConta({ searchParams }: { searchParams: Promi
   return (
     <>
       <PageHeader title={`Olá, ${user.name.split(" ")[0]}`} subtitle="Seus agendamentos em um só lugar." action={<ButtonLink href="/" variant="secondary">Agendar novo</ButtonLink>} />
+      {bemvindo && (
+        <div className="mb-4">
+          <Alert tone={convite ? "warning" : "success"}>
+            {convite ? "Conta criada, mas o convite não estava mais válido. Você já pode buscar e agendar serviços." : `Bem-vindo(a)! Sua conta (Acesso 2) está pronta${pros.length ? `, ligada a ${pros.map((p) => p.displayName).join(", ")}` : ""}.`}
+          </Alert>
+        </div>
+      )}
       {ok && okMsg[ok] && <div className="mb-4"><Alert tone="success">{okMsg[ok]}</Alert></div>}
       {erro && <div className="mb-4"><Alert tone="danger">{erro}</Alert></div>}
 
@@ -89,6 +98,22 @@ export default async function MinhaConta({ searchParams }: { searchParams: Promi
           </ul>
         </>
       )}
+      <section className="mt-10">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-xl font-semibold">Meus profissionais</h2>
+          <Link href="/vitrine" className="text-sm font-semibold text-primary">Buscar outros serviços →</Link>
+        </div>
+        {pros.length === 0 ? <p className="text-sm text-muted">Você ainda não tem profissionais. Busque na vitrine ou peça o link de convite.</p> : (
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {pros.map((p) => (
+              <Card key={p.slug} className="flex items-center justify-between gap-3 p-4">
+                <span className="font-semibold">{p.displayName}</span>
+                <ButtonLink href={`/p/${p.slug}/agendar`} variant="secondary">Agendar</ButtonLink>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
     </>
   );
 }

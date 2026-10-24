@@ -1,7 +1,7 @@
 import { getImpersonator, getUser } from "@/lib/auth";
 import { stopViewAs } from "@/app/view-as-actions";
 
-const roleLabel = { PLATFORM_ADMIN: "admin", PROFESSIONAL: "profissional", CLIENT: "cliente" } as const;
+import { accessLabel } from "@/lib/format";
 
 /**
  * Selo flutuante mostrado enquanto um admin vê a plataforma como outro
@@ -20,7 +20,7 @@ export async function ViewAsBanner() {
       <span className="min-w-0">
         {user ? (
           <>
-            Vendo como <strong>{user.name}</strong> ({roleLabel[user.role]}{user.isSandbox && ", prévia"}).
+            Vendo como <strong>{user.name}</strong> ({accessLabel[user.role]}{user.isSandbox && ", prévia"}).
             <span className="block text-xs opacity-90">
               {user.isSandbox ? "Conta de prévia: pode testar à vontade." : "Ações aqui valem como se fosse essa pessoa."}
             </span>

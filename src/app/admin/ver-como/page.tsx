@@ -56,11 +56,11 @@ export default async function VerComo({ searchParams }: { searchParams: Promise<
             <div className="mt-auto"><ActionButton action={viewAsVisitor} fields={{}} label="Ver como visitante" /></div>
           </Card>
           <Card className="flex flex-col gap-3">
-            <div><p className="font-semibold">Cliente</p><p className="text-sm text-muted">Portal com agendamentos, remarcação, avaliações e dados (LGPD).</p></div>
+            <div><p className="font-semibold">Acesso 2 · Cliente</p><p className="text-sm text-muted">Clientes, pacientes, alunos: portal com agendamentos, remarcação, avaliações e dados (LGPD).</p></div>
             <a href="#clientes" className="mt-auto text-sm font-semibold text-primary">Escolher cliente ↓</a>
           </Card>
           <Card className="flex flex-col gap-3">
-            <div><p className="font-semibold">Profissional</p><p className="text-sm text-muted">Área completa, com o tema da profissão. Escolha por profissão ou por pessoa.</p></div>
+            <div><p className="font-semibold">Acesso 1 · Profissional</p><p className="text-sm text-muted">Área completa, com o tema da profissão. Escolha por profissão ou por pessoa.</p></div>
             <a href="#profissoes" className="mt-auto text-sm font-semibold text-primary">Escolher profissão ↓</a>
           </Card>
           <Card className="flex flex-col gap-3">
@@ -102,7 +102,7 @@ export default async function VerComo({ searchParams }: { searchParams: Promise<
 
       <div className="grid gap-8 xl:grid-cols-2">
         <section id="profissionais" className="scroll-mt-6">
-          <h2 className="mb-3 text-xl font-semibold">Profissionais <span className="text-base font-normal text-muted">({pros.length})</span></h2>
+          <h2 className="mb-3 text-xl font-semibold">Acesso 1 · Profissionais <span className="text-base font-normal text-muted">({pros.length})</span></h2>
           <div className="grid gap-3">
             {pros.map((u) => (
               <Card key={u.id} role="group" aria-label={u.professional!.displayName} className="flex flex-wrap items-center gap-3 p-4">
@@ -122,7 +122,7 @@ export default async function VerComo({ searchParams }: { searchParams: Promise<
           </div>
         </section>
         <section id="clientes" className="scroll-mt-6">
-          <h2 className="mb-3 text-xl font-semibold">Clientes com portal <span className="text-base font-normal text-muted">({clients.length})</span></h2>
+          <h2 className="mb-3 text-xl font-semibold">Acesso 2 · Clientes com conta <span className="text-base font-normal text-muted">({clients.length})</span></h2>
           <div className="grid gap-3">
             {clients.map((u) => (
               <Card key={u.id} role="group" aria-label={`${u.name} (${u.email})`} className="flex items-center gap-3 p-4">

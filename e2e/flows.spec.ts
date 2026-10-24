@@ -164,7 +164,7 @@ test("app do profissional no celular: navegação inferior e agenda @mobile", as
   await expect(nav).toBeVisible();
   await nav.getByRole("link", { name: "Agenda" }).click();
   await expect(page.getByRole("heading", { name: "Agenda" })).toBeVisible();
-  await nav.getByRole("link", { name: "Clientes" }).click();
+  await nav.getByRole("link", { name: "Clientes", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Pacientes" })).toBeVisible();
 });
 
@@ -352,4 +352,101 @@ test("triagem: sinal de emergência interrompe o agendamento online", async ({ p
   await expect(page.getByText(/192/).first()).toBeVisible();
   await expect(page.locator('input[name="horario"]')).toHaveCount(0);
   await page.getByRole("button", { name: "Voltar ao admin" }).click();
+});
+
+async function inviteLink(page: Page) {
+  const url = await page.getByLabel("Link do convite").inputValue();
+  return new URL(url, "http://x").pathname;
+}
+
+test("convite pessoal: cliente cria a conta (Acesso 2) já ligada à ficha existente", async ({ page }) => {
+  const id = uid();
+  const email = `convidada-${id}@teste.dev`;
+  await login(page, "ana@concord.dev");
+  await page.goto("/app/clientes/novo");
+  await page.getByLabel("Nome completo").fill(`Convidada ${id}`);
+  await page.getByLabel("E-mail").fill(email);
+  await page.getByRole("button", { name: "Salvar" }).click();
+  await page.waitForURL(/\/app\/clientes\/(?!novo)[^/]+$/);
+  const ficha = new URL(page.url()).pathname;
+  await page.getByRole("button", { name: "Enviar convite de acesso" }).click();
+  await expect(page.getByRole("link", { name: "Enviar no WhatsApp" })).toHaveAttribute("href", /wa\.me/);
+  const link = await inviteLink(page);
+  await logout(page);
+
+  await page.goto(link);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Ana Ribeiro convidou você");
+  await expect(page.getByLabel("E-mail")).toHaveValue(email);
+  await page.getByLabel("Celular (WhatsApp)").fill("(11) 91111-2222");
+  await page.getByLabel("Senha").fill(PASSWORD);
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Criar conta e aceitar" }).click();
+  await page.waitForURL(/\/minha-conta/);
+  await expect(page.getByText(/Sua conta \(Acesso 2\) está pronta, ligada a Ana Ribeiro/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Meus profissionais" })).toBeVisible();
+
+  // O link pessoal só vale uma vez.
+  await logout(page);
+  await page.goto(link);
+  await expect(page.getByText("Convite indisponível")).toBeVisible();
+
+  await login(page, "ana@concord.dev");
+  await page.goto(ficha);
+  await expect(page.getByText("Usa o portal")).toBeVisible();
+});
+
+test("link geral de convite cria cliente novo; cliente já logado aceita com um clique", async ({ page }) => {
+  await login(page, "carlos@concord.dev");
+  await page.getByRole("link", { name: "Convidar clientes" }).first().click();
+  await expect(page.getByRole("heading", { name: "Convidar clientes" })).toBeVisible();
+  const link = await inviteLink(page);
+  await logout(page);
+
+  const email = `geral-${uid()}@teste.dev`;
+  await page.goto(link);
+  await page.getByLabel("Seu nome").fill("Cliente Geral");
+  await page.getByLabel("E-mail").fill(email);
+  await page.getByLabel("Celular (WhatsApp)").fill("(11) 93333-4444");
+  await page.getByLabel("Senha").fill(PASSWORD);
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Criar conta e aceitar" }).click();
+  await expect(page.getByText(/ligada a Carlos Mendes/)).toBeVisible();
+
+  // Maria (cliente da Ana) entra pelo link do Carlos e liga a conta com um clique.
+  await logout(page);
+  await login(page, "maria@exemplo.com");
+  await page.goto(link);
+  await page.getByRole("button", { name: "Aceitar convite" }).click();
+  await page.waitForURL(/\/minha-conta/);
+  await expect(page.getByRole("heading", { name: "Meus profissionais" })).toBeVisible();
+  await expect(page.getByText("Carlos Mendes").first()).toBeVisible();
+
+  await logout(page);
+  await login(page, "carlos@concord.dev");
+  await page.goto("/app/clientes?q=Cliente%20Geral");
+  await expect(page.getByText("Cliente Geral").first()).toBeVisible();
+});
+
+test("cadastro mostra os dois tipos de conta e cria conta de cliente (Acesso 2)", async ({ page }) => {
+  await page.goto("/cadastro");
+  await expect(page.getByRole("link", { name: /Acesso 1/ })).toHaveAttribute("aria-current", "page");
+  await page.getByRole("link", { name: /Acesso 2/ }).click();
+  await page.getByLabel("Seu nome").fill("Aluno Teste");
+  await page.getByLabel("E-mail").fill(`aluno-${uid()}@teste.dev`);
+  await page.getByLabel("Celular (WhatsApp)").fill("(11) 95555-6666");
+  await page.getByLabel("Senha").fill(PASSWORD);
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Criar minha conta" }).click();
+  await page.waitForURL(/\/minha-conta/);
+  await expect(page.getByText("Acesso 2 · Cliente")).toBeVisible();
+});
+
+test("profissional não aceita convite com conta de Acesso 1", async ({ page }) => {
+  await login(page, "carlos@concord.dev");
+  await page.goto("/app/convites");
+  const link = await inviteLink(page);
+  await logout(page);
+  await login(page, "juliana@concord.dev");
+  await page.goto(link);
+  await expect(page.getByRole("heading", { name: "Este convite é para clientes" })).toBeVisible();
 });

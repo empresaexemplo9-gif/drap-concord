@@ -2,11 +2,12 @@ import { BottomNav, type NavItem } from "@/components/app-nav";
 import { Brand } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { requireUser } from "@/lib/auth";
+import { accessLabel } from "@/lib/format";
 import { logout } from "../(auth)/actions";
 
 const items: NavItem[] = [
   { href: "/minha-conta", label: "Agendamentos", icon: "calendar" },
-  { href: "/", label: "Buscar", icon: "home" },
+  { href: "/vitrine", label: "Buscar serviços", icon: "store" },
   { href: "/minha-conta/dados", label: "Meus dados", icon: "user" },
 ];
 
@@ -18,7 +19,7 @@ export default async function ClientLayout({ children }: { children: React.React
         <div className="gutter flex items-center justify-between py-4">
           <Brand href="/minha-conta" />
           <div className="flex items-center gap-3 text-sm">
-            <span className="hidden text-muted sm:inline">{user.name}</span>
+            <span className="hidden text-muted sm:inline">{user.name} · <span className="font-semibold text-accent">{accessLabel.CLIENT}</span></span>
             <ThemeToggle />
             <form action={logout}><button className="min-h-11 rounded-xl px-3 font-semibold text-primary hover:bg-surface">Sair</button></form>
           </div>

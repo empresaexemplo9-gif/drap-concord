@@ -128,6 +128,7 @@ model Organization {
   records       AttendanceRecord[]
   auditLogs     AuditLog[]
   triages       TriageResponse[]
+  invites       Invite[]
 }
 
 model Membership {
@@ -216,6 +217,7 @@ model Professional {
   rules        Rule[]
   records      AttendanceRecord[]
   triages      TriageResponse[]
+  invites      Invite[]
 
   @@index([orgId])
 }
@@ -281,6 +283,7 @@ model Client {
   reviews      Review[]
   ruleEvents   RuleEvent[]
   triages      TriageResponse[]
+  invites      Invite[]
 
   @@unique([orgId, userId])
   @@index([orgId])
@@ -440,4 +443,29 @@ model TriageResponse {
   appointment  Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
 
   @@index([orgId, clientId])
+}
+
+// Convite de um profissional (Acesso 1) para o cliente criar a própria conta
+// (Acesso 2). Geral: link de uso múltiplo (bio, redes). Pessoal: para um
+// cliente já cadastrado na ficha, uso único; a conta criada assume o cadastro.
+model Invite {
+  id             String    @id @default(cuid())
+  token          String    @unique
+  orgId          String
+  professionalId String
+  clientId       String?
+  kind           String // GENERAL | PERSONAL
+  label          String?
+  uses           Int       @default(0)
+  maxUses        Int?
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+  createdById    String
+  createdAt      DateTime  @default(now())
+
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  client       Client?      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
 }

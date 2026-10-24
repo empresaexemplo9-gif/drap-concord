@@ -9,6 +9,9 @@ import { audit } from "@/lib/audit";
 import { canSeeRecords, professionalConfig } from "@/lib/profiles/registry";
 import { dateShort, fmt, stageLabel, statusLabel, statusTone } from "@/lib/format";
 import { updateClient } from "../../actions";
+import { invitePersonal } from "../../convites/actions";
+import { InviteShare } from "@/components/invite-share";
+import { inviteStatus } from "@/lib/invites";
 
 
 export const metadata = { title: "Ficha" };
@@ -28,6 +31,8 @@ export default async function Cliente({ params }: { params: Promise<{ id: string
     db.ruleEvent.findMany({ where: { clientId: id, rule: { orgId } }, include: { rule: true }, orderBy: { createdAt: "desc" } }),
   ]);
   if (records.length) await audit({ orgId, userId: user.id, action: "record.viewed", entity: "Client", entityId: id });
+  const personal = client.userId ? null : await db.invite.findFirst({ where: { orgId, clientId: id, kind: "PERSONAL", revokedAt: null }, orderBy: { createdAt: "desc" } });
+  const activeInvite = personal && inviteStatus(personal) === "ativo" ? personal : null;
   const fields = cfg.recordTemplate.sections.flatMap((s) => s.fields);
 
   type Item = { at: Date; kind: string; node: React.ReactNode };
@@ -123,6 +128,23 @@ export default async function Cliente({ params }: { params: Promise<{ id: string
         </div>
 
         <div className="space-y-6">
+          {!client.userId && (
+            <Card id="convite" className="scroll-mt-6">
+              <h2 className="mb-1 text-lg font-semibold">Acesso do {cfg.terminology.client.singular.toLowerCase()}</h2>
+              <p className="mb-4 text-sm text-muted">{client.name.split(" ")[0]} ainda não tem conta. Envie um convite: a conta criada (Acesso 2) fica ligada a esta ficha e ao histórico.</p>
+              {activeInvite ? (
+                <>
+                  <InviteShare token={activeInvite.token} professionalName={professional.displayName} clientName={client.name} />
+                  <p className="mt-2 text-xs text-muted">Vale para uma pessoa e expira em {fmt(activeInvite.expiresAt!, "dd/MM/yyyy", tz)}.</p>
+                </>
+              ) : (
+                <form action={invitePersonal}>
+                  <input type="hidden" name="clientId" value={client.id} />
+                  <SubmitButton pendingText="Gerando…">Enviar convite de acesso</SubmitButton>
+                </form>
+              )}
+            </Card>
+          )}
           {intake.length > 0 && (
             <Card>
               <h2 className="mb-3 text-lg font-semibold">Formulário prévio</h2>
