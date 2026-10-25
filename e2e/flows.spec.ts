@@ -465,8 +465,8 @@ test("o tema da profissão acompanha a conta: portal do cliente e vitrine do pro
   await logout(page);
   await page.goto("/");
   await expect(themed).toHaveCount(0);
-  // Visitante vê a home vestida pelas imagens da plataforma.
-  for (const img of ["vida", "profissoes", "rotina"]) await expect(page.locator(`img[src="/home/${img}.webp"]`)).toHaveCount(1);
+  // Visitante vê a home vestida pela imagem da plataforma.
+  await expect(page.locator('img[src="/home/home.webp"]')).toHaveCount(1);
 });
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64");

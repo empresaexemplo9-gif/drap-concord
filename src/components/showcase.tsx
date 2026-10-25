@@ -72,7 +72,7 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
         </div>
       </Scene>
 
-      <Scene image={home ? "profissoes" : undefined} className={`gutter py-10 ${home ? "min-h-[70vh] py-16" : ""}`}>
+      <Scene className={`gutter py-10 ${home ? "min-h-[70vh] py-16" : ""}`}>
         <div className={`mb-5 flex flex-wrap items-baseline justify-between gap-3 ${home ? "rounded-2xl border border-line bg-card/70 px-5 py-4" : ""}`}>
           <h2 className="text-2xl font-semibold">{filtering ? `${results.length} ${results.length === 1 ? "profissional encontrado" : "profissionais encontrados"}` : "Profissionais em destaque"}</h2>
           {filtering && <Link href={basePath} className="text-sm font-semibold text-primary">Limpar filtros</Link>}
@@ -116,7 +116,7 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
         )}
       </Scene>
 
-      <Scene image={home ? "rotina" : undefined} className={`gutter ${home ? "flex min-h-[60vh] items-center py-20" : "pb-16"}`}>
+      <Scene className={`gutter ${home ? "flex min-h-[60vh] items-center py-20" : "pb-16"}`}>
         <Card className="flex w-full flex-col items-start gap-4 bg-primary p-8 text-on-primary sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold">Você atende pessoas?</h2>
