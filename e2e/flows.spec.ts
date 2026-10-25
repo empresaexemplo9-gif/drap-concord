@@ -680,3 +680,20 @@ test("sala com três pessoas: todos se veem e o dono adiciona alguém durante a 
   await expect.poll(() => tilesWithVideo(a), { timeout: 15_000 }).toBe(1);
   await Promise.all([pc.close(), mc.close(), jc.close()]);
 });
+
+test("página de download do app para todos os sistemas e manifesto completo", async ({ page, request }) => {
+  await page.goto("/baixar");
+  await expect(page.getByRole("heading", { level: 1, name: "Baixe o app DRAP Concord" })).toBeVisible();
+  for (const name of ["Android", "iPhone", "iPad", "Windows", "macOS", "Linux", "ChromeOS"]) {
+    await page.getByRole("button", { name, exact: true }).click();
+    await expect(page.getByRole("heading", { level: 2, name, exact: true })).toBeVisible();
+  }
+  const manifest = await (await request.get("/manifest.webmanifest")).json();
+  expect(manifest.id).toBe("/");
+  expect(manifest.icons.some((i: { purpose: string }) => i.purpose === "maskable")).toBe(true);
+  expect(manifest.screenshots.length).toBeGreaterThanOrEqual(2);
+  for (const src of ["/icons/icon-512.png", "/icons/maskable-512.png", "/icons/apple-touch-icon.png", "/favicon.ico", manifest.screenshots[0].src]) {
+    expect((await request.get(src)).status()).toBe(200);
+  }
+  expect(await (await request.get("/.well-known/assetlinks.json")).json()).toEqual([]);
+});

@@ -12,6 +12,7 @@ const links = [
   ["/app/atendimento", "Como atendo"],
   ["/app/notificacoes", "Notificações"],
   ["/app/convites", "Convidar clientes"],
+  ["/baixar", "Baixar o app"],
   ["/vitrine", "Vitrine pública"],
 ];
 

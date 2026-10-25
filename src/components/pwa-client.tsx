@@ -65,13 +65,16 @@ export function PwaClient() {
       setIos(true);
       setHidden(false);
     }
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setInstallEvent(e as InstallEvent);
+    // O convite do navegador é guardado logo no carregamento (layout raiz).
+    const onPrompt = () => {
+      const e = (window as unknown as { __installPrompt?: InstallEvent }).__installPrompt;
+      if (!e) return;
+      setInstallEvent(e);
       setHidden(false);
     };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+    onPrompt();
+    window.addEventListener("concord:installable", onPrompt);
+    return () => window.removeEventListener("concord:installable", onPrompt);
   }, []);
 
   const dismiss = () => {

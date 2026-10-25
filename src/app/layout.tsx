@@ -21,7 +21,19 @@ export const metadata: Metadata = {
     "Encontre profissionais e agende online. Para profissionais: agenda inteligente, CRM e organização de atendimentos para qualquer área.",
   applicationName: "DRAP Concord",
   appleWebApp: { capable: true, title: "Concord", statusBarStyle: "default" },
-  icons: { icon: "/icons/icon.svg", apple: "/icons/apple-touch-icon.png" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180" },
+      { url: "/icons/apple-touch-icon-167.png", sizes: "167x167" },
+      { url: "/icons/apple-touch-icon-152.png", sizes: "152x152" },
+    ],
+  },
+  other: { "msapplication-TileImage": "/icons/mstile-310.png", "msapplication-TileColor": "#1F4E5A", "mobile-web-app-capable": "yes" },
 };
 
 export const viewport: Viewport = {
@@ -35,6 +47,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="pt-BR" data-theme={theme} className={`${inter.variable} ${fraunces.variable} ${playfair.variable} ${nunito.variable}`}>
       <body className="min-h-dvh antialiased">
+        {/* Guarda o convite de instalação do navegador para o botão "Instalar" de qualquer página. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__installPrompt=e;dispatchEvent(new Event("concord:installable"))});addEventListener("appinstalled",function(){window.__installPrompt=null;dispatchEvent(new Event("concord:installed"))});`,
+          }}
+        />
         <ViewAsBanner />
         {user ? <RealtimeProvider>{children}</RealtimeProvider> : children}
         <PwaClient />
