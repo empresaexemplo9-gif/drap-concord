@@ -42,3 +42,6 @@ next-env.d.ts
 !.env.example
 /test-results/
 /playwright-report/
+
+# Recursos do Windows gerados por apps/windows/build.sh
+apps/windows/*.syso

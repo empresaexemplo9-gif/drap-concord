@@ -12,6 +12,10 @@ type Listener = (m: RealtimeMessage) => void;
 type Ring = { roomId: string; title: string; kind: string; from: { id: string; name: string }; ringSeconds: number };
 type Toast = { id: number; title: string; body: string; link: string | null };
 
+/** Ponte do app Android (apps/android): avisos do sistema com o app em segundo plano. */
+type AndroidBridge = { notify: (title: string, body: string, path: string) => void; askNotifications: () => void };
+const android = () => (typeof window !== "undefined" ? (window as unknown as { ConcordAndroid?: AndroidBridge }).ConcordAndroid : undefined);
+
 const Ctx = createContext<{ subscribe: (fn: Listener) => () => void; connected: boolean } | null>(null);
 
 export function useRealtime(fn: Listener) {
@@ -85,6 +89,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   }, [ringtone]);
 
   useEffect(() => {
+    android()?.askNotifications();
     const es = new EventSource("/api/tempo-real");
     es.onopen = () => setConnected(true);
     es.onerror = () => setConnected(false);
@@ -102,7 +107,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         if (pathRef.current === `/chamadas/${r.roomId}`) return; // já está na sala
         setRing(r);
         ringtone.start();
-        if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+        if (document.hidden && android()) android()!.notify(`${r.from.name} está te chamando`, r.title, `/chamadas/${r.roomId}?atender=1`);
+        else if (document.hidden && "Notification" in window && Notification.permission === "granted") {
           const n = new Notification(`${r.from.name} está te chamando`, { body: r.title, tag: `call-${r.roomId}`, requireInteraction: true });
           n.onclick = () => {
             window.focus();
@@ -120,6 +126,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       } else if (m.type === "notification") {
         if (String(d.title ?? "").endsWith("está te chamando")) return; // a tela de chamada já avisa
         const t: Toast = { id: Date.now() + Math.random(), title: String(d.title), body: String(d.body), link: (d.link as string) ?? null };
+        if (document.hidden) android()?.notify(t.title, t.body, t.link ?? "/");
         setToasts((cur) => [...cur.slice(-2), t]);
         setTimeout(() => setToasts((cur) => cur.filter((x) => x.id !== t.id)), 7000);
         // Atualiza o sino e listas sem recarregar a página.

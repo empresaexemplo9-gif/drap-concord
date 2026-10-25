@@ -23,6 +23,7 @@ type Props = {
   contacts: Contact[];
   autoJoin: boolean;
   backHref: string;
+  maxParticipants: number;
 };
 
 type Peer = {
@@ -713,7 +714,7 @@ export function CallRoom(props: Props) {
               <button onClick={() => setPanel(null)} aria-label="Fechar painel" className="rounded-lg p-2 hover:bg-white/10"><CallIcon name="close" className="size-5" /></button>
             </div>
             {panel === "people" && (
-              <PeoplePanel participants={participants} me={me.id} isOwner={isOwner} contacts={props.contacts} onInvite={inviteMore} />
+              <PeoplePanel participants={participants} me={me.id} isOwner={isOwner} contacts={props.contacts} onInvite={inviteMore} max={props.maxParticipants} />
             )}
             {panel === "chat" && <ChatPanel messages={chat} me={me.id} onSend={sendChat} />}
             {panel === "settings" && (
@@ -821,11 +822,12 @@ function StateDot({ state }: { state: string }) {
   return <span className="inline-block size-2.5 rounded-full" style={{ background: c }} />;
 }
 
-function PeoplePanel({ participants, me, isOwner, contacts, onInvite }: { participants: CallParticipantView[]; me: string; isOwner: boolean; contacts: Contact[]; onInvite: (ids: string[]) => void }) {
+function PeoplePanel({ participants, me, isOwner, contacts, onInvite, max }: { participants: CallParticipantView[]; me: string; isOwner: boolean; contacts: Contact[]; onInvite: (ids: string[]) => void; max: number }) {
   const [picked, setPicked] = useState<string[]>([]);
   const [q, setQ] = useState("");
   const inRoom = new Set(participants.filter((p) => p.state === "JOINED" || p.state === "INVITED").map((p) => p.userId));
   const available = contacts.filter((c) => !inRoom.has(c.id) && c.name.toLowerCase().includes(q.toLowerCase()));
+  const slots = Math.max(0, max - inRoom.size);
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
       <ul className="space-y-2">
@@ -835,20 +837,20 @@ function PeoplePanel({ participants, me, isOwner, contacts, onInvite }: { partic
             <span className="flex-1 truncate">{p.name}{p.userId === me && " (você)"}{p.owner && <span className="text-white/50"> · organizador</span>}</span>
             <span className="text-xs text-white/50">{stateLabel(p.state)}</span>
             {isOwner && p.userId !== me && ["DECLINED", "MISSED", "LEFT"].includes(p.state) && (
-              <button onClick={() => onInvite([p.userId])} className="rounded-lg bg-white/10 px-2 py-1 text-xs font-semibold">Chamar</button>
+              <button onClick={() => onInvite([p.userId])} disabled={slots === 0} className="rounded-lg bg-white/10 px-2 py-1 text-xs font-semibold disabled:opacity-40">Chamar</button>
             )}
           </li>
         ))}
       </ul>
       {isOwner && (
         <div className="mt-6 border-t border-white/10 pt-4">
-          <h3 className="mb-2 text-sm font-semibold">Adicionar à chamada</h3>
+          <h3 className="mb-2 text-sm font-semibold">Adicionar à chamada <span className="font-normal text-white/50">({slots} vaga{slots === 1 ? "" : "s"} de {max})</span></h3>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar contato" aria-label="Buscar contato" className="mb-2 min-h-11 w-full rounded-xl bg-white/10 px-3" />
           <ul className="max-h-64 space-y-1 overflow-y-auto">
             {available.map((c) => (
               <li key={c.id}>
                 <label className="flex min-h-11 items-center gap-2 rounded-lg px-2 hover:bg-white/5">
-                  <input type="checkbox" checked={picked.includes(c.id)} onChange={(e) => setPicked((cur) => (e.target.checked ? [...cur, c.id] : cur.filter((x) => x !== c.id)))} className="size-5" />
+                  <input type="checkbox" checked={picked.includes(c.id)} disabled={!picked.includes(c.id) && picked.length >= slots} onChange={(e) => setPicked((cur) => (e.target.checked ? [...cur, c.id] : cur.filter((x) => x !== c.id)))} className="size-5" />
                   <span className="flex-1 truncate">{c.name}</span>
                   <span className="text-xs text-white/50">{c.label}</span>
                 </label>

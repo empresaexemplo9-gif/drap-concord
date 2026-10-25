@@ -695,7 +695,24 @@ test("página de download do app para todos os sistemas e manifesto completo", a
   for (const src of ["/icons/icon-512.png", "/icons/maskable-512.png", "/icons/apple-touch-icon.png", "/favicon.ico", manifest.screenshots[0].src]) {
     expect((await request.get(src)).status()).toBe(200);
   }
-  expect(await (await request.get("/.well-known/assetlinks.json")).json()).toEqual([]);
+  const links = await (await request.get("/.well-known/assetlinks.json")).json();
+  expect(links[0].target.package_name).toBe("com.drapconcord.app");
+
+  // Instaladores próprios, baixados pelo navegador.
+  await page.getByRole("button", { name: "Android", exact: true }).click();
+  const apk = page.getByRole("link", { name: /Baixar o app para Android/ });
+  await expect(apk).toHaveAttribute("href", "/downloads/drap-concord.apk");
+  const [download] = await Promise.all([page.waitForEvent("download"), apk.click()]);
+  expect(download.suggestedFilename()).toBe("drap-concord.apk");
+  await page.getByRole("button", { name: "Windows", exact: true }).click();
+  await expect(page.getByRole("link", { name: /Baixar para Windows/ })).toHaveAttribute("href", "/downloads/DRAP-Concord-Windows-x64.exe");
+  await page.getByRole("button", { name: "iPhone", exact: true }).click();
+  await expect(page.getByText("Adicionar à Tela de Início").first()).toBeVisible();
+  for (const f of ["drap-concord.apk", "DRAP-Concord-Windows-x64.exe", "DRAP-Concord-Windows-ARM64.exe", "DRAP-Concord-macOS.zip", "drap-concord_1.0.0_all.deb", "drap-concord-linux.tar.gz"]) {
+    const r = await request.get(`/downloads/${f}`);
+    expect(r.status()).toBe(200);
+    expect(r.headers()["content-disposition"]).toContain("attachment");
+  }
 });
 
 test("mapa do atendimento presencial: profissional marca o local, aparece na página e na busca perto de mim", async ({ browser }) => {

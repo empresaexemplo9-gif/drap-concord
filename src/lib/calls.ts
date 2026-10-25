@@ -15,6 +15,12 @@ export type Contact = { id: string; name: string; email: string; label: string }
 
 /** Ring vale por este tempo; depois a chamada aparece como perdida. */
 export const RING_SECONDS = 45;
+/**
+ * Pessoas por sala (incluindo quem criou). A mídia vai direto entre os
+ * aparelhos, sem servidor de terceiros; acima disso cada aparelho teria de
+ * enviar vídeo para gente demais e a qualidade cairia.
+ */
+export const MAX_PARTICIPANTS = 8;
 /** Sem sinal de vida por este tempo, o participante é considerado fora da chamada. */
 export const PRESENCE_SECONDS = 40;
 
@@ -89,6 +95,7 @@ async function ring(room: { id: string; title: string; kind: string }, caller: {
 export async function createRoom(user: CallUser, input: { title?: string; kind: "AUDIO" | "VIDEO"; participantIds: string[]; appointmentId?: string }) {
   const ids = [...new Set(input.participantIds)].filter((id) => id !== user.id);
   if (!ids.length) throw new CallError("Escolha pelo menos uma pessoa para chamar.");
+  if (ids.length + 1 > MAX_PARTICIPANTS) throw new CallError(`Cada sala aceita até ${MAX_PARTICIPANTS} pessoas, contando com você.`);
   await assertContacts(user, ids);
   const names = await db.user.findMany({ where: { id: { in: ids } }, select: { name: true } });
   const title = input.title?.trim() || (names.length === 1 ? `${user.name} e ${names[0].name}` : `Sala de ${user.name}`);
@@ -111,6 +118,9 @@ export async function invite(user: CallUser, roomId: string, participantIds: str
   if (!room || room.status !== "ACTIVE") throw new CallError("Sala encerrada.");
   if (room.ownerId !== user.id) throw new CallError("Só quem criou a sala adiciona pessoas.");
   const ids = [...new Set(participantIds)].filter((id) => id !== user.id);
+  const busy = new Set(participantView(room).filter((p) => p.state === "JOINED" || p.state === "INVITED").map((p) => p.userId));
+  const fresh = ids.filter((id) => !busy.has(id));
+  if (busy.size + fresh.length > MAX_PARTICIPANTS) throw new CallError(`A sala aceita até ${MAX_PARTICIPANTS} pessoas. Há ${MAX_PARTICIPANTS - busy.size} vaga(s).`);
   await assertContacts(user, ids);
   for (const userId of ids) {
     await db.callParticipant.upsert({

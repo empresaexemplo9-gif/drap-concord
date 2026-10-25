@@ -1,0 +1,26 @@
+{
+  "DRAP-Concord-Windows-ARM64.exe": {
+    "size": 2440704,
+    "sha256": "14c05997e37e8f95abb662b626ac47a25aa7d0b376b6c5a7e8043826d25e0901"
+  },
+  "DRAP-Concord-Windows-x64.exe": {
+    "size": 2536960,
+    "sha256": "b02d75013807b4de001ae66a2411cfd46ccb40164ec14d962e2410f5ddef9d9f"
+  },
+  "DRAP-Concord-macOS.zip": {
+    "size": 53240,
+    "sha256": "736f824f82cd342ac09ee5dac079eea4a1c30c033438b5c1c51ab66314da0ded"
+  },
+  "drap-concord-linux.tar.gz": {
+    "size": 7115,
+    "sha256": "a61522c2fef580784934645b819210d8234757c8f2cdf1432c198622ce7d335a"
+  },
+  "drap-concord.apk": {
+    "size": 37848,
+    "sha256": "e33f83cc5c945fceadf16b864c2ac506640e0cf62062ae4e09c66e50b62e1293"
+  },
+  "drap-concord_1.0.0_all.deb": {
+    "size": 24608,
+    "sha256": "06ba10e4132eed40373c59efec86d4154c3839688b5c94037fcf40df3015759c"
+  }
+}

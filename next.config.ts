@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
+      // Instaladores do app: sempre baixam como arquivo, com o tipo certo.
+      { source: "/downloads/:file*", headers: [{ key: "Content-Disposition", value: "attachment" }, { key: "Cache-Control", value: "public, max-age=3600" }] },
+      { source: "/downloads/:file*.apk", headers: [{ key: "Content-Type", value: "application/vnd.android.package-archive" }] },
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache" }, { key: "Service-Worker-Allowed", value: "/" }] },
     ];
   },

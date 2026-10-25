@@ -36,7 +36,7 @@ servidor TURN (retransmissão). Opções, em variáveis de ambiente:
 - Servidor TURN próprio (ex.: coturn): `TURN_URLS` (separadas por vírgula),
   `TURN_USERNAME` e `TURN_CREDENTIAL`.
 
-As salas são em malha (cada participante conversa com todos). A qualidade se
+As salas são em malha (cada participante conversa direto com todos), sem
+servidor de mídia de terceiros, com até 8 pessoas por sala. A qualidade se
 ajusta ao tamanho da sala: Full HD em 1:1 e resolução menor conforme entram
-mais pessoas. Para salas muito grandes (dezenas de pessoas com vídeo), o
-próximo passo é um servidor de mídia (SFU), sem mudar a tela da chamada.
+mais pessoas.

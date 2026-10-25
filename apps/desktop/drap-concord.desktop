@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=DRAP Concord
+GenericName=Agenda e atendimentos
+Comment=Agenda, atendimentos e chamadas de vídeo
+Exec=drap-concord
+Icon=drap-concord
+Terminal=false
+Categories=Office;Network;Calendar;
+StartupWMClass=DRAPConcord

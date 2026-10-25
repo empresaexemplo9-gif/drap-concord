@@ -5,7 +5,6 @@ const icon = (s: number) => ({ src: `/icons/icon-${s}.png`, sizes: `${s}x${s}`, 
 // Manifesto do app instalável. Completo para Android, iOS/iPadOS, Windows,
 // macOS, Linux e ChromeOS, e para gerar pacotes de loja (PWABuilder/Bubblewrap).
 export default function manifest(): MetadataRoute.Manifest {
-  const playId = process.env.ANDROID_PACKAGE_NAME;
   return {
     id: "/",
     name: "DRAP Concord",
@@ -42,6 +41,5 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     launch_handler: { client_mode: ["navigate-existing", "auto"] },
     prefer_related_applications: false,
-    ...(playId ? { related_applications: [{ platform: "play", id: playId, url: `https://play.google.com/store/apps/details?id=${playId}` }] } : {}),
   } as MetadataRoute.Manifest;
 }

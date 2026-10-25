@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { CallRoom } from "@/components/call/call-room";
 import { requireUser } from "@/lib/auth";
-import { contactsFor, participantView, roomFor } from "@/lib/calls";
+import { contactsFor, MAX_PARTICIPANTS, participantView, roomFor } from "@/lib/calls";
 
 export const metadata = { title: "Chamada", robots: { index: false } };
 
@@ -24,6 +24,7 @@ export default async function Chamada({ params, searchParams }: { params: Promis
       contacts={contacts}
       autoJoin={atender === "1" || room.ownerId === user.id}
       backHref="/chamadas"
+      maxParticipants={MAX_PARTICIPANTS}
     />
   );
 }

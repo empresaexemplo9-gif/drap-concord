@@ -4,7 +4,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { NotificationPermission } from "@/components/call/notification-permission";
 import { ContactPicker } from "@/components/call/contact-picker";
 import type { CurrentUser } from "@/lib/auth";
-import { contactsFor, myRooms } from "@/lib/calls";
+import { contactsFor, MAX_PARTICIPANTS, myRooms } from "@/lib/calls";
 import { fmt } from "@/lib/format";
 import { startCall, redial } from "@/app/chamadas/actions";
 
@@ -18,7 +18,7 @@ export async function CallsHome({ user, from, erro }: { user: CurrentUser; from:
 
   return (
     <>
-      <PageHeader title="Chamadas" subtitle="Chamadas de áudio e vídeo dentro da plataforma, com quantas pessoas você quiser. Quem você chamar recebe a chamada tocando na própria conta." />
+      <PageHeader title="Chamadas" subtitle={`Chamadas de áudio e vídeo da própria plataforma, sem programas de terceiros: até ${MAX_PARTICIPANTS} pessoas por sala. Quem você chamar recebe a chamada tocando na própria conta.`} />
       {erro && <div className="mb-4"><Alert tone="danger">{erro}</Alert></div>}
       <NotificationPermission />
       <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
@@ -29,7 +29,7 @@ export async function CallsHome({ user, from, erro }: { user: CurrentUser; from:
           ) : (
             <form action={startCall} className="space-y-4">
               <input type="hidden" name="from" value={from} />
-              <ContactPicker contacts={contacts.map(({ id, name, label }) => ({ id, name, label }))} />
+              <ContactPicker contacts={contacts.map(({ id, name, label }) => ({ id, name, label }))} max={MAX_PARTICIPANTS - 1} />
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Nome da sala (opcional)" htmlFor="title"><Input id="title" name="title" maxLength={120} placeholder="Ex.: Reunião de equipe" /></Field>
                 <fieldset>
