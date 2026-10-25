@@ -5,21 +5,26 @@ import { Badge, Card, EmptyState, Input, Select, Stars } from "@/components/ui";
 import { categories } from "@/lib/profiles/registry";
 import { searchProfessionals, type SearchParams } from "@/lib/search";
 import { fmt, modalityLabel, money } from "@/lib/format";
-import { UserTheme } from "./user-theme";
+import { ProfessionTheme } from "./profession-theme";
+import { HomeVisual, Scene } from "./home-scenes";
+import { getUser } from "@/lib/auth";
+import { themeForUser } from "@/lib/themes/load";
 
 /** Vitrine pública (busca + profissionais). `basePath` mantém os filtros na mesma rota. */
 export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: string }) {
-  const [cats, results] = await Promise.all([categories(), searchProfessionals(sp)]);
+  const [cats, results, theme] = await Promise.all([categories(), searchProfessionals(sp), getUser().then(themeForUser)]);
+  // Quem tem marca (profissional ou cliente de um profissional) vê o visual dela; os demais, a home da plataforma.
+  const home = !theme;
   const filterKeys = ["q", "cidade", "categoria", "modalidade", "precoMax", "disponivel"] as const;
   const filtering = filterKeys.some((k) => sp[k]);
 
   return (
     <>
-      <UserTheme />
-      <section className="bg-surface/70">
+      {home ? <HomeVisual /> : <ProfessionTheme theme={theme} />}
+      <Scene className={home ? "" : "bg-surface/70"}>
         <div className="gutter pb-10 pt-12 sm:pt-16">
           <div className="grid items-end gap-8 lg:grid-cols-[1.5fr_1fr]">
-            <div>
+            <div className={home ? "rounded-3xl border border-line bg-card/70 p-6 shadow-soft sm:p-8" : ""}>
               <p className="text-sm font-semibold text-accent">Saúde, jurídico, esporte, educação e muito mais</p>
               <h1 className="mt-2 text-4xl font-semibold leading-tight sm:text-5xl xl:text-6xl">Encontre quem cuida de você e agende em poucos toques</h1>
               <p className="mt-3 text-lg text-muted">Profissionais com registro verificado, horários reais e confirmação na hora.</p>
@@ -65,10 +70,10 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
             ))}
           </div>
         </div>
-      </section>
+      </Scene>
 
-      <section className="gutter py-10">
-        <div className="mb-5 flex items-baseline justify-between">
+      <Scene image={home ? "profissoes" : undefined} className={`gutter py-10 ${home ? "min-h-[70vh] py-16" : ""}`}>
+        <div className={`mb-5 flex flex-wrap items-baseline justify-between gap-3 ${home ? "rounded-2xl border border-line bg-card/70 px-5 py-4" : ""}`}>
           <h2 className="text-2xl font-semibold">{filtering ? `${results.length} ${results.length === 1 ? "profissional encontrado" : "profissionais encontrados"}` : "Profissionais em destaque"}</h2>
           {filtering && <Link href={basePath} className="text-sm font-semibold text-primary">Limpar filtros</Link>}
         </div>
@@ -109,17 +114,17 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
             ))}
           </div>
         )}
-      </section>
+      </Scene>
 
-      <section className="gutter pb-16">
-        <Card className="flex flex-col items-start gap-4 bg-primary p-8 text-on-primary sm:flex-row sm:items-center sm:justify-between">
+      <Scene image={home ? "rotina" : undefined} className={`gutter ${home ? "flex min-h-[60vh] items-center py-20" : "pb-16"}`}>
+        <Card className="flex w-full flex-col items-start gap-4 bg-primary p-8 text-on-primary sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold">Você atende pessoas?</h2>
             <p className="mt-1 opacity-90">Agenda, lembretes, fichas e página própria, configurados para a sua profissão em minutos.</p>
           </div>
-          <Link href="/cadastro" className="inline-flex min-h-11 items-center rounded-xl bg-bg px-5 font-semibold text-primary">Começar grátis</Link>
+          <Link href="/cadastro" className="inline-flex min-h-11 items-center rounded-xl bg-on-primary px-5 font-semibold text-primary">Começar grátis</Link>
         </Card>
-      </section>
+      </Scene>
     </>
   );
 }
