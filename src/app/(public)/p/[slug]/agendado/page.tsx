@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { dateLong, modalityLabel, time } from "@/lib/format";
 import { directionLinks } from "@/lib/directions";
+import { brandName, parseBrand } from "@/lib/brand";
 
 export const metadata = { title: "Agendamento solicitado", robots: { index: false } };
 
@@ -19,6 +20,12 @@ export default async function Agendado({ searchParams }: { searchParams: Promise
         <Logo size={44} />
         <h1 className="mt-6 text-3xl font-semibold sm:text-4xl">Pedido enviado!</h1>
         <p className="mt-2 text-lg text-muted">{appt.professional.displayName} recebeu seu agendamento. Você é avisado(a) aqui no portal quando houver novidades.</p>
+        {parseBrand(appt.professional.brand).confirmationMessage && (
+          <div className="mt-6 rounded-2xl border border-line bg-card p-4">
+            <p className="text-sm font-semibold text-accent">Recado de {brandName(appt.professional)}</p>
+            <p className="mt-1 whitespace-pre-line">{parseBrand(appt.professional.brand).confirmationMessage}</p>
+          </div>
+        )}
         <ButtonLink href="/minha-conta" className="mt-8">Ver meus agendamentos</ButtonLink>
       </div>
       <Card>

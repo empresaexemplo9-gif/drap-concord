@@ -30,5 +30,15 @@ export async function processLogo(input: Buffer) {
     .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: meta.format !== "svg" })
     .webp({ quality: 90, alphaQuality: 100 })
     .toBuffer({ resolveWithObject: true });
+  // Cores do logo (sugestão de paleta): ignora transparência e tons sem cor.
+  const small = await sharp(input, { density: 72 }).resize(48, 48, { fit: "inside" }).flatten({ background: "#ffffff" }).removeAlpha().raw().toBuffer();
+  return { data, mime: "image/webp", width: info.width, height: info.height, palette: buildPalette(small, 3) };
+}
+
+/** Foto da galeria: até 1600 px, WebP. */
+export async function processPhoto(input: Buffer) {
+  const meta = await sharp(input).metadata();
+  if (!meta.width || !meta.height || !["jpeg", "png", "webp", "avif", "heif"].includes(meta.format ?? "")) throw new Error("Envie fotos em JPG, PNG ou WebP.");
+  const { data, info } = await sharp(input).rotate().resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toBuffer({ resolveWithObject: true });
   return { data, mime: "image/webp", width: info.width, height: info.height };
 }

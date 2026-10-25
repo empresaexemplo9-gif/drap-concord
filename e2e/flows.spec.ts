@@ -484,8 +484,8 @@ test("profissional cria a própria marca: nome, logo, fundo, cor, fonte e contat
   await expect(page.getByRole("link", { name: "Studio Movimento, início" })).toBeVisible();
 
   await page.getByRole("radio", { name: /Sem imagem/ }).check();
-  await page.getByRole("radio", { name: "Usar a cor da minha marca" }).check();
-  await page.getByLabel("Cor da marca").fill("#1d4ed8");
+  await page.getByRole("group", { name: /Cor principal/ }).getByRole("radio", { name: "Minha cor" }).check();
+  await page.getByLabel("Cor principal da marca").fill("#1d4ed8");
   await page.getByLabel("Fonte dos títulos").selectOption("moderna");
   await page.getByRole("button", { name: "Salvar visual" }).click();
   await expect(page.getByText("Visual salvo.")).toBeVisible();
@@ -736,4 +736,48 @@ test("mapa do atendimento presencial: profissional marca o local, aparece na pá
   await v.getByRole("link", { name: "Mapa", exact: true }).click();
   await expect(v.getByRole("region", { name: "Profissionais no mapa" })).toBeVisible();
   await visitor.close();
+});
+
+test("personalização completa: paleta, cantos, galeria, perguntas frequentes, ordem das seções e recado", async ({ page }) => {
+  await login(page, "juliana@concord.dev");
+  await page.goto("/app/marca");
+
+  await page.getByRole("button", { name: "Paleta Floresta" }).click();
+  await page.getByRole("radio", { name: /Arredondados/ }).check();
+  await page.getByRole("button", { name: "Salvar visual" }).click();
+  await expect(page.getByText("Visual salvo.")).toBeVisible();
+  const corner = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--corner-xl").trim());
+  expect(corner).toBe("1.4rem");
+
+  await page.getByRole("button", { name: "+ Adicionar pergunta" }).click();
+  await page.getByLabel("Pergunta 1").fill("Preciso levar algo para o treino?");
+  await page.getByLabel("Resposta 1").fill("Só roupa confortável e uma garrafa de água.");
+  // Perguntas frequentes vão para o topo da página.
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "Subir Perguntas frequentes" }).click();
+  await page.getByLabel("Mensagem depois do agendamento").fill("Chegue 10 minutos antes para o aquecimento.");
+  await page.getByRole("button", { name: "Salvar conteúdo" }).click();
+  await expect(page.getByText("Conteúdo da página salvo.")).toBeVisible();
+
+  await page.getByLabel("Adicionar foto").setInputFiles({ name: "studio.png", mimeType: "image/png", buffer: PNG });
+  await page.getByRole("button", { name: "Enviar foto" }).click();
+  await expect(page.getByText("Foto adicionada à galeria.")).toBeVisible();
+  await expect(page.getByText("1 de 8")).toBeVisible();
+
+  await logout(page);
+  await page.goto("/p/juliana-costa");
+  const headings = await page.getByRole("heading", { level: 2 }).allTextContents();
+  expect(headings.indexOf("Perguntas frequentes")).toBeLessThan(headings.indexOf("Serviços"));
+  await page.getByText("Preciso levar algo para o treino?").click();
+  await expect(page.getByText("Só roupa confortável e uma garrafa de água.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Galeria" })).toBeVisible();
+  await expect(page.getByRole("img", { name: /Foto 1 de/ })).toBeVisible();
+  const accent = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--accent").trim());
+  expect(accent).not.toBe("");
+
+  await login(page, "juliana@concord.dev");
+  await page.goto("/app/marca");
+  await page.getByRole("button", { name: "Remover foto" }).click();
+  await expect(page.getByText("Foto removida.")).toBeVisible();
+  await page.getByRole("button", { name: "Voltar ao visual padrão da profissão" }).click();
+  await expect(page.getByText("Marca restaurada")).toBeVisible();
 });

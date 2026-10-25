@@ -6,8 +6,9 @@ import type { Prisma } from "@prisma/client";
 import { requireProfessional } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
-import { brandSchema, parseBrand, type Brand } from "@/lib/brand";
-import { MAX_LOGO_UPLOAD, MAX_THEME_UPLOAD, processLogo, processThemeImage } from "@/lib/themes/process";
+import { brandSchema, galleryOf, MAX_GALLERY, parseBrand, SECTION_KEYS, type Brand } from "@/lib/brand";
+import { randomBytes } from "node:crypto";
+import { MAX_LOGO_UPLOAD, MAX_THEME_UPLOAD, processLogo, processPhoto, processThemeImage } from "@/lib/themes/process";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const back = (msg: string, ok = false): never => redirect(`/app/marca?${ok ? "ok" : "erro"}=${encodeURIComponent(msg)}`);
@@ -32,7 +33,7 @@ function upload(form: FormData, key: string) {
   return f instanceof File && f.size > 0 ? f : null;
 }
 
-async function storeAsset(professionalId: string, kind: "LOGO" | "BACKGROUND", img: { data: Buffer; mime: string; width: number; height: number; palette?: unknown }) {
+async function storeAsset(professionalId: string, kind: string, img: { data: Buffer; mime: string; width: number; height: number; palette?: unknown }) {
   const data = { data: img.data, mime: img.mime, width: img.width, height: img.height, palette: (img.palette ?? undefined) as Prisma.InputJsonValue | undefined };
   await db.brandAsset.upsert({ where: { professionalId_kind: { professionalId, kind } }, update: data, create: { professionalId, kind, ...data } });
 }
@@ -78,6 +79,8 @@ export async function saveVisual(form: FormData) {
       background,
       libraryThemeId: libraryThemeId || undefined,
       primaryColor: form.get("colorMode") === "custom" ? str(form, "primaryColor") : undefined,
+      accentColor: form.get("accentMode") === "custom" ? str(form, "accentColor") : undefined,
+      corners: (str(form, "corners") || "suave") as Brand["corners"],
       font: str(form, "font") as Brand["font"],
       glass: form.get("glass") === "on",
     },
@@ -120,4 +123,39 @@ export async function resetBrand() {
   await audit({ orgId: professional.orgId, userId: user.id, action: "brand.reset", entity: "Professional", entityId: professional.id });
   revalidatePath("/", "layout");
   back("Marca restaurada para o padrão da profissão.", true);
+}
+
+/** Conteúdo da página: ordem das seções, perguntas frequentes e mensagem pós-agendamento. */
+export async function saveContent(form: FormData) {
+  const { professional, user } = await owner();
+  const order = form.getAll("sectionOrder").map(String).filter((k): k is keyof typeof SECTION_KEYS => k in SECTION_KEYS);
+  const qs = form.getAll("faqQ").map(String);
+  const answers = form.getAll("faqA").map(String);
+  const faq = qs.map((q, i) => ({ q: q.trim(), a: (answers[i] ?? "").trim() })).filter((f) => f.q && f.a);
+  await saveBrand(professional, user.id, { sectionOrder: order, faq, confirmationMessage: str(form, "confirmationMessage") }, "brand.content");
+  back("Conteúdo da página salvo.", true);
+}
+
+export async function addPhoto(form: FormData) {
+  const { professional } = await owner();
+  const file = upload(form, "photo");
+  if (!file) back("Escolha uma foto.");
+  if (file!.size > MAX_THEME_UPLOAD) back("A foto pode ter no máximo 4 MB.");
+  if ((await galleryOf(professional.id)).length >= MAX_GALLERY) back(`A galeria aceita até ${MAX_GALLERY} fotos. Remova uma para enviar outra.`);
+  try {
+    // Chave ordenável pelo momento do envio.
+    const key = `${Date.now().toString(36)}${randomBytes(3).toString("hex")}`;
+    await storeAsset(professional.id, `GALLERY:${key}`, await processPhoto(Buffer.from(await file!.arrayBuffer())));
+  } catch (e) {
+    back((e as Error).message || "Não foi possível ler a foto.");
+  }
+  revalidatePath("/", "layout");
+  back("Foto adicionada à galeria.", true);
+}
+
+export async function removePhoto(form: FormData) {
+  const { professional } = await owner();
+  await db.brandAsset.deleteMany({ where: { professionalId: professional.id, kind: `GALLERY:${str(form, "key")}` } });
+  revalidatePath("/", "layout");
+  back("Foto removida.", true);
 }

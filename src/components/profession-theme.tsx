@@ -1,4 +1,5 @@
-import { themeTokens, type Palette } from "@/lib/themes/colors";
+import { ensureContrast, hex, themeTokens, type Palette, type RGB } from "@/lib/themes/colors";
+import { CORNERS } from "@/lib/brand";
 import type { ThemeInfo } from "@/lib/themes/load";
 
 const decl = (tokens: Record<string, string>) =>
@@ -27,8 +28,12 @@ const pick = (t: Record<string, string>) => Object.fromEntries(Object.entries(t)
  * superfícies (cartões, menus, campos) ganham vidro; sem imagem, só a cor de
  * destaque muda. Também troca a fonte dos títulos.
  */
-export function themeCss({ palette, withImage, glass = true, font }: { palette: Palette | null; withImage: boolean; glass?: boolean; font?: ThemeInfo["font"] }) {
+export function themeCss({ palette, withImage, glass = true, font, accent, corners }: { palette: Palette | null; withImage: boolean; glass?: boolean; font?: ThemeInfo["font"]; accent?: RGB; corners?: ThemeInfo["corners"] }) {
   const css: string[] = [];
+  if (corners && corners !== "suave") {
+    const c = CORNERS[corners];
+    css.push(`html:root{--corner-xl:${c.xl};--corner-2xl:${c.x2};--corner-3xl:${c.x3};}`);
+  }
   if (font && font !== "classica") css.push(`html:root{--heading-font:${FONT_VARS[font]};}`);
   if (withImage && palette) {
     const t = themeTokens(palette, { solid: !glass });
@@ -51,6 +56,12 @@ export function themeCss({ palette, withImage, glass = true, font }: { palette: 
     const t = themeTokens(palette);
     css.push(`html:root[data-theme="light"]{${decl(pick(t.light))}}`, `html:root[data-theme="dark"]{${decl(pick(t.dark))}}`);
   }
+  // Cor secundária da marca (destaques, selos, foco), sempre com contraste legível.
+  if (accent) {
+    const light = hex(ensureContrast(accent, [255, 255, 255], 3, "darken"));
+    const dark = hex(ensureContrast(accent, [12, 12, 14], 3, "lighten"));
+    css.push(`html:root[data-theme="light"]{--accent:${light};--ring:${light};}`, `html:root[data-theme="dark"]{--accent:${dark};--ring:${dark};}`);
+  }
   return css.join("");
 }
 
@@ -71,7 +82,7 @@ export function Backdrop({ src, mobileSrc }: { src: string; mobileSrc?: string }
 export function ProfessionTheme({ theme }: { theme: ThemeInfo | null }) {
   if (!theme) return null;
   const withImage = !!(theme.url && theme.palette);
-  const css = themeCss({ palette: theme.palette, withImage, glass: theme.glass !== false, font: theme.font });
+  const css = themeCss({ palette: theme.palette, withImage, glass: theme.glass !== false, font: theme.font, accent: theme.accent, corners: theme.corners });
   if (!css) return null;
   return (
     <>

@@ -97,14 +97,19 @@
   --color-line: var(--border);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--heading-font);
-  --radius-xl: 1rem;
-  --radius-2xl: 1.25rem;
+  --radius-xl: var(--corner-xl);
+  --radius-2xl: var(--corner-2xl);
+  --radius-3xl: var(--corner-3xl);
   --shadow-soft: var(--shadow);
 }
 
 /* Fonte dos títulos: o profissional pode trocar na marca (lib/brand.ts). */
 :root {
   --heading-font: var(--font-fraunces), ui-serif, Georgia, serif;
+  /* Cantos: o profissional escolhe retos, suaves ou arredondados na marca. */
+  --corner-xl: 1rem;
+  --corner-2xl: 1.25rem;
+  --corner-3xl: 1.5rem;
 }
 
 html {

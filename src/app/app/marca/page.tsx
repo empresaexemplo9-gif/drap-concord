@@ -4,10 +4,14 @@ import { SubmitButton } from "@/components/submit-button";
 import { BrandMark } from "@/components/brand-mark";
 import { requireProfessional } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { assetUrl, BACKGROUNDS, FONTS, parseBrand } from "@/lib/brand";
+import { assetUrl, BACKGROUNDS, CORNERS, FONTS, galleryOf, MAX_GALLERY, PALETTES, parseBrand, SECTION_KEYS } from "@/lib/brand";
+import { PaletteEditor } from "@/components/brand/palette-editor";
+import { FaqEditor, SectionOrder } from "@/components/brand/content-editor";
+import type { Palette } from "@/lib/themes/colors";
 import { allThemes, themeForProfessional } from "@/lib/themes/load";
 import { hex } from "@/lib/themes/colors";
-import { resetBrand, saveIdentity, savePage, saveVisual } from "./actions";
+import { addPhoto, removePhoto, resetBrand, saveContent, saveIdentity, savePage, saveVisual } from "./actions";
+import { Textarea } from "@/components/ui";
 
 export const metadata = { title: "Minha marca" };
 
@@ -19,11 +23,12 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
   const { professional, memberRole } = await requireProfessional();
   const { ok, erro } = await searchParams;
   const brand = parseBrand(professional.brand);
-  const [assets, library, current, profile] = await Promise.all([
-    db.brandAsset.findMany({ where: { professionalId: professional.id }, select: { kind: true, updatedAt: true } }),
+  const [assets, library, current, profile, gallery] = await Promise.all([
+    db.brandAsset.findMany({ where: { professionalId: professional.id, kind: { in: ["LOGO", "BACKGROUND"] } }, select: { kind: true, updatedAt: true, palette: true } }),
     allThemes(),
     themeForProfessional(professional),
     db.professionProfile.findUniqueOrThrow({ where: { id: professional.profileId }, select: { name: true, theme: { select: { name: true } } } }),
+    galleryOf(professional.id),
   ]);
   const logo = assets.find((a) => a.kind === "LOGO");
   const bg = assets.find((a) => a.kind === "BACKGROUND");
@@ -83,7 +88,7 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
                         <span className="block font-semibold">{label}</span>
                         <span className="text-muted">
                           {k === "profession" && (profile.theme ? `${profile.theme.name} (${profile.name})` : "A profissão ainda não tem imagem")}
-                          {k === "library" && "Escolha abaixo qualquer imagem da plataforma"}
+                          {k === "library" && "Escolha abaixo uma das imagens da plataforma"}
                           {k === "custom" && (bg ? "Imagem enviada por você" : "Envie abaixo uma foto do seu espaço ou da sua marca")}
                           {k === "none" && "Visual limpo, só com a sua cor"}
                         </span>
@@ -94,7 +99,7 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
               </fieldset>
 
               <fieldset>
-                <legend className="mb-2 text-sm font-medium">Galeria</legend>
+                <legend className="mb-2 text-sm font-medium">Imagens da plataforma</legend>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 2xl:grid-cols-4">
                   {library.map((t) => (
                     <label key={t.id} className="cursor-pointer overflow-hidden rounded-xl border-2 border-transparent has-[:checked]:border-primary">
@@ -117,13 +122,29 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
                     <Input id="backgroundImage" name="backgroundImage" type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="py-2" />
                   </Field>
                 </div>
-                <div className="space-y-3">
-                  <p className="text-sm font-medium">Cor principal</p>
-                  <label className={check}><input type="radio" name="colorMode" value="auto" defaultChecked={!brand.primaryColor} className={box} /> Tirar da imagem de fundo</label>
-                  <label className={check}><input type="radio" name="colorMode" value="custom" defaultChecked={!!brand.primaryColor} className={box} /> Usar a cor da minha marca</label>
-                  <input type="color" name="primaryColor" defaultValue={color} aria-label="Cor da marca" className="h-11 w-24 cursor-pointer rounded-xl border border-line bg-card p-1" />
-                </div>
               </div>
+
+              <PaletteEditor
+                primary={color}
+                accent={brand.accentColor ?? "#c8643b"}
+                autoPrimary={!brand.primaryColor}
+                autoAccent={!brand.accentColor}
+                logo={(logo?.palette as Palette | null)?.vibrant ?? null}
+                presets={PALETTES}
+              />
+
+              <fieldset>
+                <legend className="mb-2 text-sm font-medium">Cantos de botões, cartões e campos</legend>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {Object.entries(CORNERS).map(([k, c]) => (
+                    <label key={k} className={radioCard}>
+                      <input type="radio" name="corners" value={k} defaultChecked={brand.corners === k} className="mt-0.5 size-5 accent-[var(--primary)]" />
+                      <span className="flex-1"><span className="block font-semibold">{c.label}</span><span className="text-muted">{c.sample}</span></span>
+                      <span aria-hidden className="size-8 border-2 border-primary" style={{ borderRadius: c.xl }} />
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
 
               <div className="grid gap-4 lg:grid-cols-2">
                 <Field label="Fonte dos títulos" htmlFor="font">
@@ -160,6 +181,55 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
               </fieldset>
               <SubmitButton>Salvar página</SubmitButton>
             </form>
+          </Card>
+
+          <Card>
+            <h2 className="text-lg font-semibold">Conteúdo da página</h2>
+            <p className="mb-4 text-sm text-muted">Organize a página do seu jeito: a ordem das seções, perguntas frequentes e a mensagem que o cliente vê depois de agendar.</p>
+            <form action={saveContent} className="space-y-6">
+              <div>
+                <p className="mb-2 text-sm font-medium">Ordem das seções</p>
+                <SectionOrder initial={brand.sectionOrder} labels={SECTION_KEYS} />
+              </div>
+              <div>
+                <p className="mb-2 text-sm font-medium">Perguntas frequentes</p>
+                <FaqEditor initial={brand.faq} />
+              </div>
+              <Field label="Mensagem depois do agendamento" htmlFor="confirmationMessage" hint="Ex.: Chegue 10 minutos antes. Estacionamento no subsolo.">
+                <Textarea id="confirmationMessage" name="confirmationMessage" defaultValue={brand.confirmationMessage ?? ""} maxLength={600} />
+              </Field>
+              <SubmitButton>Salvar conteúdo</SubmitButton>
+            </form>
+          </Card>
+
+          <Card>
+            <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-lg font-semibold">Galeria de fotos</h2>
+              <span className="text-sm text-muted">{gallery.length} de {MAX_GALLERY}</span>
+            </div>
+            <p className="mb-4 text-sm text-muted">Mostre seu espaço, seu trabalho e sua equipe.</p>
+            {gallery.length > 0 && (
+              <ul className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {gallery.map((g) => (
+                  <li key={g.key} className="relative overflow-hidden rounded-xl border border-line">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- foto servida pela API da marca */}
+                    <img src={g.url} alt="" className="aspect-square w-full object-cover" />
+                    <form action={removePhoto} className="absolute right-1 top-1">
+                      <input type="hidden" name="key" value={g.key} />
+                      <button aria-label="Remover foto" className="flex size-9 items-center justify-center rounded-full bg-black/60 text-white">✕</button>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {gallery.length < MAX_GALLERY && (
+              <form action={addPhoto} className="flex flex-wrap items-end gap-3">
+                <Field label="Adicionar foto" htmlFor="photo" hint="JPG, PNG ou WebP, até 4 MB.">
+                  <Input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" className="py-2" required />
+                </Field>
+                <SubmitButton pendingText="Enviando…">Enviar foto</SubmitButton>
+              </form>
+            )}
           </Card>
         </fieldset>
 

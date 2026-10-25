@@ -6,7 +6,7 @@ import type { Palette, RGB } from "./colors";
  * Visual aplicado à página. `url` nula = sem imagem de fundo; `palette` nula =
  * cores padrão da plataforma. `font` e `glass` vêm da marca do profissional.
  */
-export type ThemeInfo = { id: string; name: string; palette: Palette | null; url: string | null; font?: Brand["font"]; glass?: boolean };
+export type ThemeInfo = { id: string; name: string; palette: Palette | null; url: string | null; font?: Brand["font"]; glass?: boolean; accent?: RGB; corners?: Brand["corners"] };
 
 const select = { id: true, name: true, palette: true, updatedAt: true } as const;
 
@@ -63,7 +63,7 @@ export async function themeForProfessional(pro: { id: string; profileId: string;
   const palette: Palette | null = custom
     ? { average: base.palette?.average ?? [247, 242, 234], brightness: base.palette?.brightness ?? 0.9, vibrant: custom }
     : base.palette;
-  return { ...base, palette, font: brand.font, glass: brand.glass };
+  return { ...base, palette, font: brand.font, glass: brand.glass, accent: brand.accentColor ? fromHex(brand.accentColor) : undefined, corners: brand.corners };
 }
 
 /**

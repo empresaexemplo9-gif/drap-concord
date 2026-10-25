@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge, Card, Stars } from "@/components/ui";
 import { BrandMark } from "@/components/brand-mark";
-import { contactLinks, logoUrl, parseBrand } from "@/lib/brand";
+import { contactLinks, galleryOf, logoUrl, parseBrand, type SectionKey } from "@/lib/brand";
+import { Fragment } from "react";
 import { PlaceCard } from "@/components/map/place-card";
 import { directionLinks } from "@/lib/directions";
 import { db } from "@/lib/db";
@@ -30,8 +31,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!pro) return {};
   const name = parseBrand(pro.brand).businessName;
   const title = `${name ? `${name} · ` : ""}${pro.displayName}, ${pro.headline ?? pro.profile.name}${pro.city ? ` em ${pro.city}` : ""}`;
-  const description = pro.bio?.slice(0, 155) ?? `Agende online com ${pro.displayName}.`;
-  return { title, description, alternates: { canonical: `/p/${pro.slug}` }, openGraph: { title, description, type: "profile" } };
+  const brand = parseBrand(pro.brand);
+  const description = brand.tagline ?? pro.bio?.slice(0, 155) ?? `Agende online com ${pro.displayName}.`;
+  // O logo do profissional vira o ícone da aba e a imagem ao compartilhar o link.
+  const logo = await logoUrl(pro.id);
+  return {
+    title,
+    description,
+    alternates: { canonical: `/p/${pro.slug}` },
+    ...(logo ? { icons: { icon: logo, apple: logo } } : {}),
+    openGraph: { title, description, type: "profile", ...(logo ? { images: [{ url: logo, width: 512, height: 512, alt: name ?? pro.displayName }] } : {}) },
+  };
 }
 
 export default async function PerfilPublico({ params }: { params: Promise<{ slug: string }> }) {
@@ -51,6 +61,81 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
     logoUrl(pro.id),
   ]);
   const rating = pro.reviews.length ? pro.reviews.reduce((s, r) => s + r.rating, 0) / pro.reviews.length : null;
+
+
+  const gallery = await galleryOf(pro.id);
+  const sections: Record<SectionKey, React.ReactNode> = {
+    sobre: pro.bio && (
+      <section>
+        <h2 className="mb-2 text-xl font-semibold">Sobre</h2>
+        <p className="whitespace-pre-line leading-relaxed text-ink">{pro.bio}</p>
+        {show.specialties && pro.specialties.length > 0 && <div className="mt-4 flex flex-wrap gap-1.5">{pro.specialties.map((s) => <Badge key={s}>{s}</Badge>)}</div>}
+      </section>
+    ),
+    servicos: (
+      <section>
+        <h2 className="mb-3 text-xl font-semibold">Serviços</h2>
+        <div className="grid gap-3 xl:grid-cols-2">
+          {pro.services.map((s) => (
+            <Card key={s.id} className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-semibold">{s.name}</p>
+                <p className="text-sm text-muted">{s.durationMin} min · {modalityLabel[s.modality]}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                {show.prices && <span className="font-semibold">{money(s.priceCents)}</span>}
+                <Link href={`/p/${pro.slug}/agendar?servico=${s.id}`} className="inline-flex min-h-11 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-on-primary hover:bg-primary-hover">{cta}</Link>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+    ),
+    local: inPerson && address && pro.latitude != null && pro.longitude != null && (
+      <PlaceCard name={name} address={address} lat={pro.latitude} lng={pro.longitude} radiusKm={pro.serviceRadiusKm} links={directionLinks({ lat: pro.latitude, lng: pro.longitude, address })} />
+    ),
+    galeria: gallery.length > 0 && (
+      <section aria-labelledby="galeria">
+        <h2 id="galeria" className="mb-3 text-xl font-semibold">Galeria</h2>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
+          {gallery.map((g, i) => (
+            <a key={g.key} href={g.url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl">
+              {/* eslint-disable-next-line @next/next/no-img-element -- fotos otimizadas pela API da marca */}
+              <img src={g.url} alt={`Foto ${i + 1} de ${name}`} loading="lazy" className="aspect-square w-full object-cover transition hover:scale-105" />
+            </a>
+          ))}
+        </div>
+      </section>
+    ),
+    faq: brand.faq.length > 0 && (
+      <section aria-labelledby="faq">
+        <h2 id="faq" className="mb-3 text-xl font-semibold">Perguntas frequentes</h2>
+        <div className="space-y-2">
+          {brand.faq.map((f, i) => (
+            <details key={i} className="group rounded-xl border border-line bg-card px-4 py-3">
+              <summary className="cursor-pointer list-none font-semibold marker:hidden">{f.q}</summary>
+              <p className="mt-2 whitespace-pre-line text-muted">{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    ),
+    avaliacoes: show.reviews && pro.reviews.length > 0 && (
+      <section>
+        <h2 className="mb-3 text-xl font-semibold">O que dizem</h2>
+        <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
+          {pro.reviews.map((r) => (
+            <Card key={r.id}>
+              <Stars value={r.rating} />
+              {r.comment && <p className="mt-2">“{r.comment}”</p>}
+              <p className="mt-2 text-sm text-muted">{r.client.name.split(" ")[0]}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
+    ),
+  };
+  const sectionOrder = brand.sectionOrder;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -90,50 +175,7 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
             </div>
           </div>
 
-          {pro.bio && (
-            <section>
-              <h2 className="mb-2 text-xl font-semibold">Sobre</h2>
-              <p className="whitespace-pre-line leading-relaxed text-ink">{pro.bio}</p>
-              {show.specialties && pro.specialties.length > 0 && <div className="mt-4 flex flex-wrap gap-1.5">{pro.specialties.map((s) => <Badge key={s}>{s}</Badge>)}</div>}
-            </section>
-          )}
-
-          <section>
-            <h2 className="mb-3 text-xl font-semibold">Serviços</h2>
-            <div className="grid gap-3 xl:grid-cols-2">
-              {pro.services.map((s) => (
-                <Card key={s.id} className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">{s.name}</p>
-                    <p className="text-sm text-muted">{s.durationMin} min · {modalityLabel[s.modality]}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {show.prices && <span className="font-semibold">{money(s.priceCents)}</span>}
-                    <Link href={`/p/${pro.slug}/agendar?servico=${s.id}`} className="inline-flex min-h-11 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-on-primary hover:bg-primary-hover">{cta}</Link>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </section>
-
-          {inPerson && address && pro.latitude != null && pro.longitude != null && (
-            <PlaceCard name={name} address={address} lat={pro.latitude} lng={pro.longitude} radiusKm={pro.serviceRadiusKm} links={directionLinks({ lat: pro.latitude, lng: pro.longitude, address })} />
-          )}
-
-          {show.reviews && pro.reviews.length > 0 && (
-            <section>
-              <h2 className="mb-3 text-xl font-semibold">O que dizem</h2>
-              <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
-                {pro.reviews.map((r) => (
-                  <Card key={r.id}>
-                    <Stars value={r.rating} />
-                    {r.comment && <p className="mt-2">“{r.comment}”</p>}
-                    <p className="mt-2 text-sm text-muted">{r.client.name.split(" ")[0]}</p>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          )}
+          {sectionOrder.map((key) => <Fragment key={key}>{sections[key]}</Fragment>)}
         </div>
 
         <aside className="lg:sticky lg:top-6 lg:h-fit">
