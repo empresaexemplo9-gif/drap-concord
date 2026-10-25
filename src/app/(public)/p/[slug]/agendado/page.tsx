@@ -3,6 +3,7 @@ import { ButtonLink, Card, Logo } from "@/components/ui";
 import { db } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { dateLong, modalityLabel, time } from "@/lib/format";
+import { directionLinks } from "@/lib/directions";
 
 export const metadata = { title: "Agendamento solicitado", robots: { index: false } };
 
@@ -24,6 +25,18 @@ export default async function Agendado({ searchParams }: { searchParams: Promise
         <p className="font-semibold">{appt.service.name}</p>
         <p className="capitalize">{dateLong(appt.startsAt, tz)}, às {time(appt.startsAt, tz)}</p>
         <p className="text-sm text-muted">{modalityLabel[appt.modality]} · com {appt.professional.displayName}</p>
+        {appt.modality === "IN_PERSON" && appt.professional.address && (
+          <div className="mt-3 border-t border-line pt-3 text-sm">
+            <p>📍 {appt.professional.address}</p>
+            {appt.professional.latitude != null && appt.professional.longitude != null && (
+              <p className="mt-2 flex flex-wrap gap-3">
+                {directionLinks({ lat: appt.professional.latitude, lng: appt.professional.longitude, address: appt.professional.address }).map((l) => (
+                  <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">{l.label}</a>
+                ))}
+              </p>
+            )}
+          </div>
+        )}
       </Card>
     </div>
   );

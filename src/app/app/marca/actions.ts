@@ -98,7 +98,7 @@ export async function savePage(form: FormData) {
         instagram: str(form, "instagram"),
         website: str(form, "website"),
         email: str(form, "email"),
-        address: str(form, "address"),
+        address: parseBrand(professional.brand).contacts.address,
       },
       sections: {
         prices: form.get("prices") === "on",

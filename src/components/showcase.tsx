@@ -3,7 +3,9 @@ import { BrandMark } from "./brand-mark";
 import { assetUrl, parseBrand } from "@/lib/brand";
 import { Badge, Card, EmptyState, Input, Select, Stars } from "@/components/ui";
 import { categories } from "@/lib/profiles/registry";
-import { searchProfessionals, type SearchParams } from "@/lib/search";
+import { searchPoint, searchProfessionals, type SearchParams } from "@/lib/search";
+import { NearMeButton, ResultsMap } from "./map/near-me";
+import { formatKm } from "@/lib/geo";
 import { fmt, modalityLabel, money } from "@/lib/format";
 import { ProfessionTheme } from "./profession-theme";
 import { HomeVisual, Scene } from "./home-scenes";
@@ -15,8 +17,16 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
   const [cats, results, theme] = await Promise.all([categories(), searchProfessionals(sp), getUser().then(themeForUser)]);
   // Quem tem marca (profissional ou cliente de um profissional) vê o visual dela; os demais, a home da plataforma.
   const home = !theme;
-  const filterKeys = ["q", "cidade", "categoria", "modalidade", "precoMax", "disponivel"] as const;
+  const filterKeys = ["q", "cidade", "categoria", "modalidade", "precoMax", "disponivel", "lat"] as const;
   const filtering = filterKeys.some((k) => sp[k]);
+  const near = searchPoint(sp);
+  const keep = Object.fromEntries(Object.entries(sp).filter(([k, v]) => typeof v === "string" && v && !["lat", "lng", "raio", "mapa"].includes(k))) as Record<string, string>;
+  const withPos = results.filter((r) => r.pro.latitude != null && r.pro.longitude != null);
+  const showMap = sp.mapa === "1" && withPos.length > 0;
+  const link = (extra: Record<string, string | undefined>) => {
+    const q = new URLSearchParams(Object.entries({ ...sp, ...extra }).filter(([, v]) => typeof v === "string" && v) as [string, string][]);
+    return `${basePath}${q.size ? `?${q}` : ""}`;
+  };
 
   return (
     <>
@@ -64,7 +74,22 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
               </div>
             </details>
           </form>
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <NearMeButton basePath={basePath} params={keep} />
+            {near && (
+              <form action={basePath} className="flex flex-wrap items-center gap-2 rounded-full border border-primary bg-card px-3 py-1 text-sm">
+                {Object.entries({ ...keep, lat: String(near.lat), lng: String(near.lng), ...(sp.mapa ? { mapa: sp.mapa } : {}) }).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
+                <span className="font-semibold text-primary">Perto de você</span>
+                <label className="flex items-center gap-1">
+                  raio
+                  <select name="raio" defaultValue={String(near.raio)} className="rounded-lg bg-transparent font-semibold" aria-label="Raio da busca">
+                    {[2, 5, 10, 15, 25, 50, 100].map((r) => <option key={r} value={r}>{r} km</option>)}
+                  </select>
+                </label>
+                <button className="font-semibold text-primary">Aplicar</button>
+                <Link href={link({ lat: undefined, lng: undefined, raio: undefined, mapa: undefined })} className="text-muted hover:text-ink" aria-label="Remover localização">✕</Link>
+              </form>
+            )}
             {cats.map((c) => (
               <Link key={c} href={`${basePath}?categoria=${encodeURIComponent(c)}`} className={`rounded-full border px-3.5 py-1.5 text-sm ${sp.categoria === c ? "border-primary bg-primary text-on-primary" : "border-line bg-card hover:border-primary"}`}>{c}</Link>
             ))}
@@ -75,9 +100,28 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
       <Scene className={`gutter py-10 ${home ? "min-h-[70vh] py-16" : ""}`}>
         <div className={`mb-5 flex flex-wrap items-baseline justify-between gap-3 ${home ? "rounded-2xl border border-line bg-card/70 px-5 py-4" : ""}`}>
           <h2 className="text-2xl font-semibold">{filtering ? `${results.length} ${results.length === 1 ? "profissional encontrado" : "profissionais encontrados"}` : "Profissionais em destaque"}</h2>
-          {filtering && <Link href={basePath} className="text-sm font-semibold text-primary">Limpar filtros</Link>}
+          <div className="flex items-center gap-3">
+            {withPos.length > 0 && (
+              <div className="flex overflow-hidden rounded-xl border border-line text-sm font-semibold" role="group" aria-label="Visualização">
+                <Link href={link({ mapa: undefined })} aria-current={!showMap ? "true" : undefined} className={`px-3 py-2 ${!showMap ? "bg-primary text-on-primary" : "bg-card"}`}>Lista</Link>
+                <Link href={link({ mapa: "1" })} aria-current={showMap ? "true" : undefined} className={`px-3 py-2 ${showMap ? "bg-primary text-on-primary" : "bg-card"}`}>Mapa</Link>
+              </div>
+            )}
+            {filtering && <Link href={basePath} className="text-sm font-semibold text-primary">Limpar filtros</Link>}
+          </div>
         </div>
-        {results.length === 0 ? (
+        {showMap ? (
+          <ResultsMap
+            user={near ? { lat: near.lat, lng: near.lng } : null}
+            markers={withPos.map(({ pro, distance }) => ({
+              id: pro.id,
+              lat: pro.latitude!,
+              lng: pro.longitude!,
+              label: `${parseBrand(pro.brand).businessName ?? pro.displayName}${distance != null ? ` · ${formatKm(distance)}` : ""}`,
+              href: `/p/${pro.slug}`,
+            }))}
+          />
+        ) : results.length === 0 ? (
           filtering ? (
             <EmptyState title="Ninguém por aqui ainda" text="Tente outra cidade, modalidade ou palavra. Novos profissionais entram todos os dias." />
           ) : (
@@ -85,7 +129,7 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
           )
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {results.map(({ pro, next, rating, category }) => (
+            {results.map(({ pro, next, rating, category, distance }) => (
               <Card key={pro.id} className="flex flex-col gap-4">
                 <div className="flex gap-4">
                   <BrandMark name={parseBrand(pro.brand).businessName ?? pro.displayName} logoUrl={pro.brandAssets[0] ? assetUrl(pro.id, "logo", pro.brandAssets[0].updatedAt) : null} size={64} />
@@ -94,6 +138,7 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
                     <Link href={`/p/${pro.slug}`} className="font-serif text-xl font-semibold hover:text-primary">{parseBrand(pro.brand).businessName ?? pro.displayName}</Link>
                     {parseBrand(pro.brand).businessName && <p className="text-sm">{pro.displayName}</p>}
                     <p className="text-sm text-muted">{pro.headline ?? pro.profile.name}{pro.city && ` · ${pro.city}`}</p>
+                    {distance != null && <p className="text-sm font-semibold text-primary">📍 a {formatKm(distance)} de você</p>}
                     <div className="mt-1 flex flex-wrap items-center gap-2">
                       {pro.registryVerified && <Badge tone="success">✓ Registro verificado</Badge>}
                       {rating && <span className="inline-flex items-center gap-1 text-sm"><Stars value={rating} /> <span className="text-muted">({pro.reviews.length})</span></span>}

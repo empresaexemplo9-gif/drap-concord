@@ -146,7 +146,7 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
                 <Field label="Instagram" htmlFor="instagram"><Input id="instagram" name="instagram" defaultValue={c.instagram ?? ""} placeholder="@suamarca" /></Field>
                 <Field label="Site" htmlFor="website"><Input id="website" name="website" defaultValue={c.website ?? ""} placeholder="suamarca.com.br" /></Field>
                 <Field label="E-mail de contato" htmlFor="email"><Input id="email" name="email" type="email" defaultValue={c.email ?? ""} /></Field>
-                <div className="lg:col-span-2"><Field label="Endereço de atendimento" htmlFor="address"><Input id="address" name="address" defaultValue={c.address ?? ""} placeholder="Rua, número, bairro, cidade" /></Field></div>
+                <p className="text-sm text-muted lg:col-span-2">O endereço e o mapa ficam em <Link href="/app/atendimento" className="font-semibold text-primary">Como atendo</Link>.</p>
                 <Field label="Texto do botão de agendar" htmlFor="ctaLabel" hint="Ex.: Marcar consulta, Reservar aula, Agendar horário."><Input id="ctaLabel" name="ctaLabel" defaultValue={brand.ctaLabel ?? ""} placeholder="Agendar" maxLength={30} /></Field>
               </div>
               <fieldset>

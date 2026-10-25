@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { Badge, Card, Stars } from "@/components/ui";
 import { BrandMark } from "@/components/brand-mark";
 import { contactLinks, logoUrl, parseBrand } from "@/lib/brand";
+import { PlaceCard } from "@/components/map/place-card";
+import { directionLinks } from "@/lib/directions";
 import { db } from "@/lib/db";
 import { getImpersonator } from "@/lib/auth";
 import { availableSlots } from "@/lib/booking";
@@ -41,6 +43,8 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
   const cta = brand.ctaLabel ?? "Agendar";
   const contacts = contactLinks(brand.contacts);
   const name = brand.businessName ?? pro.displayName;
+  const address = pro.address ?? brand.contacts.address ?? null;
+  const inPerson = pro.services.some((s) => s.modality !== "ONLINE");
   const first = pro.services[0];
   const [slots, logo] = await Promise.all([
     first && show.nextSlots ? availableSlots(pro.id, first.id, 14, new Date(), { client: true }).then((s) => s.slice(0, 8)) : Promise.resolve([]),
@@ -53,7 +57,8 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
     "@type": "ProfessionalService",
     name,
     description: pro.bio ?? undefined,
-    address: pro.city || brand.contacts.address ? { "@type": "PostalAddress", streetAddress: brand.contacts.address, addressLocality: pro.city ?? undefined, addressCountry: "BR" } : undefined,
+    address: pro.city || address ? { "@type": "PostalAddress", streetAddress: address ?? undefined, addressLocality: pro.city ?? undefined, addressCountry: "BR" } : undefined,
+    geo: pro.latitude != null && pro.longitude != null ? { "@type": "GeoCoordinates", latitude: pro.latitude, longitude: pro.longitude } : undefined,
     aggregateRating: rating ? { "@type": "AggregateRating", ratingValue: rating.toFixed(1), reviewCount: pro.reviews.length } : undefined,
     makesOffer: pro.services.map((s) => ({ "@type": "Offer", name: s.name, ...(show.prices ? { price: (s.priceCents / 100).toFixed(2), priceCurrency: "BRL" } : {}) })),
   };
@@ -81,7 +86,7 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
                   ))}
                 </ul>
               )}
-              {brand.contacts.address && <p className="mt-2 text-sm text-muted">📍 {brand.contacts.address}</p>}
+              {address && <p className="mt-2 text-sm text-muted">📍 {address}</p>}
             </div>
           </div>
 
@@ -110,6 +115,10 @@ export default async function PerfilPublico({ params }: { params: Promise<{ slug
               ))}
             </div>
           </section>
+
+          {inPerson && address && pro.latitude != null && pro.longitude != null && (
+            <PlaceCard name={name} address={address} lat={pro.latitude} lng={pro.longitude} radiusKm={pro.serviceRadiusKm} links={directionLinks({ lat: pro.latitude, lng: pro.longitude, address })} />
+          )}
 
           {show.reviews && pro.reviews.length > 0 && (
             <section>

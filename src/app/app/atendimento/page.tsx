@@ -5,6 +5,7 @@ import { requireProfessional } from "@/lib/auth";
 import { professionalConfig } from "@/lib/profiles/registry";
 import { bookingDefaults } from "@/lib/profiles/schema";
 import { saveAttendance } from "./actions";
+import { LocationEditor } from "@/components/map/location-editor";
 
 export const metadata = { title: "Como atendo" };
 
@@ -59,6 +60,12 @@ export default async function ComoAtendo({ searchParams }: { searchParams: Promi
                   <Input id="bufferMin" name="bufferMin" type="number" min={0} max={240} defaultValue={professional.bufferMin} />
                 </Field>
               </div>
+            </Card>
+
+            <Card className="space-y-3">
+              <h2 className="text-lg font-semibold">Onde atendo</h2>
+              <p className="text-sm text-muted">Aparece no mapa da sua página, na busca &ldquo;perto de mim&rdquo; e nos agendamentos presenciais, com o botão Como chegar.</p>
+              <LocationEditor initial={{ address: professional.address, lat: professional.latitude, lng: professional.longitude, radiusKm: professional.serviceRadiusKm }} />
             </Card>
 
             <Card className="space-y-3">

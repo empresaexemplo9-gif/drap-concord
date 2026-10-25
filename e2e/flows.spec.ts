@@ -697,3 +697,43 @@ test("página de download do app para todos os sistemas e manifesto completo", a
   }
   expect(await (await request.get("/.well-known/assetlinks.json")).json()).toEqual([]);
 });
+
+test("mapa do atendimento presencial: profissional marca o local, aparece na página e na busca perto de mim", async ({ browser }) => {
+  const pro = await browser.newContext();
+  const a = await pro.newPage();
+  await login(a, "ana@concord.dev");
+  await a.goto("/app/atendimento");
+  await a.getByLabel("Endereço do atendimento presencial").fill("Avenida Paulista, 1000, Bela Vista, São Paulo");
+  await a.getByRole("button", { name: "Buscar no mapa" }).click();
+  await expect(a.getByRole("region", { name: "Local de atendimento no mapa" })).toBeVisible();
+  await expect(a.getByText("Local marcado.")).toBeVisible();
+  const lat = Number(await a.locator('input[name="latitude"]').inputValue());
+  const lng = Number(await a.locator('input[name="longitude"]').inputValue());
+  expect(lat).not.toBe(0);
+  await a.getByLabel("Atendo a domicílio até (km)").fill("10");
+  await a.getByRole("button", { name: "Salvar modo de atendimento" }).click();
+  await expect(a.getByText("Modo de atendimento salvo.")).toBeVisible();
+  await pro.close();
+
+  // Visitante perto do consultório.
+  const visitor = await browser.newContext({ geolocation: { latitude: lat + 0.01, longitude: lng }, permissions: ["geolocation"] });
+  const v = await visitor.newPage();
+  await v.goto("/p/ana-ribeiro");
+  await expect(v.getByRole("heading", { name: "Onde fica" })).toBeVisible();
+  await expect(v.getByText("Avenida Paulista, 1000, Bela Vista, São Paulo").first()).toBeVisible();
+  await expect(v.getByRole("link", { name: "Google Maps" })).toHaveAttribute("href", new RegExp(`destination=${lat}`));
+  await expect(v.getByRole("link", { name: "Waze" })).toBeVisible();
+  await v.getByRole("button", { name: "Ver distância de mim" }).click();
+  await expect(v.getByText(/Fica a 1,1 km de você/)).toBeVisible();
+
+  await v.goto("/");
+  await v.getByRole("button", { name: "Perto de mim" }).click();
+  await v.waitForURL(/lat=/);
+  await expect(v.getByText("Perto de você")).toBeVisible();
+  await expect(v.getByRole("link", { name: "Ana Ribeiro" }).first()).toBeVisible();
+  await expect(v.getByText(/a 1,1 km de você/).first()).toBeVisible();
+  await expect(v.getByRole("link", { name: "Carlos Mendes" })).toHaveCount(0); // sem local cadastrado
+  await v.getByRole("link", { name: "Mapa", exact: true }).click();
+  await expect(v.getByRole("region", { name: "Profissionais no mapa" })).toBeVisible();
+  await visitor.close();
+});

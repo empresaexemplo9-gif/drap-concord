@@ -207,6 +207,11 @@ model Professional {
   overrides        Json     @default("{}")
   // Marca própria: nome da empresa, visual da página e contatos (ver lib/brand.ts).
   brand            Json     @default("{}")
+  // Local do atendimento presencial (mapa e "perto de mim") e raio para atendimento a domicílio.
+  address          String?
+  latitude         Float?
+  longitude        Float?
+  serviceRadiusKm  Int?
   timezone         String   @default("America/Sao_Paulo")
   bufferMin        Int      @default(0)
   createdAt        DateTime @default(now())

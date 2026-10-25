@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { dateLong, fmt, modalityLabel, statusLabel, statusTone, time } from "@/lib/format";
 import { cancel, confirm, markRead } from "./actions";
+import { directionLinks } from "@/lib/directions";
 
 export const metadata = { title: "Meus agendamentos" };
 
@@ -72,6 +73,18 @@ export default async function MinhaConta({ searchParams }: { searchParams: Promi
                   </div>
                   <Badge tone={statusTone[a.status]}>{statusLabel[a.status]}</Badge>
                 </div>
+                {a.modality === "IN_PERSON" && a.professional.address && (
+                  <div className="mt-3 rounded-xl bg-surface p-3 text-sm">
+                    <p>📍 {a.professional.address}</p>
+                    {a.professional.latitude != null && a.professional.longitude != null && (
+                      <p className="mt-1 flex flex-wrap gap-3">
+                        {directionLinks({ lat: a.professional.latitude, lng: a.professional.longitude, address: a.professional.address }).map((l) => (
+                          <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">{l.label}</a>
+                        ))}
+                      </p>
+                    )}
+                  </div>
+                )}
                 {liveRooms.find((r) => r.appointmentId === a.id) && (
                   <Link href={`/chamadas/${liveRooms.find((r) => r.appointmentId === a.id)!.id}`} className="mt-4 flex min-h-12 items-center justify-center rounded-xl bg-[#1f9d55] font-semibold text-white">Entrar na chamada agora</Link>
                 )}

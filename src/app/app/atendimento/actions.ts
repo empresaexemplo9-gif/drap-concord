@@ -6,6 +6,7 @@ import { requireProfessional } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { profileOverridesSchema } from "@/lib/profiles/schema";
+import { geocode } from "@/lib/geo";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const int = (f: FormData, k: string, min: number, max: number, fallback: number) => {
@@ -40,9 +41,27 @@ export async function saveAttendance(form: FormData) {
   for (const k of ["clientSingular", "clientPlural", "apptSingular", "apptPlural"]) {
     if (!str(form, k)) redirect(`/app/atendimento?erro=${encodeURIComponent("Preencha os nomes de cliente e atendimento.")}`);
   }
+  // Local: o ponto escolhido no mapa; se só digitou o endereço, localiza automaticamente.
+  const address = str(form, "address").slice(0, 200) || null;
+  let latitude = Number(str(form, "latitude")) || null;
+  let longitude = Number(str(form, "longitude")) || null;
+  if (address && (latitude == null || longitude == null)) {
+    const [first] = await geocode(address);
+    latitude = first?.lat ?? null;
+    longitude = first?.lng ?? null;
+  }
+  if (!address) latitude = longitude = null;
+  const radius = str(form, "serviceRadiusKm");
   await db.professional.update({
     where: { id: professional.id },
-    data: { overrides, bufferMin: int(form, "bufferMin", 0, 240, professional.bufferMin) },
+    data: {
+      overrides,
+      bufferMin: int(form, "bufferMin", 0, 240, professional.bufferMin),
+      address,
+      latitude,
+      longitude,
+      serviceRadiusKm: radius ? int(form, "serviceRadiusKm", 0, 300, 0) || null : null,
+    },
   });
   await audit({ orgId: professional.orgId, userId: user.id, action: "attendance.updated", entity: "Professional", entityId: professional.id });
   revalidatePath("/", "layout");

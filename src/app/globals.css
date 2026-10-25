@@ -157,3 +157,30 @@ h1, h2, h3 {
 .gutter {
   padding-inline: clamp(1rem, 3.5vw, 4rem);
 }
+
+/* Mapas (Leaflet): pino na cor da marca e ponto azul para "você". */
+.concord-pin {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--primary);
+  border: 3px solid #fff;
+  transform: rotate(-45deg);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 0.3);
+}
+.concord-me {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 6px rgb(37 99 235 / 0.25);
+}
+.concord-map .leaflet-popup-content-wrapper,
+.concord-map .leaflet-popup-tip {
+  background: var(--card);
+  color: var(--text);
+}
+.concord-map a { color: var(--primary); }
