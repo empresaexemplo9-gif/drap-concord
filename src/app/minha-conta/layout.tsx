@@ -8,6 +8,7 @@ import { logout } from "../(auth)/actions";
 
 const items: NavItem[] = [
   { href: "/minha-conta", label: "Agendamentos", icon: "calendar" },
+  { href: "/minha-conta/chamadas", label: "Chamadas", icon: "phone" },
   { href: "/vitrine", label: "Buscar serviços", icon: "store" },
   { href: "/minha-conta/dados", label: "Meus dados", icon: "user" },
 ];

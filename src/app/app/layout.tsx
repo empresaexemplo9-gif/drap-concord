@@ -15,6 +15,7 @@ const items: NavItem[] = [
   { href: "/app", label: "Hoje", icon: "home" },
   { href: "/app/agenda", label: "Agenda", icon: "calendar" },
   { href: "/app/clientes", label: "Clientes", icon: "users" },
+  { href: "/app/chamadas", label: "Chamadas", icon: "phone" },
   { href: "/app/regras", label: "Regras", icon: "bolt" },
   { href: "/app/servicos", label: "Serviços", icon: "briefcase" },
   { href: "/app/horarios", label: "Horários", icon: "clock" },

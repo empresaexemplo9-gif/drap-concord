@@ -4,6 +4,8 @@ import { Fraunces, Inter, Nunito, Playfair_Display } from "next/font/google";
 import { PwaClient } from "@/components/pwa-client";
 import { ViewAsBanner } from "@/components/view-as-banner";
 import { THEME_COOKIE } from "@/lib/theme";
+import { RealtimeProvider } from "@/components/realtime";
+import { getUser } from "@/lib/auth";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -28,11 +30,13 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const theme = (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
+  // Com conta logada, um canal em tempo real recebe chamadas e notificações em qualquer página.
+  const user = await getUser();
   return (
     <html lang="pt-BR" data-theme={theme} className={`${inter.variable} ${fraunces.variable} ${playfair.variable} ${nunito.variable}`}>
       <body className="min-h-dvh antialiased">
         <ViewAsBanner />
-        {children}
+        {user ? <RealtimeProvider>{children}</RealtimeProvider> : children}
         <PwaClient />
       </body>
     </html>

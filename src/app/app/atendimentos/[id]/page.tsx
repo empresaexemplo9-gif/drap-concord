@@ -14,6 +14,7 @@ import { availableSlots } from "@/lib/booking";
 import { canSeeRecords, professionalConfig } from "@/lib/profiles/registry";
 import { dateLong, modalityLabel, money, statusLabel, statusTone, time, fmt } from "@/lib/format";
 import { rescheduleAppointment, saveRecord, setStatus } from "../../actions";
+import { startCall } from "@/app/chamadas/actions";
 
 export const metadata = { title: "Atendimento" };
 
@@ -39,6 +40,7 @@ export default async function Atendimento({ params, searchParams }: { params: Pr
   const active = appt.status === "PENDING" || appt.status === "CONFIRMED";
   const slots = active ? await availableSlots(professional.id, appt.serviceId, 21) : [];
   const allFields = cfg.recordTemplate.sections.flatMap((s) => s.fields);
+  const liveRoom = await db.callRoom.findFirst({ where: { appointmentId: appt.id, status: "ACTIVE" }, select: { id: true } });
 
   const StatusBtn = ({ status, label, variant = "secondary" }: { status: string; label: string; variant?: "primary" | "secondary" | "danger" }) => (
     <form action={setStatus}>
@@ -60,7 +62,26 @@ export default async function Atendimento({ params, searchParams }: { params: Pr
           <Card className="space-y-2 text-sm">
             <p><span className="text-muted">Modalidade:</span> {modalityLabel[appt.modality]}</p>
             <p><span className="text-muted">Valor:</span> {money(appt.service.priceCents)}</p>
-            {appt.modality === "ONLINE" && <p><span className="text-muted">Sala de vídeo:</span> o link é gerado ao integrar o provedor de vídeo.</p>}
+            {appt.client.userId ? (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {liveRoom ? (
+                  <Link href={`/chamadas/${liveRoom.id}`} className="inline-flex min-h-11 items-center rounded-xl bg-[#1f9d55] px-4 font-semibold text-white">Entrar na chamada em andamento</Link>
+                ) : (
+                  (["VIDEO", "AUDIO"] as const).map((k) => (
+                    <form key={k} action={startCall}>
+                      <input type="hidden" name="participants" value={appt.client.userId!} />
+                      <input type="hidden" name="appointmentId" value={appt.id} />
+                      <input type="hidden" name="kind" value={k} />
+                      <input type="hidden" name="title" value={`${appt.service.name} · ${appt.client.name}`} />
+                      <input type="hidden" name="from" value={`/app/atendimentos/${appt.id}`} />
+                      <SubmitButton variant={k === "VIDEO" ? "primary" : "secondary"} pendingText="Chamando…">{k === "VIDEO" ? "Chamada de vídeo" : "Chamada de áudio"}</SubmitButton>
+                    </form>
+                  ))
+                )}
+              </div>
+            ) : (
+              appt.modality === "ONLINE" && <p className="text-muted">Para atender online pela plataforma, {appt.client.name.split(" ")[0]} precisa ter conta: envie o convite na ficha.</p>
+            )}
             {appt.notes && <p><span className="text-muted">Observações:</span> {appt.notes}</p>}
             {appt.cancelReason && <p><span className="text-muted">Motivo:</span> {appt.cancelReason}</p>}
             <Link href={`/app/clientes/${appt.clientId}`} className="inline-block pt-2 font-semibold text-primary">Ver ficha de {appt.client.name.split(" ")[0]} →</Link>

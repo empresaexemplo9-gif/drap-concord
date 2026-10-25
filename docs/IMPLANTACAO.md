@@ -21,3 +21,22 @@ Recomendado: **Vercel** (app) + **PostgreSQL gerenciado** (Supabase, Neon ou sim
 - Validar com especialistas as regras de compliance de cada perfil (marcadas como pendentes).
 - Trocar o limite de tentativas em memória por Redis se houver mais de uma instância.
 - Configurar backups automáticos do banco.
+
+## Chamadas de áudio e vídeo
+
+As chamadas são da própria plataforma (WebRTC): a mídia vai direto entre os
+navegadores e o servidor só faz a sinalização (canal em tempo real em
+`/api/tempo-real`). Funcionam sem configuração na maioria das redes.
+
+Para redes corporativas ou móveis que bloqueiam conexão direta, configure um
+servidor TURN (retransmissão). Opções, em variáveis de ambiente:
+
+- Cloudflare Realtime TURN (recomendado, credenciais temporárias geradas a cada chamada):
+  `CF_TURN_KEY_ID` e `CF_TURN_API_TOKEN`.
+- Servidor TURN próprio (ex.: coturn): `TURN_URLS` (separadas por vírgula),
+  `TURN_USERNAME` e `TURN_CREDENTIAL`.
+
+As salas são em malha (cada participante conversa com todos). A qualidade se
+ajusta ao tamanho da sala: Full HD em 1:1 e resolução menor conforme entram
+mais pessoas. Para salas muito grandes (dezenas de pessoas com vídeo), o
+próximo passo é um servidor de mídia (SFU), sem mudar a tela da chamada.

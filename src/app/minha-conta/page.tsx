@@ -26,6 +26,7 @@ export default async function MinhaConta({ searchParams }: { searchParams: Promi
   const now = new Date();
   const upcoming = appts.filter((a) => a.startsAt >= now && (a.status === "PENDING" || a.status === "CONFIRMED"));
   const past = appts.filter((a) => !upcoming.includes(a)).reverse();
+  const liveRooms = await db.callRoom.findMany({ where: { status: "ACTIVE", appointmentId: { in: upcoming.map((a) => a.id) }, participants: { some: { userId: user.id } } }, select: { id: true, appointmentId: true } });
   const notifications = await db.notification.findMany({ where: { userId: user.id, readAt: null }, orderBy: { createdAt: "desc" }, take: 5 });
 
   return (
@@ -71,6 +72,9 @@ export default async function MinhaConta({ searchParams }: { searchParams: Promi
                   </div>
                   <Badge tone={statusTone[a.status]}>{statusLabel[a.status]}</Badge>
                 </div>
+                {liveRooms.find((r) => r.appointmentId === a.id) && (
+                  <Link href={`/chamadas/${liveRooms.find((r) => r.appointmentId === a.id)!.id}`} className="mt-4 flex min-h-12 items-center justify-center rounded-xl bg-[#1f9d55] font-semibold text-white">Entrar na chamada agora</Link>
+                )}
                 <div className="mt-4 grid grid-cols-3 gap-2">
                   {a.status === "PENDING" ? (
                     <form action={confirm}><input type="hidden" name="id" value={a.id} /><Button className="w-full">Confirmar</Button></form>

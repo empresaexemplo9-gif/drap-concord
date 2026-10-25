@@ -191,7 +191,7 @@ test("admin vê a plataforma como profissional e como cliente, e volta ao admin"
 test("quem não é admin não consegue usar o Ver como", async ({ page }) => {
   await login(page, "maria@exemplo.com");
   await page.goto("/admin/ver-como");
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("load");
   expect(new URL(page.url()).pathname.startsWith("/admin")).toBe(false);
 });
 
@@ -560,4 +560,123 @@ test("profissional define o próprio modo de atendimento: triagem, nomes e confi
   if (await triage.count()) await triage.check();
   await page.getByRole("button", { name: "Salvar modo de atendimento" }).click();
   await expect(page.getByText("Modo de atendimento salvo.")).toBeVisible();
+});
+
+const remoteVideoWidth = (p: Page) =>
+  p.evaluate(() => (document.querySelector("[data-testid=remote-tile] video") as HTMLVideoElement | null)?.videoWidth ?? 0);
+
+test("chamada de vídeo: profissional chama, o cliente recebe tocando na conta, atende e os dois se veem e conversam", async ({ browser }) => {
+  const pro = await browser.newContext({ permissions: ["camera", "microphone"] });
+  const cli = await browser.newContext({ permissions: ["camera", "microphone"] });
+  const a = await pro.newPage();
+  const m = await cli.newPage();
+  await login(m, "maria@exemplo.com");
+  await m.goto("/minha-conta");
+  await login(a, "ana@concord.dev");
+  await a.goto("/app/chamadas");
+  await a.getByRole("checkbox", { name: /Maria Oliveira/ }).check();
+  await a.getByRole("button", { name: "Chamar", exact: true }).click();
+  await a.waitForURL(/\/chamadas\/[^/?]+$/);
+
+  const ring = m.getByRole("alertdialog");
+  await expect(ring).toContainText("Ana Ribeiro", { timeout: 15_000 });
+  await expect(ring).toContainText("Chamada de vídeo");
+  await ring.getByRole("button", { name: "Atender" }).click();
+  await m.waitForURL(/atender=1/);
+
+  await expect.poll(() => remoteVideoWidth(a), { timeout: 30_000 }).toBeGreaterThan(0);
+  await expect.poll(() => remoteVideoWidth(m), { timeout: 30_000 }).toBeGreaterThan(0);
+  await expect(a.getByText("2 na chamada")).toBeVisible();
+
+  await m.getByRole("button", { name: "Conversa" }).click();
+  await m.getByLabel("Mensagem").fill("Oi, Ana! Estou te ouvindo bem.");
+  await m.getByRole("button", { name: "Enviar" }).click();
+  await a.getByRole("button", { name: "Conversa" }).click();
+  await expect(a.getByText("Oi, Ana! Estou te ouvindo bem.")).toBeVisible({ timeout: 10_000 });
+
+  await m.getByRole("button", { name: "Desligar microfone" }).click();
+  await expect(a.locator("[data-testid=remote-tile]").getByText("Maria Oliveira")).toBeVisible();
+
+  await a.getByRole("button", { name: "Encerrar para todos" }).click();
+  await expect(m.getByRole("heading", { name: "Chamada encerrada" })).toBeVisible({ timeout: 15_000 });
+  await pro.close();
+  await cli.close();
+});
+
+test("cliente chama o profissional por áudio, ele recusa e a chamada aparece como recusada", async ({ browser }) => {
+  const pro = await browser.newContext({ permissions: ["camera", "microphone"] });
+  const cli = await browser.newContext({ permissions: ["camera", "microphone"] });
+  const a = await pro.newPage();
+  const m = await cli.newPage();
+  await login(a, "ana@concord.dev");
+  await a.goto("/app");
+  await login(m, "maria@exemplo.com");
+  await m.goto("/minha-conta/chamadas");
+  await m.getByRole("checkbox", { name: /Ana Ribeiro/ }).check();
+  await m.getByRole("radio", { name: "Só áudio" }).check();
+  await m.getByRole("button", { name: "Chamar", exact: true }).click();
+  await m.waitForURL(/\/chamadas\/[^/?]+$/);
+
+  const ring = a.getByRole("alertdialog");
+  await expect(ring).toContainText("Maria Oliveira", { timeout: 15_000 });
+  await expect(ring).toContainText("Chamada de áudio");
+  await ring.getByRole("button", { name: "Recusar" }).click();
+  await expect(ring).toBeHidden();
+
+  await m.getByRole("button", { name: "Participantes" }).click();
+  await expect(m.getByText("recusou")).toBeVisible({ timeout: 15_000 });
+  await pro.close();
+  await cli.close();
+});
+
+test("sala com três pessoas: todos se veem e o dono adiciona alguém durante a chamada", async ({ browser }) => {
+  const ctx = () => browser.newContext({ permissions: ["camera", "microphone"] });
+  const [pc, mc, jc] = await Promise.all([ctx(), ctx(), ctx()]);
+  const a = await pc.newPage();
+  const m = await mc.newPage();
+  const j = await jc.newPage();
+
+  // Terceira pessoa entra pelo convite da Ana e vira contato dela.
+  await login(a, "ana@concord.dev");
+  await a.goto("/app/convites");
+  const link = await inviteLink(a);
+  const id = uid();
+  const email = `grupo-${id}@teste.dev`;
+  await j.goto(link);
+  await j.getByLabel("Seu nome").fill(`Joana ${id}`);
+  await j.getByLabel("E-mail").fill(email);
+  await j.getByLabel("Celular (WhatsApp)").fill("(11) 97777-0000");
+  await j.getByLabel("Senha").fill(PASSWORD);
+  await j.getByRole("checkbox").check();
+  await j.getByRole("button", { name: "Criar conta e aceitar" }).click();
+  await expect(j).toHaveURL(/minha-conta/, { timeout: 15_000 });
+
+  await login(m, "maria@exemplo.com");
+  await m.goto("/minha-conta");
+
+  // Ana começa só com a Maria e adiciona a Joana durante a chamada.
+  await a.goto("/app/chamadas");
+  await a.getByRole("checkbox", { name: /Maria Oliveira/ }).check();
+  await a.getByLabel("Nome da sala (opcional)").fill("Grupo de apoio");
+  await a.getByRole("button", { name: "Chamar", exact: true }).click();
+  await a.waitForURL(/\/chamadas\/[^/?]+$/);
+  await m.getByRole("alertdialog").getByRole("button", { name: "Atender" }).click({ timeout: 15_000 });
+  await expect.poll(() => remoteVideoWidth(a), { timeout: 30_000 }).toBeGreaterThan(0);
+
+  await a.getByRole("button", { name: "Participantes" }).click();
+  await a.getByRole("checkbox", { name: new RegExp(`Joana ${id}`) }).check();
+  await a.getByRole("button", { name: /^Chamar \(1\)/ }).click();
+  const ring = j.getByRole("alertdialog");
+  await expect(ring).toContainText("Grupo de apoio", { timeout: 15_000 });
+  await ring.getByRole("button", { name: "Atender" }).click();
+
+  const tilesWithVideo = (p: Page) =>
+    p.evaluate(() => [...document.querySelectorAll("[data-testid=remote-tile] video")].filter((v) => (v as HTMLVideoElement).videoWidth > 0).length);
+  for (const p of [a, m, j]) await expect.poll(() => tilesWithVideo(p), { timeout: 30_000 }).toBe(2);
+  await expect(j.getByText("3 na chamada")).toBeVisible();
+
+  // Quem sai some da tela dos outros; a sala continua.
+  await j.getByRole("button", { name: "Sair da chamada" }).click();
+  await expect.poll(() => tilesWithVideo(a), { timeout: 15_000 }).toBe(1);
+  await Promise.all([pc.close(), mc.close(), jc.close()]);
 });

@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/ui";
 import { logout } from "../../(auth)/actions";
 
 const links = [
+  ["/app/chamadas", "Chamadas de áudio e vídeo"],
   ["/app/servicos", "Serviços e preços"],
   ["/app/horarios", "Horários e bloqueios"],
   ["/app/relatorios", "Relatórios"],
