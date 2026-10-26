@@ -431,6 +431,9 @@ test("cadastro mostra os dois tipos de conta e cria conta de cliente (Acesso 2)"
   await page.goto("/cadastro");
   await expect(page.getByRole("link", { name: /Acesso 1/ })).toHaveAttribute("aria-current", "page");
   await page.getByRole("link", { name: /Acesso 2/ }).click();
+  // A página de cadastro de profissional também tem "Seu nome": espera trocar de página.
+  await page.waitForURL(/\/cadastro\/cliente$/);
+  await expect(page.getByRole("heading", { name: "Sua conta para agendar atendimentos" })).toBeVisible();
   await page.getByLabel("Seu nome").fill("Aluno Teste");
   await page.getByLabel("E-mail").fill(`aluno-${uid()}@teste.dev`);
   await page.getByLabel("Celular (WhatsApp)").fill("(11) 95555-6666");
@@ -797,4 +800,42 @@ test("personalização completa: paleta, cantos, galeria, perguntas frequentes, 
   await expect(page.getByText("Foto removida.")).toBeVisible();
   await page.getByRole("button", { name: "Voltar ao visual padrão da profissão" }).click();
   await expect(page.getByText("Marca restaurada")).toBeVisible();
+});
+
+test("explorar no globo 3D: profissionais no globo, busca com voo até o local e cartão para agendar", async ({ browser, request }) => {
+  // Garante um profissional com local de atendimento.
+  const pro = await browser.newContext();
+  const a = await pro.newPage();
+  await login(a, "ana@concord.dev");
+  await a.goto("/app/atendimento");
+  await a.getByLabel("Endereço do atendimento presencial").fill("Rua Augusta, 500, Consolação, São Paulo");
+  await a.getByRole("button", { name: "Buscar no mapa" }).click();
+  await expect(a.getByText("Local marcado.")).toBeVisible();
+  const lat = Number(await a.locator('input[name="latitude"]').inputValue());
+  await a.getByRole("button", { name: "Salvar modo de atendimento" }).click();
+  await expect(a.getByText("Modo de atendimento salvo.")).toBeVisible();
+  await pro.close();
+
+  const geo = await (await request.get("/api/globo")).json();
+  const ana = geo.features.find((f: { properties: { slug: string } }) => f.properties.slug === "ana-ribeiro");
+  expect(ana.geometry.coordinates[1]).toBeCloseTo(lat, 4);
+
+  const ctx = await browser.newContext();
+  const v = await ctx.newPage();
+  // Imagens de satélite e ruas vêm de fora; no teste, só a estrutura do globo.
+  await v.route(/gibs\.earthdata|basemaps\.cartocdn|elevation-tiles/, (r) => r.abort());
+  await v.goto("/explorar");
+  await v.waitForSelector('[data-ready="1"]', { state: "attached", timeout: 60_000 });
+  await expect(v.locator("canvas.maplibregl-canvas")).toBeVisible();
+  await v.getByRole("button", { name: "Parar o giro" }).click();
+  const panel = v.getByRole("complementary", { name: "Profissionais nesta área" });
+  await expect(panel.getByText("Ana Ribeiro")).toBeVisible();
+
+  await v.getByLabel("Buscar no globo").fill("Ana Ribeiro");
+  await v.getByRole("button", { name: "Ir", exact: true }).click();
+  await expect.poll(async () => Number((await v.getAttribute('[data-testid="globo"]', "data-center"))!.split(",")[0]), { timeout: 20_000 }).toBeCloseTo(lat, 1);
+  const card = v.getByRole("dialog", { name: "Ana Ribeiro" });
+  await expect(card).toBeVisible();
+  await expect(card.getByRole("link", { name: "Agendar" })).toHaveAttribute("href", "/p/ana-ribeiro/agendar");
+  await ctx.close();
 });

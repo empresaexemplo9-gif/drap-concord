@@ -76,6 +76,10 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
           </form>
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <NearMeButton basePath={basePath} params={keep} />
+            <Link href="/explorar" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-sm font-semibold text-primary hover:border-primary">
+              <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></svg>
+              Explorar no globo
+            </Link>
             {near && (
               <form action={basePath} className="flex flex-wrap items-center gap-2 rounded-full border border-primary bg-card px-3 py-1 text-sm">
                 {Object.entries({ ...keep, lat: String(near.lat), lng: String(near.lng), ...(sp.mapa ? { mapa: sp.mapa } : {}) }).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}

@@ -12,6 +12,7 @@ export default async function PublicLayout({ children }: { children: React.React
         <div className="gutter flex items-center justify-between gap-3 py-4">
           <Brand />
           <nav className="flex items-center gap-1 text-sm">
+            <Link href="/explorar" className="hidden min-h-11 items-center rounded-xl px-3 font-semibold text-primary hover:bg-surface md:inline-flex">Explorar no globo</Link>
             <Link href="/baixar" className="hidden min-h-11 items-center rounded-xl px-3 font-semibold text-primary hover:bg-surface md:inline-flex">Baixar o app</Link>
             <ThemeToggle />
             {user ? (
@@ -30,6 +31,7 @@ export default async function PublicLayout({ children }: { children: React.React
         <div className="gutter flex flex-wrap items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} DRAP Concord</p>
           <nav className="flex flex-wrap gap-x-4 gap-y-2">
+            <Link href="/explorar" className="hover:text-ink">Explorar no globo</Link>
             <Link href="/baixar" className="hover:text-ink">Baixar o app</Link>
             <Link href="/cadastro" className="hover:text-ink">Para profissionais</Link>
             <Link href="/termos" className="hover:text-ink">Termos de uso</Link>
