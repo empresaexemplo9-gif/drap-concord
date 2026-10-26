@@ -823,7 +823,7 @@ test("explorar no globo 3D: profissionais no globo, busca com voo até o local e
   const ctx = await browser.newContext();
   const v = await ctx.newPage();
   // Imagens de satélite e ruas vêm de fora; no teste, só a estrutura do globo.
-  await v.route(/gibs\.earthdata|basemaps\.cartocdn|elevation-tiles/, (r) => r.abort());
+  await v.route(/gibs\.earthdata|openfreemap\.org|elevation-tiles/, (r) => r.abort());
   await v.goto("/explorar");
   await v.waitForSelector('[data-ready="1"]', { state: "attached", timeout: 60_000 });
   await expect(v.locator("canvas.maplibregl-canvas")).toBeVisible();

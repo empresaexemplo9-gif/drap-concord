@@ -2,63 +2,17 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { GeoJSONSource, Map as GLMap, Marker, StyleSpecification } from "maplibre-gl";
+import type { GeoJSONSource, Map as GLMap, Marker } from "maplibre-gl";
+import { GLOBE_STYLE } from "./globe-style";
 
 // Globo de exploração da plataforma: a Terra em 3D girando no espaço, com os
-// profissionais de atendimento presencial marcados onde atendem. De longe,
-// imagens de satélite (NASA Blue Marble, domínio público); de perto, mapa de
-// ruas (OpenStreetMap) e relevo em 3D (dados abertos de elevação). Implementação
-// própria sobre o MapLibre GL (código aberto).
+// profissionais de atendimento presencial marcados onde atendem. Estilo próprio
+// em globe-style.ts (satélite da NASA de longe, nomes de cidades e mapa vetorial
+// do OpenFreeMap, relevo 3D). Implementação própria sobre o MapLibre GL.
 
 type Pro = { id: string; slug: string; name: string; person: string | null; category: string; profession: string; headline: string | null; city: string | null; color: string | null; homeKm: number | null };
 type Feature = { type: "Feature"; geometry: { type: "Point"; coordinates: [number, number] }; properties: Pro };
 type Place = { label: string; lat: number; lng: number };
-
-const STYLE: StyleSpecification = {
-  version: 8,
-  projection: { type: "globe" },
-  sources: {
-    satelite: {
-      type: "raster",
-      tiles: ["https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg"],
-      tileSize: 256,
-      maxzoom: 8,
-      attribution: "Imagens da Terra: NASA Blue Marble",
-    },
-    ruas: {
-      type: "raster",
-      tiles: ["a", "b", "c", "d"].map((s) => `https://${s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png`),
-      tileSize: 256,
-      maxzoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    },
-    relevo: {
-      type: "raster-dem",
-      tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
-      encoding: "terrarium",
-      tileSize: 256,
-      maxzoom: 14,
-      attribution: "Relevo: Terrain Tiles (dados abertos)",
-    },
-  },
-  layers: [
-    // No globo, o fundo é a própria superfície: oceano enquanto as imagens carregam.
-    { id: "oceano", type: "background", paint: { "background-color": "#173f63" } },
-    // Satélite de longe, ruas de perto, com transição suave entre os dois.
-    { id: "satelite", type: "raster", source: "satelite", paint: { "raster-opacity": ["interpolate", ["linear"], ["zoom"], 6, 1, 9, 0], "raster-fade-duration": 200 } },
-    { id: "ruas", type: "raster", source: "ruas", minzoom: 5, paint: { "raster-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0, 9, 1] } },
-    { id: "sombras", type: "hillshade", source: "relevo", minzoom: 7, paint: { "hillshade-exaggeration": 0.35, "hillshade-shadow-color": "#1f2a33" } },
-  ],
-  sky: {
-    "sky-color": "#0b1d3a",
-    "horizon-color": "#9cc8ff",
-    "fog-color": "#cfe4ff",
-    "sky-horizon-blend": 0.6,
-    "horizon-fog-blend": 0.5,
-    "fog-ground-blend": 0.6,
-    "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 6, 1, 9, 0],
-  },
-};
 
 const BRAND = "#1F4E5A";
 
@@ -98,7 +52,7 @@ export function GlobeExplorer() {
       if (cancelled || !box.current) return;
       const m = new ml.Map({
         container: box.current,
-        style: STYLE,
+        style: GLOBE_STYLE,
         center: [-52, -14],
         zoom: 1.6,
         maxPitch: 75,
