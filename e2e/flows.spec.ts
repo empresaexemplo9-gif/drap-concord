@@ -533,7 +533,7 @@ test("profissional cria a própria marca: nome, logo, fundo, cor, fonte e contat
   const font = await page.evaluate(() => getComputedStyle(document.querySelector("h1")!).fontFamily);
   expect(font).toMatch(/playfair/i);
 
-  // Volta ao padrão da profissão.
+  // Volta ao visual padrão.
   await login(page, "juliana@concord.dev");
   await page.goto("/app/marca");
   await page.getByRole("button", { name: "Voltar ao visual padrão" }).click();
@@ -816,7 +816,7 @@ test("personalização completa: paleta, cantos, galeria, perguntas frequentes, 
   await page.goto("/app/marca");
   await page.getByRole("button", { name: "Remover foto" }).click();
   await expect(page.getByText("Foto removida.")).toBeVisible();
-  await page.getByRole("button", { name: "Voltar ao visual padrão da profissão" }).click();
+  await page.getByRole("button", { name: "Voltar ao visual padrão" }).click();
   await expect(page.getByText("Marca restaurada")).toBeVisible();
 });
 
