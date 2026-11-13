@@ -251,7 +251,7 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
             <Link href={`/p/${professional.slug}`} className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-line font-semibold text-primary hover:bg-surface">Abrir minha página</Link>
             {!locked && (
               <form action={resetBrand} className="border-t border-line pt-3">
-                <button className="min-h-11 text-sm font-semibold text-danger">Voltar ao visual padrão da profissão</button>
+                <button className="min-h-11 text-sm font-semibold text-danger">Voltar ao visual padrão</button>
               </form>
             )}
           </Card>

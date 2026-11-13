@@ -34,7 +34,7 @@ export function themeCss({ palette, withImage, glass = true, font, accent, corne
     const c = CORNERS[corners];
     css.push(`html:root{--corner-xl:${c.xl};--corner-2xl:${c.x2};--corner-3xl:${c.x3};}`);
   }
-  if (font && font !== "classica") css.push(`html:root{--heading-font:${FONT_VARS[font]};}`);
+  if (font && font !== "moderna") css.push(`html:root{--heading-font:${FONT_VARS[font]};}`);
   if (withImage && palette) {
     const t = themeTokens(palette, { solid: !glass });
     css.push(

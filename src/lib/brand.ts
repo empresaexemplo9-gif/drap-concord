@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "./db";
 
-// Marca própria do profissional. Começa vazia (visual genérico da profissão) e
+// Marca própria do profissional. Começa vazia (visual limpo da plataforma) e
 // cada campo, quando preenchido, substitui o padrão: o profissional decide
 // quanto quer personalizar.
 
@@ -10,15 +10,15 @@ const optionalText = (max: number) =>
   z.preprocess((v) => (typeof v === "string" && v.trim() === "" ? undefined : v), z.string().trim().max(max).optional());
 
 export const BACKGROUNDS = {
+  none: "Sem imagem (fundo liso, padrão)",
   profession: "Imagem da minha profissão",
   library: "Imagem da galeria",
   custom: "Minha própria imagem",
-  none: "Sem imagem (fundo liso)",
 } as const;
 
 export const FONTS = {
+  moderna: { label: "Moderna", sample: "Limpa, direta (padrão)" },
   classica: { label: "Clássica", sample: "Serifada, acolhedora" },
-  moderna: { label: "Moderna", sample: "Limpa, direta" },
   elegante: { label: "Elegante", sample: "Sofisticada, editorial" },
   amigavel: { label: "Amigável", sample: "Arredondada, leve" },
 } as const;
@@ -49,12 +49,12 @@ export const MAX_GALLERY = 8;
 export const brandSchema = z.object({
   businessName: optionalText(80),
   tagline: optionalText(140),
-  background: z.enum(Object.keys(BACKGROUNDS) as [keyof typeof BACKGROUNDS, ...(keyof typeof BACKGROUNDS)[]]).default("profession"),
+  background: z.enum(Object.keys(BACKGROUNDS) as [keyof typeof BACKGROUNDS, ...(keyof typeof BACKGROUNDS)[]]).default("none"),
   libraryThemeId: optionalText(40),
   primaryColor: hexColor.optional(),
   accentColor: hexColor.optional(),
   corners: z.enum(["reto", "suave", "arredondado"]).default("suave"),
-  font: z.enum(Object.keys(FONTS) as [keyof typeof FONTS, ...(keyof typeof FONTS)[]]).default("classica"),
+  font: z.enum(Object.keys(FONTS) as [keyof typeof FONTS, ...(keyof typeof FONTS)[]]).default("moderna"),
   glass: z.boolean().default(true),
   ctaLabel: optionalText(30),
   contacts: z

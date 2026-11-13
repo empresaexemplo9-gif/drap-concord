@@ -106,7 +106,7 @@
 
 /* Fonte dos títulos: o profissional pode trocar na marca (lib/brand.ts). */
 :root {
-  --heading-font: var(--font-fraunces), ui-serif, Georgia, serif;
+  --heading-font: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   /* Cantos: o profissional escolhe retos, suaves ou arredondados na marca. */
   --corner-xl: 1rem;
   --corner-2xl: 1.25rem;
@@ -127,7 +127,7 @@ body {
 
 h1, h2, h3 {
   font-family: var(--heading-font);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 

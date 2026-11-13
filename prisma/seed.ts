@@ -75,14 +75,14 @@ async function user(email: string, name: string, role: "PLATFORM_ADMIN" | "PROFE
   return db.user.upsert({ where: { email }, update: {}, create: { email, name, role, passwordHash } });
 }
 
-async function pro(email: string, name: string, profileKey: string, extra: { city: string; bio: string; specialties: string[]; registry: string }) {
+async function pro(email: string, name: string, profileKey: string, extra: { city: string; bio: string; specialties: string[]; registry: string; brand?: object }) {
   const u = await user(email, name, "PROFESSIONAL");
   const existing = await db.professional.findUnique({ where: { userId: u.id } });
   if (existing) return existing;
   const p = await applyProfile({ userId: u.id, profileKey, displayName: name, city: extra.city, registryNumber: extra.registry });
   return db.professional.update({
     where: { id: p.id },
-    data: { bio: extra.bio, specialties: extra.specialties, registryVerified: true },
+    data: { bio: extra.bio, specialties: extra.specialties, registryVerified: true, ...(extra.brand ? { brand: extra.brand } : {}) },
   });
 }
 
@@ -146,6 +146,8 @@ async function seedDemo() {
     registry: "OAB/MG 98.765",
     specialties: ["Direito do Consumidor", "Direito Civil"],
     bio: "Advogado com foco em direito do consumidor e contratos. Explico seus direitos em linguagem simples.",
+    // Exemplo de quem escolheu vestir a página com a imagem da profissão (o padrão é o fundo liso).
+    brand: { background: "profession" },
   });
   await pro("juliana@concord.dev", "Juliana Costa", "personal-trainer", {
     city: "São Paulo",

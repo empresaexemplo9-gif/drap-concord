@@ -1,19 +1,21 @@
 import type { ReactNode } from "react";
-import homeImages from "@/lib/home-images.json";
-import type { Palette } from "@/lib/themes/colors";
-import { Backdrop, themeCss } from "./profession-theme";
 
-// Página inicial vestida por uma única imagem da plataforma, cobrindo a página
-// inteira e fixa ao rolar; cores e vidro saem dela.
+// Página inicial com fundo liso e limpo: só as cores da plataforma e, bem de
+// leve, a forma do logo. Sem fotos, funciona igual nos modos claro e escuro.
 
-/** Cores e vidro tirados da imagem da home, mais a imagem cobrindo toda a página. */
+/** Fundo da home: cor sólida, um brilho suave no topo e o logo em marca d'água. */
 export function HomeVisual() {
-  const css = themeCss({ palette: homeImages.home as Palette, withImage: true });
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: css }} />
-      <Backdrop src="/home/home.webp" mobileSrc="/home/home-m.webp" />
-    </>
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-bg">
+      <div
+        className="absolute inset-x-0 top-0 h-[70vh]"
+        style={{ background: "radial-gradient(80% 60% at 70% 0%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 70%)" }}
+      />
+      <svg viewBox="0 0 778 781" className="absolute -right-[12vw] top-[8vh] w-[min(60vw,720px)] text-primary opacity-[0.045]" fill="currentColor">
+        <path d="M0 0H533L212 781H0Z" />
+        <path d="M581 2C601 2 777 60 777 290V480C777 675 652 781 512 781H219Z" />
+      </svg>
+    </div>
   );
 }
 
