@@ -34,7 +34,7 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
   const bg = assets.find((a) => a.kind === "BACKGROUND");
   const logoSrc = logo ? assetUrl(professional.id, "logo", logo.updatedAt) : null;
   const name = brand.businessName ?? professional.displayName;
-  const color = brand.primaryColor ?? (current?.palette ? hex(current.palette.vibrant) : "#a35d33");
+  const color = brand.primaryColor ?? (current?.palette ? hex(current.palette.vibrant) : "#2f6475");
   const locked = memberRole !== "OWNER";
   const c = brand.contacts;
 
@@ -126,7 +126,7 @@ export default async function Marca({ searchParams }: { searchParams: Promise<{ 
 
               <PaletteEditor
                 primary={color}
-                accent={brand.accentColor ?? "#c8643b"}
+                accent={brand.accentColor ?? "#477770"}
                 autoPrimary={!brand.primaryColor}
                 autoAccent={!brand.accentColor}
                 logo={(logo?.palette as Palette | null)?.vibrant ?? null}

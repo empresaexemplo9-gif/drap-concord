@@ -1,21 +1,25 @@
 # Design system
 
-**Sensação:** acolhedor, calmo e confiável, com acabamento premium.
+**Sensação:** profissional, calmo e confiável: neutros frios e suaves, pouco contraste de cor e acabamento discreto.
 
 ## Tokens (`src/app/globals.css`)
 
 | Token | Claro | Uso |
 | --- | --- | --- |
-| `bg` | `#FBF7F2` creme quente | fundo |
-| `surface` | `#F3EBDF` areia | painéis, menu lateral |
-| `primary` | `#1F4E5A` azul-petróleo (hover `#173B44`) | ações, logo |
-| `accent` | `#C8745A` terracota | destaques, foco (anel de 3:1) |
-| `success` | sálvia `#46654E` sobre `#E3EBE4` | confirmado |
-| `gold` | `#D9A441` | avaliações |
-| `ink` / `muted` | `#2B2622` / `#6B6259` | texto |
-| `danger` / `warning` / `info` | `#9C3B2F` / `#7F520E` / `#2F6473` | estados |
+| `bg` | `#F5F7F8` cinza-névoa | fundo |
+| `surface` | `#EDF1F3` cinza-gelo | painéis, menu lateral |
+| `card` | `#FFFFFF` | cartões, campos |
+| `primary` | `#2F6475` azul-petróleo sereno (hover `#26525F`) | ações, links |
+| `accent` | `#477770` sálvia | destaques, foco |
+| `success` | `#3D6A50` sobre `#E4EFE8` | confirmado |
+| `gold` | `#C99A3E` | avaliações |
+| `ink` / `muted` | `#1E2A32` / `#5C6B75` | texto |
+| `danger` / `warning` / `info` | `#A2453A` / `#7A5512` / `#2F6475` | estados |
+| `line` | `#E1E7EA` | bordas |
 
-Os tons de estado foram escurecidos em relação ao prompt para passar no **WCAG AA (≥ 4,5:1)** sobre os fundos dos selos. Há modo escuro (automático pelo sistema ou `data-theme="dark"`).
+Todos os textos passam no **WCAG AA (≥ 4,5:1)** sobre os fundos em que aparecem. Há modo escuro (automático pelo sistema ou `data-theme="dark"`), com grafite azulado e os mesmos tons em versão clara.
+
+**Temas com imagem:** a cor marcante da foto entra dessaturada (`soften` em `lib/themes/colors.ts`), a foto aparece um pouco menos saturada sob um véu mais forte e os cartões de vidro ficam quase opacos, para a imagem não competir com o conteúdo.
 
 **Tipografia:** Fraunces nos títulos e Inter no corpo, via `next/font`.
 

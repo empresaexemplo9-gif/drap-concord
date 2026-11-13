@@ -48,7 +48,7 @@ export function themeCss({ palette, withImage, glass = true, font, accent, corne
       // Só fundos aplicados de fato (não variantes como hover:bg-card/60).
       const sel = [".bg-card", ".bg-surface", ".page-header", ...["bg-card/", "bg-surface/", "bg-bg/"].flatMap((c) => [`[class^='${c}']`, `[class*=' ${c}']`])].join(",");
       css.push(
-        `${sel}{-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);}`,
+        `${sel}{-webkit-backdrop-filter:blur(20px) saturate(120%);backdrop-filter:blur(20px) saturate(120%);}`,
         `@media (prefers-reduced-transparency: reduce){${sel}{-webkit-backdrop-filter:none;backdrop-filter:none;}}`,
       );
     }
@@ -71,7 +71,7 @@ export function Backdrop({ src, mobileSrc }: { src: string; mobileSrc?: string }
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
       <picture>
         {mobileSrc && <source media="(max-width: 768px)" srcSet={mobileSrc} />}
-        <img src={src} alt="" className="h-full w-full object-cover" fetchPriority="high" decoding="async" />
+        <img src={src} alt="" className="h-full w-full object-cover saturate-[.8]" fetchPriority="high" decoding="async" />
       </picture>
       <div className="absolute inset-0" style={{ background: "var(--overlay)" }} />
     </div>
