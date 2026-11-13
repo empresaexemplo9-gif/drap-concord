@@ -31,7 +31,7 @@ export const CORNERS = {
 
 /** Paletas prontas (cor principal e secundária) para começar rápido. */
 export const PALETTES = [
-  { name: "Oceano", primary: "#1f4e5a", accent: "#c8643b" },
+  { name: "Oceano", primary: "#2f6475", accent: "#477770" },
   { name: "Floresta", primary: "#2f5d3a", accent: "#b88a2e" },
   { name: "Terracota", primary: "#a4532f", accent: "#2f5f6b" },
   { name: "Ameixa", primary: "#5b2a5e", accent: "#d08a3c" },

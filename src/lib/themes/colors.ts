@@ -86,12 +86,22 @@ export function ensureContrast(color: RGB, against: RGB, min: number, direction:
   return c;
 }
 
+/**
+ * Tira parte da saturação de uma cor (mistura com o cinza de mesma luminância
+ * percebida). Deixa as cores tiradas das fotos mais sóbrias e agradáveis.
+ */
+export function soften(color: RGB, amount = 0.4): RGB {
+  const [r, g, b] = color;
+  const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+  return mix(color, [gray, gray, gray], amount);
+}
+
 export type ThemeTokens = Record<string, string>;
 
 const WHITE: RGB = [255, 255, 255];
-const INK: RGB = [28, 25, 21];
-const NIGHT: RGB = [12, 12, 14];
-const PAPER: RGB = [247, 242, 234];
+const INK: RGB = [27, 36, 43];
+const NIGHT: RGB = [12, 14, 16];
+const PAPER: RGB = [234, 239, 242];
 
 /**
  * Tokens de tema para o modo claro e escuro. Os nomes batem com as variáveis
@@ -100,45 +110,47 @@ const PAPER: RGB = [247, 242, 234];
 export function themeTokens(p: Palette, opts: { solid?: boolean } = {}): { light: ThemeTokens; dark: ThemeTokens } {
   // Sem efeito de vidro, os cartões ficam quase opacos para manter a leitura sobre a imagem.
   const a = (glass: number, solid: number) => (opts.solid ? solid : glass);
-  const lightPrimary = ensureContrast(p.vibrant, WHITE, 4.6, "darken");
-  const darkPrimary = ensureContrast(p.vibrant, NIGHT, 7, "lighten");
-  const lightGlass = mix(WHITE, p.average, 0.1);
-  const darkGlass = mix(NIGHT, p.average, 0.22);
-  const accentLight = ensureContrast(p.vibrant, WHITE, 3, "darken");
-  const accentDark = ensureContrast(p.vibrant, NIGHT, 3, "lighten");
+  // A cor marcante da foto entra mais sóbria; o vidro quase não puxa a cor da cena.
+  const tone = soften(p.vibrant, 0.4);
+  const lightPrimary = ensureContrast(tone, WHITE, 4.6, "darken");
+  const darkPrimary = ensureContrast(tone, NIGHT, 7, "lighten");
+  const lightGlass = mix(WHITE, p.average, 0.06);
+  const darkGlass = mix(NIGHT, p.average, 0.16);
+  const accentLight = ensureContrast(tone, WHITE, 4.5, "darken");
+  const accentDark = ensureContrast(tone, NIGHT, 4.5, "lighten");
 
-  const common = { "--danger": "#9c3b2f" };
+  const common = { "--danger": "#a2453a" };
   return {
     light: {
       ...common,
       "--bg": rgba(lightGlass, 0.2),
-      "--surface": rgba(lightGlass, a(0.5, 0.88)),
-      "--card": rgba(lightGlass, a(0.74, 0.95)),
+      "--surface": rgba(lightGlass, a(0.7, 0.92)),
+      "--card": rgba(lightGlass, a(0.86, 0.97)),
       "--primary": hex(lightPrimary),
       "--primary-hover": hex(mix(lightPrimary, [0, 0, 0], 0.15)),
       "--on-primary": "#ffffff",
       "--accent": hex(accentLight),
       "--ring": hex(accentLight),
       "--text": hex(INK),
-      "--muted": "#433d36",
-      "--border": "rgba(255, 255, 255, 0.62)",
-      "--overlay": `linear-gradient(180deg, ${rgba(lightGlass, 0.22)}, ${rgba(lightGlass, 0.48)})`,
-      "--glass-shadow": "0 1px 1px rgb(0 0 0 / 0.04), 0 12px 32px -12px rgb(20 16 12 / 0.28)",
+      "--muted": "#46535c",
+      "--border": "rgba(255, 255, 255, 0.7)",
+      "--overlay": `linear-gradient(180deg, ${rgba(lightGlass, 0.5)}, ${rgba(lightGlass, 0.72)})`,
+      "--glass-shadow": "0 1px 2px rgb(16 24 32 / 0.04), 0 10px 28px -14px rgb(16 24 32 / 0.18)",
     },
     dark: {
       "--bg": rgba(darkGlass, 0.25),
-      "--surface": rgba(darkGlass, a(0.5, 0.88)),
-      "--card": rgba(darkGlass, a(0.64, 0.95)),
+      "--surface": rgba(darkGlass, a(0.66, 0.9)),
+      "--card": rgba(darkGlass, a(0.78, 0.96)),
       "--primary": hex(darkPrimary),
       "--primary-hover": hex(mix(darkPrimary, WHITE, 0.15)),
       "--on-primary": hex(NIGHT),
       "--accent": hex(accentDark),
       "--ring": hex(accentDark),
       "--text": hex(PAPER),
-      "--muted": "#d6cec3",
-      "--border": "rgba(255, 255, 255, 0.16)",
-      "--danger": "#ef9a8e",
-      "--overlay": `linear-gradient(180deg, ${rgba(darkGlass, 0.5)}, ${rgba(darkGlass, 0.72)})`,
+      "--muted": "#c3ccd2",
+      "--border": "rgba(255, 255, 255, 0.12)",
+      "--danger": "#e8998d",
+      "--overlay": `linear-gradient(180deg, ${rgba(darkGlass, 0.62)}, ${rgba(darkGlass, 0.8)})`,
       "--glass-shadow": "0 1px 1px rgb(0 0 0 / 0.3), 0 16px 40px -16px rgb(0 0 0 / 0.6)",
     },
   };

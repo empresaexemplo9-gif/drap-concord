@@ -1,77 +1,78 @@
 @import "tailwindcss";
 
-/* Design tokens da DRAP Concord. Paleta do prompt, modo claro e escuro. */
+/* Design tokens da DRAP Concord: neutros frios e suaves, azul-petróleo
+   sereno como cor principal e sálvia como destaque. Modo claro e escuro. */
 :root {
-  --bg: #fbf7f2;
-  --surface: #f3ebdf;
-  --card: #fffdf9;
-  --primary: #1f4e5a;
-  --primary-hover: #173b44;
-  --on-primary: #fbf7f2;
-  --accent: #c8745a;
-  --success: #46654e; /* sálvia escurecida para texto AA */
-  --success-bg: #e3ebe4;
-  --gold: #d9a441;
-  --text: #2b2622;
-  --muted: #6b6259;
-  --danger: #9c3b2f;
-  --danger-bg: #f6e1dd;
-  --warning: #7f520e; /* alerta escurecido para texto AA */
-  --warning-bg: #f6ead2;
-  --info: #2f6473;
-  --info-bg: #dfecef;
-  --border: #e6dccd;
-  --ring: #c8745a;
-  --shadow: 0 1px 2px rgb(43 38 34 / 0.04), 0 8px 24px -12px rgb(43 38 34 / 0.12);
+  --bg: #f5f7f8;
+  --surface: #edf1f3;
+  --card: #ffffff;
+  --primary: #2f6475;
+  --primary-hover: #26525f;
+  --on-primary: #ffffff;
+  --accent: #477770;
+  --success: #3d6a50;
+  --success-bg: #e4efe8;
+  --gold: #c99a3e;
+  --text: #1e2a32;
+  --muted: #5c6b75;
+  --danger: #a2453a;
+  --danger-bg: #f8e6e3;
+  --warning: #7a5512;
+  --warning-bg: #f7eed9;
+  --info: #2f6475;
+  --info-bg: #e3eef1;
+  --border: #e1e7ea;
+  --ring: #477770;
+  --shadow: 0 1px 2px rgb(16 24 32 / 0.04), 0 6px 20px -10px rgb(16 24 32 / 0.1);
 }
 
 :root[data-theme="dark"] {
-  --bg: #171513;
-  --surface: #211e1b;
-  --card: #26221f;
-  --primary: #7fb3c0;
-  --primary-hover: #9cc6d1;
-  --on-primary: #10262c;
-  --accent: #e0957c;
-  --success: #9dbba4;
-  --success-bg: #26332a;
-  --gold: #e3b65e;
-  --text: #f1ebe3;
-  --muted: #b3a89c;
-  --danger: #e38b7e;
-  --danger-bg: #3a221e;
-  --warning: #e3b65e;
-  --warning-bg: #352a17;
-  --info: #8cc0cd;
-  --info-bg: #1d2f34;
-  --border: #3a342e;
-  --ring: #e0957c;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
+  --bg: #12171a;
+  --surface: #182024;
+  --card: #1c2529;
+  --primary: #8fbacb;
+  --primary-hover: #a8cbd8;
+  --on-primary: #0f2129;
+  --accent: #8dbdb3;
+  --success: #9fc4ab;
+  --success-bg: #1f2e25;
+  --gold: #e0bb6e;
+  --text: #e7edf0;
+  --muted: #9dabb3;
+  --danger: #e8998d;
+  --danger-bg: #36211e;
+  --warning: #e0bb6e;
+  --warning-bg: #30291a;
+  --info: #93c1d1;
+  --info-bg: #1a2b31;
+  --border: #2a353a;
+  --ring: #8dbdb3;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 8px 24px -12px rgb(0 0 0 / 0.45);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #171513;
-    --surface: #211e1b;
-    --card: #26221f;
-    --primary: #7fb3c0;
-    --primary-hover: #9cc6d1;
-    --on-primary: #10262c;
-    --accent: #e0957c;
-    --success: #9dbba4;
-    --success-bg: #26332a;
-    --gold: #e3b65e;
-    --text: #f1ebe3;
-    --muted: #b3a89c;
-    --danger: #e38b7e;
-    --danger-bg: #3a221e;
-    --warning: #e3b65e;
-    --warning-bg: #352a17;
-    --info: #8cc0cd;
-    --info-bg: #1d2f34;
-    --border: #3a342e;
-    --ring: #e0957c;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
+    --bg: #12171a;
+    --surface: #182024;
+    --card: #1c2529;
+    --primary: #8fbacb;
+    --primary-hover: #a8cbd8;
+    --on-primary: #0f2129;
+    --accent: #8dbdb3;
+    --success: #9fc4ab;
+    --success-bg: #1f2e25;
+    --gold: #e0bb6e;
+    --text: #e7edf0;
+    --muted: #9dabb3;
+    --danger: #e8998d;
+    --danger-bg: #36211e;
+    --warning: #e0bb6e;
+    --warning-bg: #30291a;
+    --info: #93c1d1;
+    --info-bg: #1a2b31;
+    --border: #2a353a;
+    --ring: #8dbdb3;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 8px 24px -12px rgb(0 0 0 / 0.45);
   }
 }
 
