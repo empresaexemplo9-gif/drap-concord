@@ -28,10 +28,10 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/icons/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
     ],
     screenshots: [
-      { src: "/screenshots/inicio-largo.png", sizes: "1280x720", type: "image/png", form_factor: "wide", label: "Encontre profissionais e agende" },
-      { src: "/screenshots/agenda-largo.png", sizes: "1280x720", type: "image/png", form_factor: "wide", label: "Agenda do profissional" },
-      { src: "/screenshots/inicio-celular.png", sizes: "780x1688", type: "image/png", form_factor: "narrow", label: "Busca no celular" },
-      { src: "/screenshots/agenda-celular.png", sizes: "780x1688", type: "image/png", form_factor: "narrow", label: "Agenda no celular" },
+      { src: "/screenshots/inicio-largo.png?v=2", sizes: "1280x720", type: "image/png", form_factor: "wide", label: "Encontre profissionais e agende" },
+      { src: "/screenshots/agenda-largo.png?v=2", sizes: "1280x720", type: "image/png", form_factor: "wide", label: "Agenda do profissional" },
+      { src: "/screenshots/inicio-celular.png?v=2", sizes: "780x1688", type: "image/png", form_factor: "narrow", label: "Busca no celular" },
+      { src: "/screenshots/agenda-celular.png?v=2", sizes: "780x1688", type: "image/png", form_factor: "narrow", label: "Agenda no celular" },
     ],
     shortcuts: [
       { name: "Agenda", url: "/app/agenda", icons: [{ src: "/icons/icon-96.png", sizes: "96x96" }] },
