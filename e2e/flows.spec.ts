@@ -454,22 +454,40 @@ test("profissional não aceita convite com conta de Acesso 1", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Este convite é para clientes" })).toBeVisible();
 });
 
-test("o tema da profissão acompanha a conta: portal do cliente e vitrine do profissional", async ({ page }) => {
+test("visual padrão é limpo e o fundo escolhido pelo profissional acompanha a conta do cliente", async ({ page }) => {
   const themed = page.locator('img[src^="/api/temas/"]');
+  const anyBackdrop = page.locator("div.fixed.inset-0 img");
+  // Visitante vê a home com fundo liso, sem foto.
+  await page.goto("/");
+  await expect(anyBackdrop).toHaveCount(0);
+  // Sem personalização, profissional e cliente também ficam no fundo liso.
+  await login(page, "maria@exemplo.com");
+  await page.goto("/minha-conta");
+  await expect(themed).toHaveCount(0);
+  await logout(page);
+
+  // A Ana escolhe a imagem da profissão: o portal da cliente dela passa a usar o mesmo fundo.
+  await login(page, "ana@concord.dev");
+  await page.goto("/app/marca");
+  await page.getByRole("radio", { name: /Imagem da minha profissão/ }).check();
+  await page.getByRole("button", { name: "Salvar visual" }).click();
+  await expect(page.getByText("Visual salvo.")).toBeVisible();
+  await page.goto("/vitrine");
+  await expect(themed).toHaveCount(1);
+  await logout(page);
   await login(page, "maria@exemplo.com");
   await page.goto("/minha-conta");
   await expect(themed).toHaveCount(1);
   await page.goto("/termos");
   await expect(themed).toHaveCount(1);
   await logout(page);
+
+  // Volta ao padrão.
   await login(page, "ana@concord.dev");
-  await page.goto("/vitrine");
-  await expect(themed).toHaveCount(1);
+  await page.goto("/app/marca");
+  await page.getByRole("button", { name: "Voltar ao visual padrão" }).click();
+  await expect(page.getByText("Marca restaurada")).toBeVisible();
   await logout(page);
-  await page.goto("/");
-  await expect(themed).toHaveCount(0);
-  // Visitante vê a home vestida pela imagem da plataforma.
-  await expect(page.locator('img[src="/home/home.webp"]')).toHaveCount(1);
 });
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64");
@@ -489,7 +507,7 @@ test("profissional cria a própria marca: nome, logo, fundo, cor, fonte e contat
   await page.getByRole("radio", { name: /Sem imagem/ }).check();
   await page.getByRole("group", { name: /Cor principal/ }).getByRole("radio", { name: "Minha cor" }).check();
   await page.getByLabel("Cor principal da marca").fill("#1d4ed8");
-  await page.getByLabel("Fonte dos títulos").selectOption("moderna");
+  await page.getByLabel("Fonte dos títulos").selectOption("elegante");
   await page.getByRole("button", { name: "Salvar visual" }).click();
   await expect(page.getByText("Visual salvo.")).toBeVisible();
   await expect(page.locator('div.fixed.inset-0 img')).toHaveCount(0);
@@ -513,12 +531,12 @@ test("profissional cria a própria marca: nome, logo, fundo, cor, fonte e contat
   const primary = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--primary").trim());
   expect(primary).not.toBe("");
   const font = await page.evaluate(() => getComputedStyle(document.querySelector("h1")!).fontFamily);
-  expect(font).toMatch(/inter/i);
+  expect(font).toMatch(/playfair/i);
 
-  // Volta ao padrão da profissão.
+  // Volta ao visual padrão.
   await login(page, "juliana@concord.dev");
   await page.goto("/app/marca");
-  await page.getByRole("button", { name: "Voltar ao visual padrão da profissão" }).click();
+  await page.getByRole("button", { name: "Voltar ao visual padrão" }).click();
   await expect(page.getByText("Marca restaurada")).toBeVisible();
   await expect(page.getByRole("link", { name: "Juliana Costa, início" })).toBeVisible();
 });
@@ -798,7 +816,7 @@ test("personalização completa: paleta, cantos, galeria, perguntas frequentes, 
   await page.goto("/app/marca");
   await page.getByRole("button", { name: "Remover foto" }).click();
   await expect(page.getByText("Foto removida.")).toBeVisible();
-  await page.getByRole("button", { name: "Voltar ao visual padrão da profissão" }).click();
+  await page.getByRole("button", { name: "Voltar ao visual padrão" }).click();
   await expect(page.getByText("Marca restaurada")).toBeVisible();
 });
 

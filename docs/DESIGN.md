@@ -19,9 +19,11 @@
 
 Todos os textos passam no **WCAG AA (≥ 4,5:1)** sobre os fundos em que aparecem. Há modo escuro (automático pelo sistema ou `data-theme="dark"`), com grafite azulado e os mesmos tons em versão clara.
 
-**Temas com imagem:** a cor marcante da foto entra dessaturada (`soften` em `lib/themes/colors.ts`), a foto aparece um pouco menos saturada sob um véu mais forte e os cartões de vidro ficam quase opacos, para a imagem não competir com o conteúdo.
+**Fundo:** o padrão é liso, sem foto, em toda a plataforma. A home usa só a cor de fundo, um brilho suave da cor principal no topo e o logo em marca d'água (`components/home-scenes.tsx`). Imagem de fundo é opcional: o profissional escolhe em "Minha marca" (profissão, galeria ou foto própria).
 
-**Tipografia:** Fraunces nos títulos e Inter no corpo, via `next/font`.
+**Temas com imagem (opcionais):** a cor marcante da foto entra dessaturada (`soften` em `lib/themes/colors.ts`), a foto aparece um pouco menos saturada sob um véu mais forte e os cartões de vidro ficam quase opacos, para a imagem não competir com o conteúdo.
+
+**Tipografia:** Inter nos títulos e no corpo, via `next/font`. Fraunces, Playfair Display e Nunito ficam como opções da marca do profissional e só baixam quando escolhidas.
 
 **Forma e movimento:** cantos de 12 a 20 px, sombras suaves, transições de 180 ms, respeito a "reduzir movimento", estados vazios com ilustração de traço e texto humano.
 

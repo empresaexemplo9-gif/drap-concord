@@ -9,8 +9,8 @@ import { getUser } from "@/lib/auth";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap" });
 // Fontes opcionais da marca do profissional: só baixam quando usadas.
+const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap", preload: false });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", display: "swap", preload: false });
 const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: "swap", preload: false });
 

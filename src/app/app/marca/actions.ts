@@ -115,14 +115,14 @@ export async function savePage(form: FormData) {
   back("Página salva.", true);
 }
 
-/** Volta ao visual genérico da profissão (apaga logo e fundo próprios). */
+/** Volta ao visual padrão da plataforma (apaga logo e fundo próprios). */
 export async function resetBrand() {
   const { professional, user } = await owner();
   await db.brandAsset.deleteMany({ where: { professionalId: professional.id } });
   await db.professional.update({ where: { id: professional.id }, data: { brand: {} } });
   await audit({ orgId: professional.orgId, userId: user.id, action: "brand.reset", entity: "Professional", entityId: professional.id });
   revalidatePath("/", "layout");
-  back("Marca restaurada para o padrão da profissão.", true);
+  back("Marca restaurada para o visual padrão.", true);
 }
 
 /** Conteúdo da página: ordem das seções, perguntas frequentes e mensagem pós-agendamento. */

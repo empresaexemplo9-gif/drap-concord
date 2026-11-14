@@ -136,7 +136,7 @@ export function Avatar({ name, size = 48 }: { name: string; size?: number }) {
   const initials = name.split(" ").filter(Boolean).slice(0, 2).map((s) => s[0]).join("").toUpperCase();
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center rounded-full bg-surface font-serif font-semibold text-primary"
+      className="inline-flex shrink-0 items-center justify-center rounded-full bg-info-bg font-semibold text-primary"
       style={{ width: size, height: size, fontSize: size * 0.38 }}
       aria-hidden
     >

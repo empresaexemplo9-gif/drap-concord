@@ -34,10 +34,10 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
       <Scene className={home ? "" : "bg-surface/70"}>
         <div className="gutter pb-10 pt-12 sm:pt-16">
           <div className="grid items-end gap-8 lg:grid-cols-[1.5fr_1fr]">
-            <div className={home ? "rounded-3xl border border-line bg-card/70 p-6 shadow-soft sm:p-8" : ""}>
+            <div>
               <p className="text-sm font-semibold text-accent">Saúde, jurídico, esporte, educação e muito mais</p>
-              <h1 className="mt-2 text-4xl font-semibold leading-tight sm:text-5xl xl:text-6xl">Encontre quem cuida de você e agende em poucos toques</h1>
-              <p className="mt-3 text-lg text-muted">Profissionais com registro verificado, horários reais e confirmação na hora.</p>
+              <h1 className="mt-3 max-w-3xl text-4xl font-semibold leading-[1.1] sm:text-5xl xl:text-6xl">Encontre quem cuida de você e agende em poucos toques</h1>
+              <p className="mt-4 max-w-2xl text-lg text-muted">Profissionais com registro verificado, horários reais e confirmação na hora.</p>
             </div>
             <ol className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
               {[
@@ -45,8 +45,8 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
                 ["2", "Escolha o horário", "só aparecem horários livres de verdade"],
                 ["3", "Pronto", "confirme, remarque ou cancele pelo app"],
               ].map(([n, t, d]) => (
-                <li key={n} className="flex items-center gap-3 rounded-2xl border border-line bg-card/70 p-3">
-                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif font-semibold text-on-primary">{n}</span>
+                <li key={n} className="flex items-center gap-3 rounded-2xl border border-line bg-card p-3 shadow-soft">
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-info-bg text-sm font-semibold text-primary">{n}</span>
                   <span className="text-sm"><strong className="block text-ink">{t}</strong><span className="text-muted">{d}</span></span>
                 </li>
               ))}
@@ -101,8 +101,8 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
         </div>
       </Scene>
 
-      <Scene className={`gutter py-10 ${home ? "min-h-[70vh] py-16" : ""}`}>
-        <div className={`mb-5 flex flex-wrap items-baseline justify-between gap-3 ${home ? "rounded-2xl border border-line bg-card/70 px-5 py-4" : ""}`}>
+      <Scene className="gutter py-10">
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="text-2xl font-semibold">{filtering ? `${results.length} ${results.length === 1 ? "profissional encontrado" : "profissionais encontrados"}` : "Profissionais em destaque"}</h2>
           <div className="flex items-center gap-3">
             {withPos.length > 0 && (
@@ -165,7 +165,7 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
         )}
       </Scene>
 
-      <Scene className={`gutter ${home ? "flex min-h-[60vh] items-center py-20" : "pb-16"}`}>
+      <Scene className="gutter pb-16">
         <Card className="flex w-full flex-col items-start gap-4 bg-primary p-8 text-on-primary sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold">Você atende pessoas?</h2>
