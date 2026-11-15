@@ -1,5 +1,6 @@
 import { runDailyRules } from "@/lib/rules/run";
 import { pruneEvents } from "@/lib/realtime";
+import { cleanupDemos } from "@/lib/demo";
 
 // Chamado por um agendador (ex.: Vercel Cron) com o cabeçalho Authorization: Bearer CRON_SECRET.
 export async function GET(req: Request) {
@@ -7,5 +8,6 @@ export async function GET(req: Request) {
   if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) return new Response("Não autorizado", { status: 401 });
   const fired = await runDailyRules();
   await pruneEvents(60);
-  return Response.json({ fired });
+  const demosRemoved = await cleanupDemos();
+  return Response.json({ fired, demosRemoved });
 }

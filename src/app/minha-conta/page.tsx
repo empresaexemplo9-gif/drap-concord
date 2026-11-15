@@ -17,7 +17,7 @@ const okMsg: Record<string, string> = {
 export default async function MinhaConta({ searchParams }: { searchParams: Promise<{ ok?: string; erro?: string; bemvindo?: string; convite?: string }> }) {
   const user = await requireUser(["CLIENT"]);
   const { ok, erro, bemvindo, convite } = await searchParams;
-  const mine = await db.client.findMany({ where: { userId: user.id }, include: { org: { include: { professionals: { where: { isPublic: true }, select: { displayName: true, slug: true }, take: 1 } } } } });
+  const mine = await db.client.findMany({ where: { userId: user.id }, include: { org: { include: { professionals: { select: { displayName: true, slug: true }, orderBy: { createdAt: "asc" }, take: 1 } } } } });
   const pros = mine.flatMap((c) => c.org.professionals);
   const appts = await db.appointment.findMany({
     where: { client: { userId: user.id }, status: { not: "RESCHEDULED" } },

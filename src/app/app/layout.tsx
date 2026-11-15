@@ -10,6 +10,7 @@ import { ProfessionTheme } from "@/components/profession-theme";
 import { BrandMark } from "@/components/brand-mark";
 import { logoUrl, parseBrand } from "@/lib/brand";
 import { themeForProfessional } from "@/lib/themes/load";
+import { DemoBanner } from "@/components/demo-banner";
 
 const items: NavItem[] = [
   { href: "/app", label: "Hoje", icon: "home" },
@@ -64,7 +65,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </aside>
 
       <div className="min-w-0">
-        <header className="gutter sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-bg/90 py-3 backdrop-blur">
+        <div className="sticky top-0 z-20">
+        <DemoBanner />
+        <header className="gutter flex items-center justify-between gap-3 border-b border-line bg-bg/90 py-3 backdrop-blur">
           <Link href="/app" className="flex min-w-0 items-center gap-2 md:hidden"><BrandMark name={brandName} logoUrl={logo} size={32} /><span className="truncate font-serif font-semibold">{brandName}</span></Link>
           <div className="hidden text-sm text-muted md:block">
             Sua página pública:{" "}
@@ -80,6 +83,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </Link>
           </div>
         </header>
+        </div>
         <main className="gutter pb-28 pt-6 md:pb-12">{children}</main>
         <Link href="/app/agendar" className="fixed bottom-20 right-4 z-30 inline-flex size-14 items-center justify-center rounded-full bg-primary text-2xl text-on-primary shadow-soft md:hidden" aria-label="Novo agendamento">+</Link>
       </div>

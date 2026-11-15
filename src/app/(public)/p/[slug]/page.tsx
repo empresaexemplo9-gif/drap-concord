@@ -8,16 +8,15 @@ import { Fragment } from "react";
 import { PlaceCard } from "@/components/map/place-card";
 import { directionLinks } from "@/lib/directions";
 import { db } from "@/lib/db";
-import { getImpersonator } from "@/lib/auth";
+import { proVisibility } from "@/lib/visibility";
 import { availableSlots } from "@/lib/booking";
 import { professionalConfig } from "@/lib/profiles/registry";
 import { fmt, modalityLabel, money } from "@/lib/format";
 
 async function load(slug: string) {
-  // Profissionais de prévia (não públicos) só abrem para o admin no "Ver como".
-  const admin = await getImpersonator();
+  // Páginas ocultas só abrem para o admin no "Ver como" e para quem é da organização.
   return db.professional.findFirst({
-    where: { slug, ...(admin ? {} : { isPublic: true }) },
+    where: { slug, ...(await proVisibility()) },
     include: {
       profile: true,
       services: { where: { active: true }, orderBy: { priceCents: "asc" } },

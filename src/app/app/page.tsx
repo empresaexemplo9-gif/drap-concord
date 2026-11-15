@@ -8,12 +8,13 @@ import { db } from "@/lib/db";
 import { tenant } from "@/lib/tenant";
 import { professionalConfig } from "@/lib/profiles/registry";
 import { dateLong, money } from "@/lib/format";
+import { ScrollToTop } from "@/components/scroll-to-top";
 
 export const metadata = { title: "Hoje" };
 
-export default async function Hoje({ searchParams }: { searchParams: Promise<{ bemvindo?: string }> }) {
+export default async function Hoje({ searchParams }: { searchParams: Promise<{ bemvindo?: string; demo?: string }> }) {
   const { professional, orgId } = await requireProfessional();
-  const { bemvindo } = await searchParams;
+  const { bemvindo, demo } = await searchParams;
   const tz = professional.timezone;
   const cfg = await professionalConfig(professional);
   const t = cfg.terminology;
@@ -34,6 +35,7 @@ export default async function Hoje({ searchParams }: { searchParams: Promise<{ b
 
   return (
     <>
+      {demo && <ScrollToTop />}
       {bemvindo && (
         <div className="mb-6">
           <Alert tone="success">

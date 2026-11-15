@@ -857,3 +857,48 @@ test("explorar no globo 3D: profissionais no globo, busca com voo até o local e
   await expect(card.getByRole("link", { name: "Agendar" })).toHaveAttribute("href", "/p/ana-ribeiro/agendar");
   await ctx.close();
 });
+
+test("profissional testa sem cadastro: escolhe a profissão, usa o app, vê como cliente e sai", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Testar sem cadastro" }).first().click();
+  await expect(page).toHaveURL(/\/experimentar/);
+  await expect(page.getByRole("heading", { name: "Teste a plataforma como se fosse sua" })).toBeVisible();
+
+  // Cada profissão mostra os serviços que já vêm prontos.
+  const card = page.getByRole("group").first();
+  await expect(card.getByText("Serviços que já vêm prontos")).toBeVisible();
+  await card.getByPlaceholder("Seu nome (opcional)").fill("Paula Teste");
+  await card.getByRole("button", { name: /^Testar como / }).click();
+
+  // Entra direto no app do profissional, com dados de exemplo.
+  await expect(page).toHaveURL(/\/app/);
+  const banner = page.getByRole("region", { name: "Modo demonstração" });
+  await expect(banner).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Olá, Paula/ })).toBeVisible();
+  await page.goto("/app/clientes");
+  await expect(page.getByText("Laura Mendes").first()).toBeVisible();
+  await expect(page.getByText("Carlos Pereira").first()).toBeVisible();
+
+  // A página pública abre para o próprio profissional, mas não entra na vitrine.
+  await page.goto("/app");
+  const publicLink = page.getByRole("link", { name: /^\/p\// });
+  const href = (await publicLink.getAttribute("href"))!;
+  await page.goto(href);
+  await expect(page.getByRole("heading", { level: 1, name: "Paula Teste" })).toBeVisible();
+  await page.goto("/vitrine?q=Paula%20Teste");
+  await expect(page.getByRole("link", { name: "Paula Teste" })).toHaveCount(0);
+
+  // Alterna para o portal da cliente de exemplo e volta.
+  await banner.getByRole("button", { name: "Ver como meu cliente" }).click();
+  await expect(page).toHaveURL(/\/minha-conta/);
+  await expect(page.getByRole("region", { name: "Modo demonstração" })).toContainText("cliente de exemplo");
+  await page.getByRole("region", { name: "Modo demonstração" }).getByRole("button", { name: "Voltar ao profissional" }).click();
+  await expect(page).toHaveURL(/\/app/);
+
+  // Sair encerra a demonstração.
+  await page.getByRole("region", { name: "Modo demonstração" }).getByRole("button", { name: "Sair da demonstração" }).click();
+  await expect(page).toHaveURL(/\/experimentar/);
+  await expect(page.getByRole("region", { name: "Modo demonstração" })).toHaveCount(0);
+  await page.goto("/app");
+  await expect(page).toHaveURL(/\/entrar/);
+});

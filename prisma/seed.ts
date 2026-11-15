@@ -95,7 +95,7 @@ const DEMO_EMAILS = ["admin@concord.dev", "ana@concord.dev", "carlos@concord.dev
  */
 async function purgeDemoData() {
   const fake = await db.user.findMany({
-    where: { OR: [{ email: { in: DEMO_EMAILS } }, { isSandbox: true }] },
+    where: { OR: [{ email: { in: DEMO_EMAILS } }, { isSandbox: true, NOT: { email: { endsWith: "@demo.drapconcord.invalid" } } }] },
     select: { id: true, professional: { select: { orgId: true } } },
   });
   if (!fake.length) return;

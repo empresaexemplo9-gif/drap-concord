@@ -5,6 +5,7 @@ import { UserTheme } from "@/components/user-theme";
 import { requireUser } from "@/lib/auth";
 import { accessLabel } from "@/lib/format";
 import { logout } from "../(auth)/actions";
+import { DemoBanner } from "@/components/demo-banner";
 
 const items: NavItem[] = [
   { href: "/minha-conta", label: "Agendamentos", icon: "calendar" },
@@ -18,6 +19,7 @@ export default async function ClientLayout({ children }: { children: React.React
   return (
     <div className="min-h-dvh">
       <UserTheme />
+      <div className="sticky top-0 z-20"><DemoBanner /></div>
       <header className="border-b border-line/60">
         <div className="gutter flex items-center justify-between py-4">
           <Brand href="/minha-conta" />

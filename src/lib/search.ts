@@ -24,6 +24,7 @@ export async function searchProfessionals(p: SearchParams) {
 
   const where: Prisma.ProfessionalWhereInput = {
     isPublic: true,
+    user: { isSandbox: false },
     ...(near ? { latitude: { not: null }, longitude: { not: null } } : {}),
     ...(profileIds ? { profileId: { in: profileIds } } : {}),
     ...(p.cidade ? { city: { contains: p.cidade.trim(), mode: "insensitive" } } : {}),
