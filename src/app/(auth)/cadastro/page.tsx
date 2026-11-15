@@ -35,6 +35,9 @@ export default async function Cadastro({ searchParams }: { searchParams: Promise
         <SubmitButton className="w-full" pendingText="Criando…">Criar minha conta</SubmitButton>
       </form>
       <p className="mt-6 text-center text-sm text-muted">
+        Quer conhecer antes? <Link href="/experimentar" className="font-semibold text-primary hover:underline">Teste sem cadastro</Link>
+      </p>
+      <p className="mt-2 text-center text-sm text-muted">
         Já tem conta? <Link href="/entrar" className="font-semibold text-primary hover:underline">Entrar</Link>
       </p>
     </Card>

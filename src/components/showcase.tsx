@@ -171,7 +171,10 @@ export async function Showcase({ sp, basePath }: { sp: SearchParams; basePath: s
             <h2 className="text-2xl font-semibold">Você atende pessoas?</h2>
             <p className="mt-1 opacity-90">Agenda, lembretes, fichas e página própria, configurados para a sua profissão em minutos.</p>
           </div>
-          <Link href="/cadastro" className="inline-flex min-h-11 items-center rounded-xl bg-on-primary px-5 font-semibold text-primary">Começar grátis</Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/experimentar" className="inline-flex min-h-11 items-center rounded-xl border border-on-primary/40 px-5 font-semibold text-on-primary hover:bg-on-primary/10">Testar sem cadastro</Link>
+            <Link href="/cadastro" className="inline-flex min-h-11 items-center rounded-xl bg-on-primary px-5 font-semibold text-primary">Começar grátis</Link>
+          </div>
         </Card>
       </Scene>
     </>

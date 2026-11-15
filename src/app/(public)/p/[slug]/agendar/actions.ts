@@ -8,13 +8,12 @@ import { createSession, getUser, hashPassword } from "@/lib/auth";
 import { book, BookingError } from "@/lib/booking";
 import { professionalConfig } from "@/lib/profiles/registry";
 import { rateLimit } from "@/lib/ratelimit";
-import { getImpersonator } from "@/lib/auth";
+import { proVisibility } from "@/lib/visibility";
 import { notify } from "@/lib/notify";
 import { answersFromForm, missingAnswers, priorityLabel } from "@/lib/triage/engine";
 import { careTypesFor, outcomeOf, saveTriage } from "@/lib/triage/service";
 
-const visiblePro = async (slug: string) =>
-  db.professional.findFirst({ where: { slug, ...((await getImpersonator()) ? {} : { isPublic: true }) } });
+const visiblePro = async (slug: string) => db.professional.findFirst({ where: { slug, ...(await proVisibility()) } });
 
 /** Salva a triagem respondida e segue para a recomendação + horários. */
 export async function submitTriage(form: FormData) {

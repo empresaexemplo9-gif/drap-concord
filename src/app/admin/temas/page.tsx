@@ -45,7 +45,7 @@ export default async function Temas({ searchParams }: { searchParams: Promise<{ 
   const [themes, profileRows, sample] = await Promise.all([
     allThemes(),
     db.professionProfile.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, theme: { select: { name: true } } } }),
-    db.professional.findMany({ where: { isPublic: true }, select: { slug: true, profileId: true }, distinct: ["profileId"] }),
+    db.professional.findMany({ where: { isPublic: true, user: { isSandbox: false } }, select: { slug: true, profileId: true }, distinct: ["profileId"] }),
   ]);
   const profiles = profileRows.map((p) => ({ id: p.id, name: p.name, themeName: p.theme?.name ?? null }));
   const sampleByProfile = new Map(sample.map((s) => [s.profileId, s.slug]));

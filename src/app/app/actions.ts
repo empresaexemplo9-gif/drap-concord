@@ -239,7 +239,7 @@ export async function undoRuleEvent(form: FormData) {
 // ---------- Perfil ----------
 
 export async function saveProfile(form: FormData) {
-  const { professional } = await requireProfessional();
+  const { professional, user } = await requireProfessional();
   const slug = slugify(str(form, "slug")) || professional.slug;
   if (slug !== professional.slug && (await db.professional.findUnique({ where: { slug } }))) {
     fail("/app/perfil", "Esse endereço já está em uso. Escolha outro.");
@@ -254,7 +254,8 @@ export async function saveProfile(form: FormData) {
       city: str(form, "city") || null,
       specialties: str(form, "specialties").split(",").map((s) => s.trim()).filter(Boolean),
       registryNumber: str(form, "registryNumber") || null,
-      isPublic: form.get("isPublic") === "on",
+      // Demonstração e prévia nunca ficam públicas.
+      isPublic: form.get("isPublic") === "on" && !user.isSandbox,
     },
   });
   redirect("/app/perfil?ok=1");

@@ -15,9 +15,8 @@ const hash = (token: string) => createHash("sha256").update(token).digest("hex")
 export const hashPassword = (pw: string) => bcrypt.hash(pw, 10);
 export const verifyPassword = (pw: string, h: string) => bcrypt.compare(pw, h);
 
-export async function createSession(userId: string) {
+export async function createSession(userId: string, expiresAt = new Date(Date.now() + TTL_DAYS * 86_400_000)) {
   const token = randomBytes(32).toString("base64url");
-  const expiresAt = new Date(Date.now() + TTL_DAYS * 86_400_000);
   await db.session.create({ data: { id: hash(token), userId, expiresAt } });
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,

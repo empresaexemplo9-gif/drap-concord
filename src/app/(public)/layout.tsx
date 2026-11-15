@@ -2,18 +2,21 @@ import Link from "next/link";
 import { Brand, ButtonLink } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { getUser } from "@/lib/auth";
+import { DemoBanner } from "@/components/demo-banner";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
   const home = user?.role === "CLIENT" ? "/minha-conta" : user?.role === "PLATFORM_ADMIN" ? "/admin/perfis" : "/app";
   return (
     <div className="flex min-h-dvh flex-col">
+      <div className="sticky top-0 z-20"><DemoBanner /></div>
       <header className="relative z-10 border-b border-line/60 bg-card/80">
         <div className="gutter flex items-center justify-between gap-3 py-4">
           <Brand />
           <nav className="flex items-center gap-1 text-sm">
             <Link href="/explorar" className="hidden min-h-11 items-center rounded-xl px-3 font-semibold text-primary hover:bg-surface md:inline-flex">Explorar no globo</Link>
             <Link href="/baixar" className="hidden min-h-11 items-center rounded-xl px-3 font-semibold text-primary hover:bg-surface md:inline-flex">Baixar o app</Link>
+            {!user && <Link href="/experimentar" className="hidden min-h-11 items-center rounded-xl px-3 font-semibold text-primary hover:bg-surface lg:inline-flex">Testar sem cadastro</Link>}
             <ThemeToggle />
             {user ? (
               <ButtonLink href={home} variant="secondary">Minha área</ButtonLink>
@@ -34,6 +37,7 @@ export default async function PublicLayout({ children }: { children: React.React
             <Link href="/explorar" className="hover:text-ink">Explorar no globo</Link>
             <Link href="/baixar" className="hover:text-ink">Baixar o app</Link>
             <Link href="/cadastro" className="hover:text-ink">Para profissionais</Link>
+            <Link href="/experimentar" className="hover:text-ink">Testar sem cadastro</Link>
             <Link href="/termos" className="hover:text-ink">Termos de uso</Link>
             <Link href="/privacidade" className="hover:text-ink">Privacidade</Link>
           </nav>

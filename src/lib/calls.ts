@@ -10,7 +10,7 @@ import { notify } from "./notify";
 
 export class CallError extends Error {}
 
-export type CallUser = { id: string; name: string; role: string; memberships: { orgId: string }[] };
+export type CallUser = { id: string; name: string; role: string; isSandbox?: boolean; memberships: { orgId: string }[] };
 export type Contact = { id: string; name: string; email: string; label: string };
 
 /** Ring vale por este tempo; depois a chamada aparece como perdida. */
@@ -44,7 +44,8 @@ export async function contactsFor(user: CallUser): Promise<Contact[]> {
   ]);
   const out = new Map<string, Contact>();
   const add = (u: { id: string; name: string; email: string; isSandbox: boolean } | null, label: string) => {
-    if (u && u.id !== user.id && !u.isSandbox && !out.has(u.id)) out.set(u.id, { id: u.id, name: u.name, email: u.email, label });
+    // Contas de prévia ficam fora, exceto entre contas da mesma demonstração (já restritas à organização).
+    if (u && u.id !== user.id && (!u.isSandbox || user.isSandbox) && !out.has(u.id)) out.set(u.id, { id: u.id, name: u.name, email: u.email, label });
   };
   team.forEach((m) => add(m.user, m.role === "OWNER" ? "Profissional" : "Equipe"));
   clients.forEach((c) => add(c.user, "Cliente"));

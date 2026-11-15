@@ -28,6 +28,10 @@ export default async function Entrar({ searchParams }: { searchParams: Promise<{
         {" · "}
         <Link href="/cadastro" className="font-semibold text-primary underline-offset-4 hover:underline">Sou profissional</Link>
       </p>
+      <p className="mt-2 text-center text-sm text-muted">
+        É profissional e quer conhecer antes?{" "}
+        <Link href="/experimentar" className="font-semibold text-primary underline-offset-4 hover:underline">Teste sem cadastro</Link>
+      </p>
     </Card>
   );
 }
