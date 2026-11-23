@@ -7,6 +7,7 @@ import { THEME_COOKIE } from "@/lib/theme";
 import { RealtimeProvider } from "@/components/realtime";
 import { getUser } from "@/lib/auth";
 import "./globals.css";
+import { AvisoLegal } from "@/components/aviso-legal";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 // Fontes opcionais da marca do profissional: só baixam quando usadas.
@@ -55,6 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
         <ViewAsBanner />
         {user ? <RealtimeProvider>{children}</RealtimeProvider> : children}
+        <AvisoLegal />
         <PwaClient />
       </body>
     </html>

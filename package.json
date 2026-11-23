@@ -51,5 +51,7 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
-  }
+  },
+  "license": "UNLICENSED",
+  "author": "DRAP INTELIGENCIA DE MERCADO LTDA (CNPJ 64.759.314/0001-55)"
 }
